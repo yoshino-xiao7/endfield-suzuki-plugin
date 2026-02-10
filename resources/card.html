@@ -1,70 +1,101 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <link rel="stylesheet" href="{{_res_path}}/resources/style.css">
     <title>Endfield Characters</title>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="header-title">
-                <img src="{{player.avatar}}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                <span>{{player.name}}</span>
-                <span style="font-size: 14px; background: #333; padding: 2px 8px; border-radius: 10px; color: #aaa;">Lv.{{player.level}}</span>
+            <div class="header-left">
+                <img src="{{player.avatar}}" class="header-avatar">
+                <div>
+                    <div class="header-title">{{player.name}}</div>
+                    <div class="header-subtitle">Lv.{{player.level}} • World {{player.worldLevel}}</div>
+                </div>
             </div>
-            <div class="header-info">
-                <div>UID: {{player.uid}}</div>
+            <div class="header-right">
+                <div class="uid-badge">UID: {{player.uid}}</div>
                 <div>干员数: {{player.charNum}}</div>
-                <div style="font-size: 10px; margin-top: 2px;">更新于: {{player.updateTime}}</div>
+                <div style="margin-top: 4px;">{{player.updateTime}}</div>
             </div>
         </div>
 
-        <!-- Character Grid -->
+        <!-- Character List -->
         <div class="char-list">
-            {{each characters char i}}
+            {{each characters char}}
             <div class="char-card rarity-{{char.rarity}}">
-                <!-- Avatar -->
-                <img class="char-avatar" src="{{char.avatar}}">
-                
-                <!-- Info -->
-                <div class="char-info">
-                    <div class="char-header">
-                        <span class="char-name">{{char.name}}</span>
-                        <span class="char-level">Lv.{{char.level}}</span>
-                        <span class="char-prof">{{char.profession}} · {{char.property}}</span>
-                    </div>
 
-                    <!-- Equipment / Weapon -->
-                    <div class="char-equip">
+                <!-- Col 1: Basic Info -->
+                <div class="col-info">
+                    <div class="char-avatar-container">
+                        <img class="char-avatar" src="{{char.avatar}}">
+                        <div class="char-evolve">E{{char.evolvePhase}}</div>
+                    </div>
+                    <div class="char-name">{{char.name}}</div>
+                    <div class="char-meta">
+                        <span class="char-level">Lv.{{char.level}}</span>
+                        <span>{{char.profession}}</span>
+                    </div>
+                </div>
+
+                <!-- Col 2: Equipment -->
+                <div class="col-equip">
+                    <!-- Weapon -->
+                    <div class="weapon-row">
                         {{if char.weapon}}
-                        <div class="weapon-section">
-                            <span style="color: #aaa;">武器</span>
+                        <img class="weapon-icon" src="{{char.weapon.icon}}">
+                        <div class="weapon-info">
+                            <span class="weapon-name">{{char.weapon.name}}</span>
+                            <span class="weapon-level">Lv.{{char.weapon.level}}</span>
                         </div>
-                        <div class="equip-item">
-                            {{if char.weapon.icon}}<img class="equip-icon" src="{{char.weapon.icon}}">{{/if}}
-                            <span class="equip-name">{{char.weapon.name}}</span>
-                            <span style="color: #ffcc00; font-size: 10px;">Lv.{{char.weapon.level}}</span>
-                        </div>
+                        {{else}}
+                        <div class="weapon-icon" style="opacity: 0.3;"></div>
+                        <span class="weapon-name" style="color: #555;">未装备</span>
                         {{/if}}
                     </div>
 
-                    <!-- Tags -->
-                    <div class="char-tags">
-                        {{each char.tags tag}}
-                        <span class="tag">{{tag}}</span>
+                    <!-- Equipment Slots (Armor -> Accessories) -->
+                    <div class="equip-row">
+                        {{each char.equips equip}}
+                        <div class="equip-item">
+                            <img class="equip-img" src="{{equip.icon}}">
+                            <div class="equip-level">{{equip.level}}</div>
+                        </div>
                         {{/each}}
+                        <!-- Fill empty slots if less than 5 items (Body, Arm, Acc1, Acc2, Tactical) -->
+                        <% for(var i=char.equips.length; i < 5; i++){ %>
+                            <div class="empty-slot"></div>
+                            <% } %>
                     </div>
                 </div>
+
+                <!-- Col 3: Skills -->
+                <div class="col-skills">
+                    {{each char.skills skill}}
+                    <div class="skill-item">
+                        <div class="skill-icon-container">
+                            <img class="skill-img" src="{{skill.icon}}">
+                        </div>
+                        <div class="skill-level {{if skill.level >= skill.maxLevel}}max{{/if}}">{{skill.level}}</div>
+                        <!-- <div class="skill-type">{{skill.type}}</div> -->
+                    </div>
+                    {{/each}}
+                </div>
+
             </div>
             {{/each}}
         </div>
 
         <!-- Footer -->
         <div class="footer">
-            Created by Endfield Suzuki Plugin
+            Powered by Endfield Suzuki Plugin
         </div>
     </div>
 </body>
+
 </html>

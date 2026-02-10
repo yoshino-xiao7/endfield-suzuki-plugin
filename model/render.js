@@ -30,21 +30,77 @@ export default class Render {
                 updateTime: formatTime(Date.now())
             },
             characters: chars.map(c => {
-                const char = c.charData
-                const equip = c.weapon?.weaponData
+                const char = c.charData || {}
+                const weapon = c.weapon?.weaponData
+                const evolvePhase = c.evolvePhase || 0
+
+                // Process Skills
+                const skillList = (char.skills || []).map(skill => {
+                    const userSkill = (c.userSkills || {})[skill.id] || {}
+                    return {
+                        name: skill.name,
+                        icon: skill.iconUrl,
+                        type: skill.type?.value, // e.g. "普通攻击", "战技"
+                        level: userSkill.level || 1,
+                        maxLevel: userSkill.maxLevel || '?'
+                    }
+                })
+
+                // Process Weapon
+                let weaponData = null
+                if (c.weapon) {
+                    const wd = c.weapon.weaponData
+                    if (wd) {
+                        weaponData = {
+                            name: wd.name,
+                            icon: wd.iconUrl,
+                            rarity: wd.rarity?.value,
+                            level: c.weapon.level
+                        }
+                    }
+                }
+
+                // Process Other Equipment
+                const otherEquips = [
+                    c.bodyEquip,
+                    c.armEquip,
+                    c.firstAccessory,
+                    c.secondAccessory,
+                    c.tacticalItem
+                ].map(eq => {
+                    if (!eq) return null
+                    const data = eq.equipData || eq.tacticalItemData
+
+                    // Determine level
+                    let level = 1
+                    if (eq.level) {
+                        level = eq.level // Weapon or top-level level
+                    } else if (data && data.level && data.level.value) {
+                        level = data.level.value // Equipment inner level object
+                    } else if (eq.activeEffect) {
+                        level = '' // Tactical item usually doesn't show level like others
+                    }
+
+                    return data ? {
+                        name: data.name,
+                        icon: data.iconUrl,
+                        rarity: data.rarity?.value,
+                        level: level
+                    } : null
+                }).filter(Boolean)
 
                 return {
                     name: char.name,
                     level: c.level,
-                    rarity: char.rarity?.value || '5', // Assuming typical rarity values
+                    rarity: char.rarity?.value || '5',
                     profession: char.profession?.value || '',
                     property: char.property?.value || '',
-                    avatar: char.avatarSqUrl || char.avatarRtUrl, // Prefer square avatar
-                    weapon: {
-                        name: equip?.name || '未知武器',
-                        icon: equip?.iconUrl,
-                        level: c.weapon?.level
-                    },
+                    avatar: char.avatarSqUrl || char.avatarRtUrl,
+                    potential: c.potentialLevel || 0,
+                    evolvePhase,
+                    weapon: weaponData,
+                    equips: otherEquips,
+                    skills: skillList,
                     tags: char.tags || []
                 }
             })
