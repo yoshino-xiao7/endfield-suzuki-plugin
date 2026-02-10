@@ -17,7 +17,7 @@
 - 兼容 [锅巴面板](https://github.com/guoba-yunzai/guoba-plugin) 可视化配置
 
 > [!TIP]
-> 如有问题或建议，欢迎提 [Issue](https://github.com/yukiryou/endfield-suzuki-plugin/issues) 反馈 ✨
+> 如有问题或建议，欢迎提 [Issue](https://github.com/yoshino-xiao7/endfield-suzuki-plugin/issues) 反馈 ✨
 
 ## 使用须知
 
@@ -36,7 +36,7 @@
 在 Yunzai 根目录执行：
 
 ```bash
-git clone https://github.com/yukiryou/endfield-suzuki-plugin ./plugins/endfield-plugin/
+git clone https://github.com/yoshino-xiao7/endfield-suzuki-plugin ./plugins/endfield-plugin/
 ```
 
 ### 2. 配置 API Key
@@ -101,7 +101,7 @@ autoSignEnabled: true         # 开启自动签到
 | `apiKey` | `''` | **必填** · Endfield Cloud API Key |
 | `apiBaseUrl` | `https://api.suzuki.ink/api` | API 地址 |
 | `autoSignEnabled` | `true` | 是否开启自动签到 |
-| `autoSignCron` | `0 5 8 * * ?` | 自动签到 Cron 表达式（默认每天 08:05） |
+| `autoSignTime` | `08:05` | 自动签到时间（HH:MM 格式，如 `08:05` 表示每天 8:05） |
 
 ### 目录结构
 
@@ -129,7 +129,7 @@ plugins/endfield-plugin/
 ## 特性
 
 - 🔑 **双重绑定方式**：Token 一步绑定 / 手机验证码两步绑定
-- ⏰ **自动签到**：Cron 定时任务，每天自动为所有用户签到
+- ⏰ **自动签到**：支持自定义时间（HH:MM 格式），每天自动为所有用户签到
 - 🔄 **凭证自动刷新**：请求失败时自动刷新凭证并重试，减少手动操作
 - 🔒 **隐私保护**：群聊中发送敏感信息时自动提醒私聊，并尝试撤回消息
 - ⚙️ **锅巴面板**：可通过可视化界面管理所有配置项
