@@ -1,6 +1,7 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import api from '../model/api.js'
 import data from '../model/data.js'
+import Render from '../model/render.js'
 
 export class CardApp extends plugin {
     constructor() {
@@ -20,17 +21,13 @@ export class CardApp extends plugin {
         if (!bindingId) return e.reply('❌ 请先绑定: 私聊发送 #终末地绑定 <token>')
 
         try {
-            const { data: result, refreshed } = await api.requestWithAutoRefresh('/skland/endfield/card')
-            const card = result.data
+            e.reply('⏳ 正在获取终末地数据...')
+            const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card')
 
-            let msg = '🎮 终末地角色信息\n'
-            if (card.nickname) msg += `👤 昵称: ${card.nickname}\n`
-            if (card.level) msg += `📊 等级: ${card.level}\n`
-            if (card.uid) msg += `🆔 UID: ${card.uid}\n`
-            // 根据实际返回字段扩展更多信息
-            if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
+            // Render image
+            const img = await Render.render(result.data)
+            e.reply(img)
 
-            e.reply(msg)
         } catch (err) {
             if (err.message.includes('失效') || err.message.includes('重新绑定')) {
                 e.reply(`❌ ${err.message}\n请私聊发送 #终末地绑定 <新token> 重新绑定`)

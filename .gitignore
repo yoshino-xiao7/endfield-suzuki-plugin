@@ -13,6 +13,9 @@ data/
 !package.json
 !package-lock.json
 
+# 测试/调试数据
+数据.txt
+
 # 开发文档 (不需要发布)
 yunzai_plugin_guide.md
 
