@@ -1,0 +1,80 @@
+import plugin from '../../../lib/plugins/plugin.js'
+import api from '../model/api.js'
+import data from '../model/data.js'
+
+export class SigninApp extends plugin {
+    constructor() {
+        super({
+            name: 'Endfield签到',
+            event: 'message',
+            priority: 500,
+            rule: [
+                { reg: '^#(终末地|endfield)签到$', fnc: 'signin' },
+                { reg: '^#(终末地|endfield)刷新$', fnc: 'refresh' }
+            ]
+        })
+        // 自动签到定时任务
+        this.task = {
+            cron: api.config.autoSignCron || '0 5 8 * * ?',
+            name: 'Endfield自动签到',
+            fnc: () => this.autoSignAll()
+        }
+    }
+
+    async signin(e) {
+        const bindingId = data.getBindingId(e.user_id)
+        if (!bindingId) return e.reply('❌ 请先绑定: 私聊发送 #终末地绑定 <token>')
+
+        try {
+            // 使用自动刷新封装，凭证过期时自动重试
+            const { data: result, refreshed } = await api.requestWithAutoRefresh(
+                `/skland/bindings/${bindingId}/signin`, 'POST'
+            )
+            let msg = '✅ 签到成功！'
+            if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
+            if (result.data?.awards) msg += `\n🎁 ${JSON.stringify(result.data.awards)}`
+            e.reply(msg)
+        } catch (err) {
+            if (err.message.includes('重复') || err.message.includes('已签')) {
+                e.reply('📋 今日已签到')
+            } else if (err.message.includes('失效') || err.message.includes('重新绑定')) {
+                e.reply(`❌ ${err.message}\n请私聊发送 #终末地绑定 <新token> 重新绑定`)
+            } else {
+                e.reply(`❌ 签到失败: ${err.message}`)
+            }
+        }
+    }
+
+    // ========== 手动刷新凭证 ==========
+    async refresh(e) {
+        try {
+            await api.refreshCred()
+            e.reply('✅ 凭证刷新成功！')
+        } catch (err) {
+            e.reply(`❌ 刷新失败: ${err.message}\n如果持续失败，请重新绑定`)
+        }
+    }
+
+    async autoSignAll() {
+        if (!api.config.autoSignEnabled) return
+        const all = data.getAll()
+        logger.info(`[Endfield] 自动签到: ${all.length} 人`)
+        for (const { qq, bindingId } of all) {
+            try {
+                const { refreshed } = await api.requestWithAutoRefresh(
+                    `/skland/bindings/${bindingId}/signin`, 'POST'
+                )
+                logger.info(`[Endfield] ✅ QQ=${qq}${refreshed ? ' (凭证已刷新)' : ''}`)
+            } catch (err) {
+                if (err.message.includes('失效')) {
+                    logger.warn(`[Endfield] ❌ QQ=${qq}: 凭证失效，需重新绑定`)
+                    // 可选: 私聊通知用户
+                    // Bot.pickUser(qq).sendMsg('❌ 终末地自动签到失败: 凭证已失效，请重新绑定')
+                } else {
+                    logger.warn(`[Endfield] ❌ QQ=${qq}: ${err.message}`)
+                }
+            }
+            await new Promise(r => setTimeout(r, 5000))
+        }
+    }
+}

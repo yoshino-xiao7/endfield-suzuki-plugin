@@ -1,0 +1,5 @@
+# 默认配置 (用户配置为 config/config.yaml)
+apiBaseUrl: https://api.suzuki.ink/api
+apiKey: ''                    # 管理员的 API Key (必填)
+autoSignCron: '0 5 8 * * ?'  # 自动签到时间
+autoSignEnabled: true         # 是否开启自动签到
