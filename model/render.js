@@ -131,6 +131,26 @@ export default class Render {
             totalHiddenCount: totalHiddenCount // 传递隐藏数量给 HTML
         }
 
+        // Helper to resize images
+        const resize = (url, size = 100) => {
+            if (!url) return ''
+            if (url.includes('x-oss-process')) return url
+            return `${url}?x-oss-process=image/resize,s_${size}`
+        }
+
+        // Apply resize to all image URLs
+        renderData.player.avatar = resize(renderData.player.avatar, 200)
+        renderData.characters.forEach(c => {
+            c.avatar = resize(c.avatar, 300)
+            if (c.weapon) c.weapon.icon = resize(c.weapon.icon, 100)
+            c.equips.forEach(eq => {
+                if (eq) eq.icon = resize(eq.icon, 100)
+            })
+            c.skills.forEach(s => {
+                s.icon = resize(s.icon, 100)
+            })
+        })
+
         // Read CSS file
         const cssPath = path.join(PLUGIN_ROOT, 'resources', 'style.css')
         let css = ''
