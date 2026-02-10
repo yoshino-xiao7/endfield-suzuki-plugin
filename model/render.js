@@ -109,35 +109,55 @@ export default class Render {
         // Generate HTML
         const html = generateHtml(renderData)
 
-        // Read CSS file to inject directly
+        // Read CSS file
         const cssPath = path.join(PLUGIN_ROOT, 'resources', 'style.css')
         const css = fs.readFileSync(cssPath, 'utf8')
 
         // Generate Image using Yunzai puppeteer
+        // We will READ the html template manually, and use art-template to render it to a string
+        // Then pass the full HTML to puppeteer. 
+        // This avoids any "tplFile" or parameter passing issues.
+
+        // Import template engine (Yunzai usually has it or we can use a simple replace if not)
+        // Actually, let's stick to the `puppeteer.screenshot` capabilities.
+
+        // Fix: The previous attempt with `style` param relies on the template correctly using it.
+        // It seems `tplFile` is used.
+        // Let's try to verify if `puppeteer.screenshot` in Yunzai supports `style` param for <style> injection?
+        // Usually it expects `html` or `tplFile`.
+        // If we want to be 100% sure, we should read the HTML template, 
+        // manually replace a placeholder with the CSS, and then save it to a temp file or pass as html.
+
+        // Let's blindly trust `art-template` is available since `resources/card.html` uses it.
+        // But maybe `puppeteer.screenshot` doesn't pass `style` variable correctly if it's not in `data`?
+        // We put `style: css` in the object spread `...renderData`.
+        // `renderData` has `player` and `characters`. 
+        // So `style` should be available as `style` in template.
+        // `{{@style}}` should work.
+
+        // Is it possible `style.css` content is somehow broken or causing parser error?
+        // Or maybe `38730` height is actually CORRECT for 1 column if grid failed?
+        // Yes.
+
+        // Let's Try: 
+        // 1. Rename `style` to `css` in variable to avoid conflict?
+        // 2. Embed CSS directly in `render.js` to debug?
+        // 3. FORCE `width` in `img` tag?
+
+        // BETTER: We will write the CSS *into* a temporary HTML file that has the link to it?
+        // No, file access issues.
+
+        // Let's try to pass the CSS as a string property named `css` instead of `style`
+        // and update template. `style` might be a reserved keyword in some context?
+
         const img = await puppeteer.screenshot('endfield-suzuki-plugin', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'card.html'),
             saveId: 'card',
             imgType: 'jpeg',
             quality: 90,
-            style: css,
+            cardCss: css, // Changed variable name
             ...renderData
         })
-
-        // DEBUG: Save debug files
-        fs.writeFileSync(path.join(PLUGIN_ROOT, 'debug_card.html'), JSON.stringify(html, null, 2) || 'No HTML gen?') // generateHtml returns renderData, template does HTML
-        // Wait, generateHtml returned DATA, not HTML string. The logic above usage was confusing.
-        // But we can check if `img` is valid.
-        if (img) {
-            // img is base64 or segment. 
-            // If it's a segment object, it might be { type: 'image', file: ... } 
-            // Yunzai puppeteer.screenshot usually returns a segment object for direct reply
-            // OR a base64 string if configured?
-            // Let's log the type.
-            logger.info(`[Endfield] Generated image type: ${typeof img}`)
-            if (typeof img === 'object') logger.info(`[Endfield] Image msg: ${JSON.stringify(img).slice(0, 100)}`)
-        } else {
-            logger.error('[Endfield] Generated image is Empty!')
-        }
 
         return img
     }
