@@ -42,7 +42,7 @@ class EndfieldApi {
         }
 
         const data = await res.json()
-        logger.debug(`[Endfield] ${method} ${reqPath} => code=${data.code}, success=${data.success}, message=${data.message}`)
+        logger.info(`[Endfield] ${method} ${reqPath} => ${JSON.stringify(data)}`)
 
         // 检查业务状态码
         if (data.code !== 200 || data.success === false) {
