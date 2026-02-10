@@ -4,7 +4,8 @@
 <head>
     <meta charset="utf-8">
     <style>
-        {
+        /* 这里的变量由插件替换，保持原样 */
+            {
                 {
                 @cardCss
             }
@@ -15,7 +16,6 @@
 
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <div class="header-left">
                 <img src="{{player.avatar}}" class="header-avatar">
@@ -26,17 +26,15 @@
             </div>
             <div class="header-right">
                 <div class="uid-badge">UID: {{player.uid}}</div>
-                <div>干员数: {{player.charNum}}</div>
+                <div>Total Agents: {{player.charNum}}</div>
                 <div style="margin-top: 4px;">{{player.updateTime}}</div>
             </div>
         </div>
 
-        <!-- Character List -->
         <div class="char-list">
             {{each characters char}}
             <div class="char-card rarity-{{char.rarity}}">
 
-                <!-- Col 1: Basic Info -->
                 <div class="col-info">
                     <div class="char-avatar-container">
                         <img class="char-avatar" src="{{char.avatar}}">
@@ -49,9 +47,7 @@
                     </div>
                 </div>
 
-                <!-- Col 2: Equipment -->
                 <div class="col-equip">
-                    <!-- Weapon -->
                     <div class="weapon-row">
                         {{if char.weapon}}
                         <img class="weapon-icon" src="{{char.weapon.icon}}">
@@ -65,7 +61,6 @@
                         {{/if}}
                     </div>
 
-                    <!-- Equipment Slots (Armor -> Accessories) -->
                     <div class="equip-row">
                         {{each char.equips equip}}
                         <div class="equip-item">
@@ -73,14 +68,12 @@
                             <div class="equip-level">{{equip.level}}</div>
                         </div>
                         {{/each}}
-                        <!-- Fill empty slots if less than 5 items (Body, Arm, Acc1, Acc2, Tactical) -->
                         <% for(var i=char.equips.length; i < 5; i++){ %>
                             <div class="empty-slot"></div>
                             <% } %>
                     </div>
                 </div>
 
-                <!-- Col 3: Skills -->
                 <div class="col-skills">
                     {{each char.skills skill}}
                     <div class="skill-item">
@@ -88,16 +81,24 @@
                             <img class="skill-img" src="{{skill.icon}}">
                         </div>
                         <div class="skill-level {{if skill.level >= skill.maxLevel}}max{{/if}}">{{skill.level}}</div>
-                        <!-- <div class="skill-type">{{skill.type}}</div> -->
                     </div>
                     {{/each}}
                 </div>
 
             </div>
             {{/each}}
+
+            {{if totalHiddenCount > 0}}
+            <div class="more-hint">
+                <div class="more-icon">+{{totalHiddenCount}}</div>
+                <div class="more-text">
+                    还有 {{totalHiddenCount}} 位干员未显示<br>
+                    <span style="font-size:12px; opacity:0.7">当前仅展示主力干员</span>
+                </div>
+            </div>
+            {{/if}}
         </div>
 
-        <!-- Footer -->
         <div class="footer">
             Powered by Endfield Suzuki Plugin
         </div>
