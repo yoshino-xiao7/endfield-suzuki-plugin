@@ -1,5 +1,5 @@
 /* Global Reset & Base Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
 
 * {
     margin: 0;
@@ -9,18 +9,24 @@
 
 body {
     font-family: 'Noto Sans SC', sans-serif;
-    color: #fff;
-    background: transparent; /* Transparent for overlaying on game images if needed, or just dark */
-    width: 800px; /* Standard width for generated image */
+    color: #e0e0e0;
+    background: transparent;
+    width: 1600px;
 }
 
 /* Main Container */
 .container {
-    background: #1a1a1e; /* Dark background similar to game UI */
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    background-image: linear-gradient(135deg, #2a2a30 0%, #1a1a1e 100%);
+    background: #141414;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+    background-image:
+        linear-gradient(180deg, rgba(30, 30, 35, 0.95) 0%, rgba(20, 20, 22, 0.98) 100%),
+        url('https://web.hycdn.cn/endfield/official/assets/images/kv_v2.jpg');
+    /* Optional background texture */
+    background-size: cover;
+    background-blend-mode: overlay;
+    border: 1px solid #333;
 }
 
 /* Header Section */
@@ -28,168 +34,323 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #ffcc00; /* Endfield yellow accent */
-    padding-bottom: 10px;
-    margin-bottom: 20px;
+    border-bottom: 2px solid #fbce06;
+    /* Endfield Yellow */
+    padding-bottom: 15px;
+    margin-bottom: 25px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #fbce06;
+    object-fit: cover;
 }
 
 .header-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #ffcc00;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-info {
-    font-size: 14px;
-    color: #aaa;
-    text-align: right;
-}
-
-.player-name {
+    font-size: 28px;
+    font-weight: 900;
     color: #fff;
-    font-weight: bold;
-    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-/* Character Grid */
+.header-subtitle {
+    font-size: 14px;
+    color: #888;
+    margin-top: 2px;
+}
+
+.header-right {
+    text-align: right;
+    font-size: 12px;
+    color: #666;
+}
+
+.uid-badge {
+    background: #fbce06;
+    color: #000;
+    font-weight: bold;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+/* Character List */
 .char-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
 }
 
 /* Individual Character Card */
 .char-card {
-    display: flex;
-    background: #25252b;
+    display: grid;
+    grid-template-columns: 100px 1fr 1fr;
+    background: linear-gradient(90deg, #1f1f23 0%, #25252b 100%);
     border: 1px solid #333;
-    border-radius: 8px;
+    border-left: 4px solid #444;
+    border-radius: 4px;
     padding: 10px;
-    align-items: center;
     position: relative;
     overflow: hidden;
+    height: 120px;
+    /* Fixed height to prevent expansion */
 }
 
-.char-card::before {
+/* Rarity Accents */
+.rarity-6 {
+    border-left-color: #fbce06;
+}
+
+.rarity-5 {
+    border-left-color: #fbce06;
+}
+
+.rarity-4 {
+    border-left-color: #a87bf3;
+}
+
+.rarity-3 {
+    border-left-color: #00b0ff;
+}
+
+.char-card::after {
     content: '';
     position: absolute;
     top: 0;
-    left: 0;
-    width: 4px;
-    height: 100%;
-    background: #444; /* Default rarity color */
+    right: 0;
+    bottom: 0;
+    width: 200px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02));
+    pointer-events: none;
 }
 
-.rarity-6::before { background: #ffcc00; } /* 6 star */
-.rarity-5::before { background: #ffcc00; } /* 5 star (Endfield uses yellow for high rarity too usually?) Adjust if needed */
-.rarity-4::before { background: #dcdcdc; } /* 4 star */
-.rarity-3::before { background: #a5a5a5; } /* 3 star */
+/* Column 1: Core Info */
+.col-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    border-right: 1px solid #333;
+    padding-right: 10px;
+}
 
-/* Avatar Section */
+.char-avatar-container {
+    position: relative;
+    width: 70px;
+    height: 70px;
+}
+
 .char-avatar {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    height: 100%;
     border-radius: 6px;
-    margin-right: 15px;
-    background: #111;
     object-fit: cover;
+    background: #111;
     border: 1px solid #444;
 }
 
-/* Info Section */
-.char-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.char-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+.char-evolve {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #000;
+    color: #fff;
+    font-size: 10px;
+    padding: 2px 4px;
+    border-radius: 2px;
+    border: 1px solid #333;
 }
 
 .char-name {
-    font-size: 18px;
+    font-size: 14px;
     font-weight: bold;
+    text-align: center;
+    line-height: 1.2;
+    color: #fff;
+}
+
+.char-meta {
+    font-size: 10px;
+    color: #888;
+    display: flex;
+    gap: 4px;
+    align-items: center;
 }
 
 .char-level {
-    font-size: 12px;
-    background: #444;
-    padding: 2px 6px;
-    border-radius: 4px;
+    color: #fbce06;
+}
+
+/* Column 2: Equipment */
+.col-equip {
+    display: flex;
+    flex-direction: column;
+    padding: 0 15px;
+    gap: 8px;
+    border-right: 1px solid #333;
+    justify-content: center;
+}
+
+.weapon-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.weapon-icon {
+    width: 36px;
+    height: 36px;
+    background: #111;
+    border: 1px solid #444;
+    border-radius: 2px;
+    object-fit: contain;
+    /* Items often transparent pngs */
+}
+
+.weapon-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.weapon-name {
+    font-size: 13px;
+    font-weight: bold;
     color: #ddd;
 }
 
-.char-prof {
-    font-size: 12px;
+.weapon-level {
+    font-size: 10px;
     color: #aaa;
+    background: #333;
+    padding: 0 4px;
+    border-radius: 2px;
+    align-self: flex-start;
 }
 
-/* Equipment Section */
-.char-equip {
+.equip-row {
     display: flex;
-    gap: 10px;
-    margin-top: 5px;
+    gap: 6px;
 }
 
 .equip-item {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    background: #18181a;
+    border: 1px solid #333;
+    border-radius: 2px;
     display: flex;
     align-items: center;
-    background: #333;
-    padding: 2px 5px;
-    border-radius: 4px;
-    font-size: 12px;
-    gap: 5px;
+    justify-content: center;
 }
 
-.equip-icon {
-    width: 20px;
-    height: 20px;
+.equip-img {
+    width: 28px;
+    height: 28px;
     object-fit: contain;
 }
 
-.equip-name {
-    color: #ddd;
+.equip-level {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #fff;
+    padding: 0 2px;
+    line-height: 1;
 }
 
-.weapon-section {
+/* Column 3: Skills */
+.col-skills {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12px;
-    color: #aaa;
-    border-right: 1px solid #444;
-    padding-right: 10px;
-    margin-right: 5px;
+    padding-left: 15px;
+    gap: 8px;
 }
 
-/* Skills/Tags Section (Optional) */
-.char-tags {
+.skill-item {
     display: flex;
-    gap: 5px;
-    margin-top: 5px;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
 }
 
-.tag {
+.skill-icon-container {
+    width: 36px;
+    height: 36px;
+    background: #18181a;
+    border: 1px solid #333;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.skill-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.skill-level {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    background: #222;
+    color: #88c0d0;
+    /* Blue for skill level */
     font-size: 10px;
-    padding: 1px 4px;
-    border: 1px solid #555;
-    border-radius: 2px;
-    color: #888;
+    font-weight: bold;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 1px solid #444;
 }
 
-/* Footer Section */
+.skill-level.max {
+    color: #fbce06;
+    /* Gold for max level */
+    border-color: #fbce06;
+}
+
+.skill-type {
+    font-size: 8px;
+    color: #666;
+    margin-top: 2px;
+}
+
+/* Empty Slots */
+.empty-slot {
+    width: 32px;
+    height: 32px;
+    background: #101012;
+    border: 1px dashed #333;
+    border-radius: 2px;
+}
+
+/* Footer */
 .footer {
     margin-top: 20px;
     text-align: center;
     font-size: 12px;
-    color: #666;
-    border-top: 1px solid #333;
+    color: #555;
+    border-top: 1px solid #222;
     padding-top: 10px;
 }
