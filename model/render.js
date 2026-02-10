@@ -2,23 +2,34 @@ import plugin from '../../../lib/plugins/plugin.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import path from 'path'
 import fs from 'fs'
+import { fileURLToPath } from 'url'
 
-const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
+// Compatible way to get plugin root directory
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PLUGIN_ROOT = path.resolve(__dirname, '..')
+
+function loadCss(filename) {
+    // Try absolute path first
+    const absPath = path.join(PLUGIN_ROOT, 'resources', filename)
+    try {
+        return fs.readFileSync(absPath, 'utf8')
+    } catch (e) {
+        logger.error(`[Endfield] CSS load failed from ${absPath}:`, e.message)
+    }
+    // Fallback: relative to Yunzai cwd
+    const cwdPath = path.join(process.cwd(), 'plugins', 'endfield-suzuki-plugin', 'resources', filename)
+    try {
+        return fs.readFileSync(cwdPath, 'utf8')
+    } catch (e2) {
+        logger.error(`[Endfield] Fallback CSS load also failed from ${cwdPath}:`, e2.message)
+    }
+    return ''
+}
 
 export default class Render {
     static async renderProfile(data) {
-        const cssPath = path.join(PLUGIN_ROOT, 'resources', 'profile.css')
-        let cardCss = ''
-        try {
-            cardCss = fs.readFileSync(cssPath, 'utf8')
-        } catch (e) {
-            logger.error(`[Endfield] Profile CSS load failed from ${cssPath}:`, e)
-            try {
-                cardCss = fs.readFileSync(path.join(process.cwd(), 'plugins/endfield-suzuki-plugin/resources/profile.css'), 'utf8')
-            } catch (e2) {
-                logger.error('[Endfield] Fallback Profile CSS load failed:', e2)
-            }
-        }
+        const cardCss = loadCss('profile.css')
 
         const base = data.detail.base
         const player = {
@@ -26,7 +37,7 @@ export default class Render {
             uid: base.roleId,
             level: base.level,
             worldLevel: base.worldLevel,
-            avatar: Render.resize(base.avatarUrl, 200),
+            avatar: base.avatarUrl || '',
             charNum: base.charNum,
             weaponNum: base.weaponNum,
             docNum: base.docNum,
@@ -42,18 +53,7 @@ export default class Render {
     }
 
     static async renderCharacter(data, charName) {
-        const cssPath = path.join(PLUGIN_ROOT, 'resources', 'character.css')
-        let cardCss = ''
-        try {
-            cardCss = fs.readFileSync(cssPath, 'utf8')
-        } catch (e) {
-            logger.error(`[Endfield] Character CSS load failed from ${cssPath}:`, e)
-            try {
-                cardCss = fs.readFileSync(path.join(process.cwd(), 'plugins/endfield-suzuki-plugin/resources/character.css'), 'utf8')
-            } catch (e2) {
-                logger.error('[Endfield] Fallback Character CSS load failed:', e2)
-            }
-        }
+        const cardCss = loadCss('character.css')
 
         // Find character
         const charList = data.detail.chars || []
@@ -67,8 +67,8 @@ export default class Render {
         // Format Data
         const character = {
             name: c.name,
-            illustrationUrl: Render.resize(c.illustrationUrl, 1200) || Render.resize(c.avatarRtUrl, 1000),
-            avatarRtUrl: Render.resize(c.avatarRtUrl, 800),
+            illustrationUrl: c.illustrationUrl || c.avatarRtUrl || '',
+            avatarRtUrl: c.avatarRtUrl || '',
             rarity: c.rarity,
             profession: c.profession,
             property: c.property,
@@ -77,7 +77,7 @@ export default class Render {
             evolvePhase: charData.evolvePhase,
             weapon: charData.weapon ? {
                 name: charData.weapon.weaponData.name,
-                icon: Render.resize(charData.weapon.weaponData.iconUrl, 200),
+                icon: charData.weapon.weaponData.iconUrl || '',
                 level: charData.weapon.level,
                 refineLevel: charData.weapon.refineLevel
             } : null,
@@ -85,7 +85,7 @@ export default class Render {
                 const userSkill = charData.userSkills ? charData.userSkills[s.id] : null
                 return {
                     name: s.name,
-                    icon: Render.resize(s.iconUrl, 150),
+                    icon: s.iconUrl || '',
                     level: userSkill ? userSkill.level : 1
                 }
             }),
@@ -94,7 +94,7 @@ export default class Render {
                     const eqData = charData[key].equipData || charData[key].tacticalItemData
                     return {
                         name: eqData.name,
-                        icon: Render.resize(eqData.iconUrl, 150),
+                        icon: eqData.iconUrl || '',
                         level: charData[key].evolvePhase !== undefined ? charData[key].evolvePhase : (charData[key].level && charData[key].level.value ? charData[key].level.value : '?')
                     }
                 }
@@ -107,14 +107,5 @@ export default class Render {
             cardCss,
             character
         })
-    }
-
-    static resize(url, size = 200) {
-        if (!url) return ''
-        if (url.includes('x-oss-process')) return url
-
-        // Revert to 's_' as 'w_' caused broken images
-        const operator = url.includes('?') ? '&' : '?'
-        return `${url}${operator}x-oss-process=image/resize,s_${size}`
     }
 }
