@@ -12,7 +12,12 @@ export default class Render {
         try {
             cardCss = fs.readFileSync(cssPath, 'utf8')
         } catch (e) {
-            logger.error('[Endfield] Profile CSS load failed:', e)
+            logger.error(`[Endfield] Profile CSS load failed from ${cssPath}:`, e)
+            try {
+                cardCss = fs.readFileSync(path.join(process.cwd(), 'plugins/endfield-suzuki-plugin/resources/profile.css'), 'utf8')
+            } catch (e2) {
+                logger.error('[Endfield] Fallback Profile CSS load failed:', e2)
+            }
         }
 
         const base = data.detail.base
@@ -21,7 +26,7 @@ export default class Render {
             uid: base.roleId,
             level: base.level,
             worldLevel: base.worldLevel,
-            avatar: Render.resize(base.avatarUrl, 150),
+            avatar: Render.resize(base.avatarUrl, 200),
             charNum: base.charNum,
             weaponNum: base.weaponNum,
             docNum: base.docNum,
@@ -42,7 +47,12 @@ export default class Render {
         try {
             cardCss = fs.readFileSync(cssPath, 'utf8')
         } catch (e) {
-            logger.error('[Endfield] Character CSS load failed:', e)
+            logger.error(`[Endfield] Character CSS load failed from ${cssPath}:`, e)
+            try {
+                cardCss = fs.readFileSync(path.join(process.cwd(), 'plugins/endfield-suzuki-plugin/resources/character.css'), 'utf8')
+            } catch (e2) {
+                logger.error('[Endfield] Fallback Character CSS load failed:', e2)
+            }
         }
 
         // Find character
@@ -57,8 +67,8 @@ export default class Render {
         // Format Data
         const character = {
             name: c.name,
-            illustrationUrl: Render.resize(c.illustrationUrl, 1000) || Render.resize(c.avatarRtUrl, 800),
-            avatarRtUrl: Render.resize(c.avatarRtUrl, 600),
+            illustrationUrl: Render.resize(c.illustrationUrl, 1200) || Render.resize(c.avatarRtUrl, 1000),
+            avatarRtUrl: Render.resize(c.avatarRtUrl, 800),
             rarity: c.rarity,
             profession: c.profession,
             property: c.property,
@@ -67,7 +77,7 @@ export default class Render {
             evolvePhase: charData.evolvePhase,
             weapon: charData.weapon ? {
                 name: charData.weapon.weaponData.name,
-                icon: Render.resize(charData.weapon.weaponData.iconUrl, 120),
+                icon: Render.resize(charData.weapon.weaponData.iconUrl, 200),
                 level: charData.weapon.level,
                 refineLevel: charData.weapon.refineLevel
             } : null,
@@ -75,7 +85,7 @@ export default class Render {
                 const userSkill = charData.userSkills ? charData.userSkills[s.id] : null
                 return {
                     name: s.name,
-                    icon: Render.resize(s.iconUrl, 100),
+                    icon: Render.resize(s.iconUrl, 150),
                     level: userSkill ? userSkill.level : 1
                 }
             }),
@@ -84,7 +94,7 @@ export default class Render {
                     const eqData = charData[key].equipData || charData[key].tacticalItemData
                     return {
                         name: eqData.name,
-                        icon: Render.resize(eqData.iconUrl, 120),
+                        icon: Render.resize(eqData.iconUrl, 150),
                         level: charData[key].evolvePhase !== undefined ? charData[key].evolvePhase : (charData[key].level && charData[key].level.value ? charData[key].level.value : '?')
                     }
                 }
@@ -103,7 +113,8 @@ export default class Render {
         if (!url) return ''
         if (url.includes('x-oss-process')) return url
 
+        // Revert to 's_' as 'w_' caused broken images
         const operator = url.includes('?') ? '&' : '?'
-        return `${url}${operator}x-oss-process=image/resize,w_${size}`
+        return `${url}${operator}x-oss-process=image/resize,s_${size}`
     }
 }
