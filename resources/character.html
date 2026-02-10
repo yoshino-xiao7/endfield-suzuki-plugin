@@ -4,10 +4,258 @@
 <head>
     <meta charset="utf-8">
     <style>
-        {
-                {
-                @cardCss
-            }
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 900px;
+            background: transparent;
+        }
+
+        .char-card {
+            display: grid;
+            grid-template-columns: 500px 400px;
+            background: #121214;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid #333;
+            height: 600px;
+        }
+
+        /* Left Column */
+        .portrait-col {
+            position: relative;
+            background: radial-gradient(circle at center, #2e2e32 0%, #1a1a1c 100%);
+            overflow: hidden;
+        }
+
+        .portrait {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        .char-info-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
+            padding: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .char-name {
+            font-size: 48px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .char-meta {
+            display: flex;
+            gap: 10px;
+            font-size: 16px;
+            color: #ddd;
+        }
+
+        .rarity {
+            color: #fbce06;
+        }
+
+        .property.char_property_fire {
+            color: #ff5555;
+        }
+
+        .property.char_property_cryst {
+            color: #55aaff;
+        }
+
+        .property.char_property_pulse {
+            color: #aa55ff;
+        }
+
+        .property.char_property_natural {
+            color: #55ff55;
+        }
+
+        .property.char_property_physical {
+            color: #aaaaaa;
+        }
+
+        /* Right Column */
+        .detail-col {
+            padding: 25px;
+            background: #1a1a1c;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            color: #fbce06;
+            text-transform: uppercase;
+            border-left: 3px solid #fbce06;
+            padding-left: 8px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Stats */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-box {
+            background: #252527;
+            padding: 10px;
+            border-radius: 6px;
+            flex: 1;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        /* Weapon */
+        .weapon-box {
+            display: flex;
+            align-items: center;
+            background: #252527;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .weapon-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            margin-right: 15px;
+            background: #000;
+        }
+
+        .weapon-name {
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .weapon-meta {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .refine {
+            color: #fbce06;
+            margin-left: 5px;
+        }
+
+        /* Skills */
+        .skills-list {
+            display: flex;
+            gap: 10px;
+        }
+
+        .skill-item {
+            position: relative;
+            width: 60px;
+            height: 60px;
+            background: #252527;
+            border-radius: 8px;
+            border: 1px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .skill-icon {
+            width: 40px;
+            height: 40px;
+        }
+
+        .skill-level {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #000;
+            color: #fbce06;
+            font-size: 10px;
+            padding: 2px 5px;
+            border-radius: 4px;
+            border: 1px solid #fbce06;
+        }
+
+        /* Equips */
+        .equips-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+
+        .equip-item {
+            background: #252527;
+            border-radius: 8px;
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .equip-icon {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+        }
+
+        .equip-level {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            font-size: 10px;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1px 3px;
+            border-radius: 3px;
+        }
+
+        .empty-box {
+            background: #252527;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            color: #555;
+            text-align: center;
+        }
+
+        .equip-empty {
+            width: 80%;
+            height: 80%;
+            background: #333;
+            border-radius: 4px;
+        }
+
+        .copyright {
+            margin-top: auto;
+            text-align: right;
+            font-size: 10px;
+            color: #444;
         }
     </style>
 </head>

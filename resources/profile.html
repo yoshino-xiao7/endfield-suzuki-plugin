@@ -4,10 +4,99 @@
 <head>
     <meta charset="utf-8">
     <style>
-        {
-                {
-                @cardCss
-            }
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 600px;
+            background: transparent;
+        }
+
+        .profile-card {
+            background: #1a1a1c;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border: 1px solid #333;
+        }
+
+        .header-bg {
+            background: linear-gradient(135deg, #2b2b2e 0%, #1f1f21 100%);
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #fbce06;
+            position: relative;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid #fbce06;
+            margin-right: 20px;
+        }
+
+        .info {
+            flex: 1;
+        }
+
+        .name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .uid {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        .level-badge {
+            background: #fbce06;
+            color: #000;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 16px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding: 25px;
+        }
+
+        .stat-item {
+            background: #252527;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+            color: #555;
+            background: #151517;
         }
     </style>
 </head>
