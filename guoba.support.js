@@ -2,7 +2,13 @@ import path from 'path'
 import YAML from 'yaml'
 import fs from 'fs'
 
+// 动态获取插件根目录
+const PLUGIN_ROOT = import.meta.dirname
+
 export function supportGuoba() {
+    const defPath = path.join(PLUGIN_ROOT, 'defSet/config.yaml')
+    const cfgPath = path.join(PLUGIN_ROOT, 'config/config.yaml')
+
     return {
         pluginInfo: {
             name: 'endfield-plugin',
@@ -24,15 +30,12 @@ export function supportGuoba() {
                 { field: 'autoSignTime', label: '签到时间', bottomHelpMessage: '格式 HH:MM，如 08:05 表示每天早上 8 点 5 分', component: 'Input', componentProps: { placeholder: '08:05' } }
             ],
             getConfigData() {
-                const defPath = path.join(process.cwd(), 'plugins/endfield-plugin/defSet/config.yaml')
-                const cfgPath = path.join(process.cwd(), 'plugins/endfield-plugin/config/config.yaml')
                 const def = YAML.parse(fs.readFileSync(defPath, 'utf8'))
                 let cfg = {}
                 if (fs.existsSync(cfgPath)) cfg = YAML.parse(fs.readFileSync(cfgPath, 'utf8')) || {}
                 return { ...def, ...cfg }
             },
             setConfigData(data, { Result }) {
-                const cfgPath = path.join(process.cwd(), 'plugins/endfield-plugin/config/config.yaml')
                 fs.mkdirSync(path.dirname(cfgPath), { recursive: true })
                 fs.writeFileSync(cfgPath, YAML.stringify(data))
                 return Result.ok({}, '保存成功，重启生效')

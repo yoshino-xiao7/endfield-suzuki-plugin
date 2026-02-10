@@ -1,10 +1,15 @@
 import fs from 'fs'
-const PATH = './plugins/endfield-plugin/data/bindings.json'
+import path from 'path'
+
+// 动态获取插件根目录
+const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
+const DATA_DIR = path.join(PLUGIN_ROOT, 'data')
+const PATH = path.join(DATA_DIR, 'bindings.json')
 
 class DataStore {
     constructor() { this.data = fs.existsSync(PATH) ? JSON.parse(fs.readFileSync(PATH, 'utf8')) : {} }
     save() {
-        fs.mkdirSync('./plugins/endfield-plugin/data', { recursive: true })
+        fs.mkdirSync(DATA_DIR, { recursive: true })
         fs.writeFileSync(PATH, JSON.stringify(this.data, null, 2))
     }
     bind(qq, bindingId) { this.data[qq] = { bindingId, time: Date.now() }; this.save() }

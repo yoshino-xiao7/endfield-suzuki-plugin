@@ -36,7 +36,7 @@
 在 Yunzai 根目录执行：
 
 ```bash
-git clone https://github.com/yoshino-xiao7/endfield-suzuki-plugin ./plugins/endfield-plugin/
+git clone https://github.com/yoshino-xiao7/endfield-suzuki-plugin ./plugins/endfield-suzuki-plugin/
 ```
 
 ### 2. 配置 API Key
