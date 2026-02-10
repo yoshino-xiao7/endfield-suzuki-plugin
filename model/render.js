@@ -123,6 +123,22 @@ export default class Render {
             ...renderData
         })
 
+        // DEBUG: Save debug files
+        fs.writeFileSync(path.join(PLUGIN_ROOT, 'debug_card.html'), JSON.stringify(html, null, 2) || 'No HTML gen?') // generateHtml returns renderData, template does HTML
+        // Wait, generateHtml returned DATA, not HTML string. The logic above usage was confusing.
+        // But we can check if `img` is valid.
+        if (img) {
+            // img is base64 or segment. 
+            // If it's a segment object, it might be { type: 'image', file: ... } 
+            // Yunzai puppeteer.screenshot usually returns a segment object for direct reply
+            // OR a base64 string if configured?
+            // Let's log the type.
+            logger.info(`[Endfield] Generated image type: ${typeof img}`)
+            if (typeof img === 'object') logger.info(`[Endfield] Image msg: ${JSON.stringify(img).slice(0, 100)}`)
+        } else {
+            logger.error('[Endfield] Generated image is Empty!')
+        }
+
         return img
     }
 }
