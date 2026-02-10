@@ -2,6 +2,9 @@ import plugin from '../../../lib/plugins/plugin.js'
 import api from '../model/api.js'
 import data from '../model/data.js'
 
+// 临时存储手机号，key 为 user_id
+const phoneCache = new Map()
+
 export class BindApp extends plugin {
     constructor() {
         super({
@@ -54,8 +57,9 @@ export class BindApp extends plugin {
 
         try {
             await api.sendCode(phone)
-            // 保存手机号到临时上下文，等待用户回复验证码
-            this.setContext('receiveCode', e, { phone }, 120) // 120秒超时
+            // 缓存手机号，等待用户回复验证码
+            phoneCache.set(e.user_id, phone)
+            this.setContext('receiveCode', false, 120) // 120秒超时
             e.reply('📱 验证码已发送，请在 120 秒内回复 6 位验证码：')
         } catch (err) {
             e.reply(`❌ 发送验证码失败: ${err.message}`)
@@ -63,15 +67,22 @@ export class BindApp extends plugin {
     }
 
     // 接收验证码 (多轮对话回调)
-    async receiveCode(e) {
+    async receiveCode() {
+        const e = this.e
         const code = e.msg.trim()
         if (!/^\d{4,6}$/.test(code)) {
             e.reply('❌ 请输入正确的验证码（4-6位数字），或发送 #取消')
             return
         }
 
-        const { phone } = this.getContext('receiveCode', e)
-        this.finish('receiveCode', e) // 结束多轮对话
+        const phone = phoneCache.get(e.user_id)
+        this.finish('receiveCode') // 结束多轮对话
+        phoneCache.delete(e.user_id)
+
+        if (!phone) {
+            e.reply('❌ 绑定已超时，请重新发送 #终末地手机绑定')
+            return
+        }
 
         try {
             const result = await api.bindByCode(phone, code)
