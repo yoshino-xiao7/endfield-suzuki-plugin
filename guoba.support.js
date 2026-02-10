@@ -11,7 +11,7 @@ export function supportGuoba() {
 
     return {
         pluginInfo: {
-            name: 'endfield-plugin',
+            name: 'endfield-suzuki-plugin',
             title: 'Endfield 终末地助手',
             author: 'Suzuki',
             authorLink: 'https://endfield.suzuki.ink',
