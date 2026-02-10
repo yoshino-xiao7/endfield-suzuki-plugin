@@ -1,0 +1,20 @@
+# 用户配置 (由锅巴面板或手动创建)
+config/
+
+# 运行时数据
+data/
+
+# IDE
+.idea/
+.vscode/
+
+# 测试/调试用的 JSON 数据文件
+*.json
+!package.json
+!package-lock.json
+
+# 开发文档 (不需要发布)
+yunzai_plugin_guide.md
+
+# Node
+node_modules/

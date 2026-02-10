@@ -21,16 +21,33 @@ class EndfieldApi {
     get apiKey() { return this.config.apiKey }
     get baseUrl() { return this.config.apiBaseUrl }
 
-    async request(path, method = 'GET', body = null) {
+    async request(reqPath, method = 'GET', body = null) {
         if (!this.apiKey) throw new Error('未配置 API Key，请联系管理员')
-        const res = await fetch(`${this.baseUrl}${path}`, {
+        const url = `${this.baseUrl}${reqPath}`
+        const res = await fetch(url, {
             method,
             headers: { 'X-API-Key': this.apiKey, 'Content-Type': 'application/json' },
             body: body ? JSON.stringify(body) : null,
             timeout: 15000
         })
+
+        // 先检查 HTTP 状态码
+        if (!res.ok) {
+            let errMsg = `HTTP ${res.status}`
+            try {
+                const errData = await res.json()
+                errMsg = errData.message || errData.msg || JSON.stringify(errData)
+            } catch { }
+            throw new Error(errMsg)
+        }
+
         const data = await res.json()
-        if (data.code !== 200) throw new Error(data.message || '请求失败')
+        logger.debug(`[Endfield] ${method} ${reqPath} => code=${data.code}, success=${data.success}, message=${data.message}`)
+
+        // 检查业务状态码
+        if (data.code !== 200 || data.success === false) {
+            throw new Error(data.message || '请求失败')
+        }
         return data
     }
 
@@ -56,8 +73,13 @@ class EndfieldApi {
             const data = await this.request(path, method, body)
             return { data, refreshed: false }
         } catch (err) {
+            // 先排除业务错误（如重复签到），它们的 message 里也可能包含 10001
+            const msg = err.message || ''
+            if (msg.includes('重复') || msg.includes('已签') || msg.includes('请勿')) {
+                throw err // 业务错误，不要尝试刷新凭证
+            }
             // 判断是否为凭证过期 (403 / 10001 / Unauthorized)
-            if (err.message?.includes('403') || err.message?.includes('Unauthorized') || err.message?.includes('10001')) {
+            if (msg.includes('403') || msg.includes('Unauthorized') || msg.includes('10001')) {
                 try {
                     await this.refreshCred()
                     const data = await this.request(path, method, body)
