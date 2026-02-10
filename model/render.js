@@ -11,6 +11,8 @@ const PLUGIN_ROOT = path.resolve(__dirname, '..')
 export default class Render {
     static async renderProfile(data) {
         const base = data.detail.base
+        const dungeon = data.detail.dungeon || {}
+        const dailyMission = data.detail.dailyMission || {}
         const player = {
             name: base.name,
             uid: base.roleId,
@@ -19,7 +21,8 @@ export default class Render {
             avatar: base.avatarUrl || '',
             charNum: base.charNum,
             weaponNum: base.weaponNum,
-            docNum: base.docNum,
+            stamina: `${dungeon.curStamina || 0}/${dungeon.maxStamina || 0}`,
+            dailyMission: `${dailyMission.dailyActivation || 0}/${dailyMission.maxDailyActivation || 100}`,
             progress: base.mainMission.description,
             days: Math.ceil((Date.now() / 1000 - base.createTime) / 86400)
         }
