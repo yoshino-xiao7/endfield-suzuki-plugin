@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        {
+                {
+                @cardCss
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="char-card">
+        <!-- Left Column: Portrait -->
+        <div class="portrait-col">
+            <img class="portrait" src="{{character.illustrationUrl || character.avatarRtUrl}}">
+            <div class="char-info-overlay">
+                <div class="char-name">{{character.name}}</div>
+                <div class="char-meta">
+                    <span class="rarity">★{{character.rarity.value}}</span>
+                    <span class="profession">{{character.profession.value}}</span>
+                    <span class="property {{character.property.key}}">{{character.property.value}}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Details -->
+        <div class="detail-col">
+            <!-- Stats Row (Mimic) -->
+            <div class="section-title">等级信息</div>
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label">等级</div>
+                    <div class="stat-value">Lv.{{character.level}}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">潜能</div>
+                    <div class="stat-value">{{character.potentialLevel + 1}}</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">意识</div>
+                    <div class="stat-value">{{character.evolvePhase}}</div>
+                </div>
+            </div>
+
+            <!-- Weapon -->
+            <div class="section-title">武器</div>
+            {{if character.weapon}}
+            <div class="weapon-box">
+                <img class="weapon-icon" src="{{character.weapon.icon}}">
+                <div class="weapon-info">
+                    <div class="weapon-name">{{character.weapon.name}}</div>
+                    <div class="weapon-meta">Lv.{{character.weapon.level}} <span class="refine">精炼
+                            {{character.weapon.refineLevel + 1}}</span></div>
+                </div>
+            </div>
+            {{else}}
+            <div class="empty-box">未装备武器</div>
+            {{/if}}
+
+            <!-- Skills -->
+            <div class="section-title">技能</div>
+            <div class="skills-list">
+                {{each character.skills skill}}
+                <div class="skill-item">
+                    <img class="skill-icon" src="{{skill.icon}}">
+                    <div class="skill-level">{{skill.level}}</div>
+                </div>
+                {{/each}}
+            </div>
+
+            <!-- Equips -->
+            <div class="section-title">装备</div>
+            <div class="equips-grid">
+                {{each character.equips equip}}
+                <div class="equip-item">
+                    {{if equip}}
+                    <img class="equip-icon" src="{{equip.icon}}">
+                    <div class="equip-level">+{{equip.level}}</div>
+                    {{else}}
+                    <div class="equip-empty"></div>
+                    {{/if}}
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        <div class="copyright">Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>

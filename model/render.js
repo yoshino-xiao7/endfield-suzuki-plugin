@@ -6,176 +6,102 @@ import fs from 'fs'
 const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
 
 export default class Render {
-    /**
-     * Render character data to image
-     * @param {Object} data - The data object containing character info
-     * @returns {Promise<string>} - The base64 image or segment
-     */
-    static async render(data) {
-        // Prepare data for rendering
-        const detail = data.detail || {}
-        const base = detail.base || {}
-        const chars = detail.chars || []
+    static async renderProfile(data) {
+        const cssPath = path.join(PLUGIN_ROOT, 'resources', 'profile.css')
+        let cardCss = ''
+        try {
+            cardCss = fs.readFileSync(cssPath, 'utf8')
+        } catch (e) {
+            logger.error('[Endfield] Profile CSS load failed:', e)
+        }
 
-        // --- 核心修改 1: 先处理所有干员数据，但不立即放入 renderData ---
-        let allCharacters = chars.map(c => {
-            const char = c.charData || {}
-            // const weapon = c.weapon?.weaponData // 未使用，注释掉防lint报错
-            const evolvePhase = c.evolvePhase || 0
+        const base = data.detail.base
+        const player = {
+            name: base.name,
+            uid: base.roleId,
+            level: base.level,
+            worldLevel: base.worldLevel,
+            avatar: Render.resize(base.avatarUrl, 150),
+            charNum: base.charNum,
+            weaponNum: base.weaponNum,
+            docNum: base.docNum,
+            progress: base.mainMission.description,
+            days: Math.ceil((Date.now() / 1000 - base.createTime) / 86400)
+        }
 
-            // Process Skills
-            const skillList = (char.skills || []).map(skill => {
-                const userSkill = (c.userSkills || {})[skill.id] || {}
+        return await puppeteer.screenshot('endfield-profile', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'profile.html'),
+            cardCss,
+            player
+        })
+    }
+
+    static async renderCharacter(data, charName) {
+        const cssPath = path.join(PLUGIN_ROOT, 'resources', 'character.css')
+        let cardCss = ''
+        try {
+            cardCss = fs.readFileSync(cssPath, 'utf8')
+        } catch (e) {
+            logger.error('[Endfield] Character CSS load failed:', e)
+        }
+
+        // Find character
+        const charList = data.detail.chars || []
+        const charData = charList.find(c => c.charData.name === charName || c.charData.name.includes(charName))
+
+        if (!charData) {
+            throw new Error(`未找到角色: ${charName}`)
+        }
+
+        const c = charData.charData
+        // Format Data
+        const character = {
+            name: c.name,
+            illustrationUrl: Render.resize(c.illustrationUrl, 1000) || Render.resize(c.avatarRtUrl, 800),
+            avatarRtUrl: Render.resize(c.avatarRtUrl, 600),
+            rarity: c.rarity,
+            profession: c.profession,
+            property: c.property,
+            level: charData.level,
+            potentialLevel: charData.potentialLevel,
+            evolvePhase: charData.evolvePhase,
+            weapon: charData.weapon ? {
+                name: charData.weapon.weaponData.name,
+                icon: Render.resize(charData.weapon.weaponData.iconUrl, 120),
+                level: charData.weapon.level,
+                refineLevel: charData.weapon.refineLevel
+            } : null,
+            skills: (c.skills || []).map(s => {
+                const userSkill = charData.userSkills ? charData.userSkills[s.id] : null
                 return {
-                    name: skill.name,
-                    icon: skill.iconUrl,
-                    type: skill.type?.value, // e.g. "普通攻击", "战技"
-                    level: userSkill.level || 1,
-                    maxLevel: userSkill.maxLevel || '?'
+                    name: s.name,
+                    icon: Render.resize(s.iconUrl, 100),
+                    level: userSkill ? userSkill.level : 1
                 }
-            })
-
-            // Process Weapon
-            let weaponData = null
-            if (c.weapon) {
-                const wd = c.weapon.weaponData
-                if (wd) {
-                    weaponData = {
-                        name: wd.name,
-                        icon: wd.iconUrl,
-                        rarity: wd.rarity?.value,
-                        level: c.weapon.level
+            }),
+            equips: ['bodyEquip', 'armEquip', 'firstAccessory', 'secondAccessory', 'tacticalItem'].map(key => {
+                if (charData[key]) {
+                    const eqData = charData[key].equipData || charData[key].tacticalItemData
+                    return {
+                        name: eqData.name,
+                        icon: Render.resize(eqData.iconUrl, 120),
+                        level: charData[key].evolvePhase !== undefined ? charData[key].evolvePhase : (charData[key].level && charData[key].level.value ? charData[key].level.value : '?')
                     }
                 }
-            }
-
-            // Process Other Equipment
-            const otherEquips = [
-                c.bodyEquip,
-                c.armEquip,
-                c.firstAccessory,
-                c.secondAccessory,
-                c.tacticalItem
-            ].map(eq => {
-                if (!eq) return null
-                const data = eq.equipData || eq.tacticalItemData
-
-                // Determine level
-                let level = 1
-                if (eq.level) {
-                    level = eq.level // Weapon or top-level level
-                } else if (data && data.level && data.level.value) {
-                    level = data.level.value // Equipment inner level object
-                } else if (eq.activeEffect) {
-                    level = '' // Tactical item usually doesn't show level like others
-                }
-
-                return data ? {
-                    name: data.name,
-                    icon: data.iconUrl,
-                    rarity: data.rarity?.value,
-                    level: level
-                } : null
-            }).filter(Boolean)
-
-            return {
-                name: char.name,
-                level: c.level || 1,
-                rarity: char.rarity?.value || '5', // 确保有默认值用于排序
-                profession: char.profession?.value || '',
-                property: char.property?.value || '',
-                avatar: char.avatarSqUrl || char.avatarRtUrl,
-                potential: c.potentialLevel || 0,
-                evolvePhase,
-                weapon: weaponData,
-                equips: otherEquips,
-                skills: skillList,
-                tags: char.tags || []
-            }
-        })
-
-        // --- 核心修改 2: 排序、计算隐藏数量、截断数据 ---
-
-        // 1. 排序：优先按等级降序，其次按稀有度降序
-        // 这样截断时保留的一定是练度最高的干员
-        allCharacters.sort((a, b) => {
-            if (b.level !== a.level) return b.level - a.level;
-            return b.rarity - a.rarity;
-        });
-
-        // 2. 设置最大显示数量
-        const MAX_DISPLAY_COUNT = 40;
-        let totalHiddenCount = 0;
-        let displayCharacters = allCharacters;
-
-        // 3. 如果数量超标，进行截断
-        if (allCharacters.length > MAX_DISPLAY_COUNT) {
-            totalHiddenCount = allCharacters.length - MAX_DISPLAY_COUNT;
-            displayCharacters = allCharacters.slice(0, MAX_DISPLAY_COUNT);
-        }
-
-        // --- 核心修改结束 ---
-
-        // formatting data for easy access in template
-        const renderData = {
-            player: {
-                name: base.name,
-                uid: base.roleId,
-                level: base.level,
-                worldLevel: base.worldLevel,
-                avatar: base.avatarUrl || 'https://bbs.hycdn.cn/image/2026/01/20/b0a40f991c7cd755b7273c6b5579f09f.png',
-                charNum: base.charNum,
-                updateTime: formatTime(Date.now())
-            },
-            characters: displayCharacters, // 使用截断后的数组
-            totalHiddenCount: totalHiddenCount // 传递隐藏数量给 HTML
-        }
-
-        // Helper to resize images
-        const resize = (url, size = 100) => {
-            if (!url) return ''
-            if (url.includes('x-oss-process')) return url
-            return `${url}?x-oss-process=image/resize,s_${size}`
-        }
-
-        // Apply resize to all image URLs
-        renderData.player.avatar = resize(renderData.player.avatar, 200)
-        renderData.characters.forEach(c => {
-            c.avatar = resize(c.avatar, 300)
-            if (c.weapon) c.weapon.icon = resize(c.weapon.icon, 100)
-            c.equips.forEach(eq => {
-                if (eq) eq.icon = resize(eq.icon, 100)
+                return null
             })
-            c.skills.forEach(s => {
-                s.icon = resize(s.icon, 100)
-            })
-        })
-
-        // Read CSS file
-        const cssPath = path.join(PLUGIN_ROOT, 'resources', 'style.css')
-        let css = ''
-        try {
-            css = fs.readFileSync(cssPath, 'utf8')
-            // logger.info(`[Endfield] Injected CSS length: ${css.length}`)
-        } catch (err) {
-            logger.error('[Endfield] Failed to load style.css')
         }
 
-        // Generate Image using Yunzai puppeteer
-        const img = await puppeteer.screenshot('endfield-suzuki-plugin', {
-            tplFile: path.join(PLUGIN_ROOT, 'resources', 'card.html'),
-            saveId: 'card',
-            imgType: 'jpeg',
-            quality: 90,
-            cardCss: css,
-            ...renderData
+        return await puppeteer.screenshot('endfield-character', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'character.html'),
+            cardCss,
+            character
         })
-
-        return img
     }
-}
 
-function formatTime(timestamp) {
-    const date = new Date(timestamp)
-    return `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+    static resize(url, size = 100) {
+        if (!url) return ''
+        if (url.includes('x-oss-process')) return url
+        return `${url}?x-oss-process=image/resize,s_${size}`
+    }
 }

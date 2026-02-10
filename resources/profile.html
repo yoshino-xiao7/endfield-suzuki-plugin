@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        {
+                {
+                @cardCss
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="profile-card">
+        <!-- Background/Header -->
+        <div class="header-bg">
+            <img class="avatar" src="{{player.avatar}}">
+            <div class="info">
+                <div class="name">{{player.name}}</div>
+                <div class="uid">UID: {{player.uid}}</div>
+            </div>
+            <div class="level-badge">Lv.{{player.level}}</div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-value">{{player.worldLevel}}</div>
+                <div class="stat-label">世界等级</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{player.charNum}}</div>
+                <div class="stat-label">干员数量</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{player.weaponNum}}</div>
+                <div class="stat-label">武器数量</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{player.docNum}}</div>
+                <div class="stat-label">文档数量</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{player.days}}</div>
+                <div class="stat-label">活跃天数</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">{{player.progress}}</div>
+                <div class="stat-label">主线进度</div>
+            </div>
+        </div>
+
+        <div class="footer">Powered by Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>
