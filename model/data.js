@@ -1,8 +1,11 @@
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 // 动态获取插件根目录
-const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PLUGIN_ROOT = path.resolve(__dirname, '..')
 const DATA_DIR = path.join(PLUGIN_ROOT, 'data')
 const PATH = path.join(DATA_DIR, 'bindings.json')
 

@@ -1,8 +1,11 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import { execSync } from 'child_process'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
-const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PLUGIN_ROOT = path.resolve(__dirname, '..')
 
 export class UpdateApp extends plugin {
     constructor() {

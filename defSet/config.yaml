@@ -3,3 +3,4 @@ apiBaseUrl: https://api.suzuki.ink/api
 apiKey: ''                    # 管理员的 API Key (必填)
 autoSignTime: '08:05'         # 自动签到时间 (HH:MM 格式)
 autoSignEnabled: true         # 是否开启自动签到
+staminaThreshold: 240         # 理智提醒阈值 (达到此值私聊提醒)

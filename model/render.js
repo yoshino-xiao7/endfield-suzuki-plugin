@@ -86,4 +86,63 @@ export default class Render {
             character
         })
     }
+
+    static async renderSpaceship(data) {
+        const base = data.detail.base
+        const ship = data.detail.spaceShip || {}
+        const charList = data.detail.chars || []
+
+        // 房间类型映射
+        const ROOM_NAMES = {
+            0: '总控中枢',
+            1: '培养仓',
+            2: '制造仓',
+            3: '会客厅',
+            5: '线索交换'
+        }
+
+        // 房间 ID 后缀映射编号
+        const getRoomDisplayName = (room) => {
+            const baseName = ROOM_NAMES[room.type] || `房间(${room.type})`
+            // 如果 id 有 _1, _2 后缀就加编号
+            const match = room.id.match(/_(\d+)$/)
+            if (match && (room.type === 1 || room.type === 2)) {
+                return `${baseName}${match[1]}`
+            }
+            return baseName
+        }
+
+        // 通过 charId 查找角色名称和头像
+        const resolveChar = (charId) => {
+            for (const c of charList) {
+                // charId 可能是 hash，尝试匹配
+                if (c.charData && (c.charId === charId || c.charData.id === charId)) {
+                    return {
+                        name: c.charData.name,
+                        avatar: c.charData.avatarUrl || c.charData.avatarRtUrl || ''
+                    }
+                }
+            }
+            return { name: charId.substring(0, 8) + '...', avatar: '' }
+        }
+
+        const rooms = (ship.rooms || []).map(room => ({
+            name: getRoomDisplayName(room),
+            level: room.level,
+            chars: (room.chars || []).map(ch => {
+                const resolved = resolveChar(ch.charId)
+                return {
+                    name: resolved.name,
+                    avatar: resolved.avatar,
+                    favorability: ch.favorability || 0
+                }
+            })
+        }))
+
+        return await puppeteer.screenshot('endfield-spaceship', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'spaceship.html'),
+            playerName: base.name,
+            rooms
+        })
+    }
 }

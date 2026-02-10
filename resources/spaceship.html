@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 650px;
+            background: transparent;
+        }
+
+        .ship-card {
+            background: #121214;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+        }
+
+        .ship-header {
+            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
+            padding: 20px 25px;
+            border-bottom: 2px solid #fbce06;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ship-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .ship-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .ship-player {
+            text-align: right;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .ship-player .name {
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .rooms-list {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .room-card {
+            background: #1e1e20;
+            border-radius: 10px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .room-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: #252527;
+            border-bottom: 1px solid #333;
+        }
+
+        .room-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .room-level {
+            font-size: 12px;
+            color: #000;
+            background: #fbce06;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .room-chars {
+            padding: 10px 16px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .room-char {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #2a2a2d;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #3a3a3d;
+        }
+
+        .char-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid #555;
+        }
+
+        .char-detail {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .char-name-tag {
+            font-size: 13px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .char-fav {
+            font-size: 10px;
+            color: #fbce06;
+        }
+
+        .room-empty {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .ship-footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+            color: #444;
+            background: #151517;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="ship-card">
+        <div class="ship-header">
+            <div>
+                <div class="ship-title">帝江号</div>
+                <div class="ship-subtitle">基建总览</div>
+            </div>
+            <div class="ship-player">
+                <div class="name">{{playerName}}</div>
+            </div>
+        </div>
+
+        <div class="rooms-list">
+            {{each rooms room}}
+            <div class="room-card">
+                <div class="room-header">
+                    <div class="room-name">{{room.name}}</div>
+                    <div class="room-level">Lv.{{room.level}}</div>
+                </div>
+                {{if room.chars.length > 0}}
+                <div class="room-chars">
+                    {{each room.chars ch}}
+                    <div class="room-char">
+                        <img class="char-avatar" src="{{ch.avatar}}">
+                        <div class="char-detail">
+                            <div class="char-name-tag">{{ch.name}}</div>
+                            {{if ch.favorability > 0}}
+                            <div class="char-fav">♥ {{ch.favorability}}</div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+                {{else}}
+                <div class="room-empty">暂无驻守干员</div>
+                {{/if}}
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="ship-footer">Powered by Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>

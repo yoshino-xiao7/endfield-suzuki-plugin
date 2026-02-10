@@ -2,9 +2,12 @@ import fetch from 'node-fetch'
 import YAML from 'yaml'
 import fs from 'fs'
 import path from 'path'
+import { fileURLToPath } from 'url'
 
 // 动态获取插件根目录，无论文件夹叫什么名字都能正常工作
-const PLUGIN_ROOT = path.join(import.meta.dirname, '..')
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const PLUGIN_ROOT = path.resolve(__dirname, '..')
 const USER_CFG = path.join(PLUGIN_ROOT, 'config/config.yaml')
 const DEF_CFG = path.join(PLUGIN_ROOT, 'defSet/config.yaml')
 
