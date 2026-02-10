@@ -42,10 +42,16 @@ export class SigninApp extends plugin {
             const { data: result, refreshed } = await api.requestWithAutoRefresh(
                 `/skland/bindings/${bindingId}/signin`, 'POST'
             )
+
+            // 后端对重复签到也返回 code:200，需要通过 message/data 判断
+            const signinData = result.data
+            if (typeof signinData === 'string' || result.message?.includes('已签到')) {
+                return e.reply('📋 今日已签到')
+            }
+
             let msg = '✅ 签到成功！'
 
             // 解析签到奖励: awardIds + resourceInfoMap
-            const signinData = result.data
             if (signinData?.awardIds && signinData?.resourceInfoMap) {
                 const awards = signinData.awardIds
                     .map(a => signinData.resourceInfoMap[a.id])
@@ -85,17 +91,37 @@ export class SigninApp extends plugin {
         logger.info(`[Endfield] 自动签到: ${all.length} 人`)
         for (const { qq, bindingId } of all) {
             try {
-                const { refreshed } = await api.requestWithAutoRefresh(
+                const { data: result, refreshed } = await api.requestWithAutoRefresh(
                     `/skland/bindings/${bindingId}/signin`, 'POST'
                 )
-                logger.info(`[Endfield] ✅ QQ=${qq}${refreshed ? ' (凭证已刷新)' : ''}`)
-            } catch (err) {
-                if (err.message.includes('失效')) {
-                    logger.warn(`[Endfield] ❌ QQ=${qq}: 凭证失效，需重新绑定`)
-                    // 可选: 私聊通知用户
-                    // Bot.pickUser(qq).sendMsg('❌ 终末地自动签到失败: 凭证已失效，请重新绑定')
+
+                const signinData = result.data
+                // 重复签到检测（后端返回 code:200 但 data 为字符串）
+                if (typeof signinData === 'string' || result.message?.includes('已签到')) {
+                    logger.info(`[Endfield] 📋 QQ=${qq}: 今日已签到`)
+                    Bot.pickUser(qq).sendMsg('📋 终末地自动签到: 今日已签到')
                 } else {
-                    logger.warn(`[Endfield] ❌ QQ=${qq}: ${err.message}`)
+                    // 签到成功，解析奖励
+                    let msg = '✅ 终末地自动签到成功！'
+                    if (signinData?.awardIds && signinData?.resourceInfoMap) {
+                        const awards = signinData.awardIds
+                            .map(a => signinData.resourceInfoMap[a.id])
+                            .filter(Boolean)
+                            .map(item => `${item.name} ×${item.count}`)
+                        if (awards.length > 0) {
+                            msg += `\n🎁 获得: ${awards.join('、')}`
+                        }
+                    }
+                    if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
+                    logger.info(`[Endfield] ✅ QQ=${qq}${refreshed ? ' (凭证已刷新)' : ''}`)
+                    Bot.pickUser(qq).sendMsg(msg)
+                }
+            } catch (err) {
+                logger.warn(`[Endfield] ❌ QQ=${qq}: ${err.message}`)
+                if (err.message.includes('失效') || err.message.includes('重新绑定')) {
+                    Bot.pickUser(qq).sendMsg('❌ 终末地自动签到失败: 凭证已失效，请私聊发送 #终末地绑定 <新token> 重新绑定')
+                } else {
+                    Bot.pickUser(qq).sendMsg(`❌ 终末地自动签到失败: ${err.message}`)
                 }
             }
             await new Promise(r => setTimeout(r, 5000))
