@@ -43,11 +43,23 @@ export class SigninApp extends plugin {
                 `/skland/bindings/${bindingId}/signin`, 'POST'
             )
             let msg = '✅ 签到成功！'
+
+            // 解析签到奖励: awardIds + resourceInfoMap
+            const signinData = result.data
+            if (signinData?.awardIds && signinData?.resourceInfoMap) {
+                const awards = signinData.awardIds
+                    .map(a => signinData.resourceInfoMap[a.id])
+                    .filter(Boolean)
+                    .map(item => `${item.name} ×${item.count}`)
+                if (awards.length > 0) {
+                    msg += `\n🎁 获得: ${awards.join('、')}`
+                }
+            }
+
             if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
-            if (result.data?.awards) msg += `\n🎁 ${JSON.stringify(result.data.awards)}`
             e.reply(msg)
         } catch (err) {
-            if (err.message.includes('重复') || err.message.includes('已签')) {
+            if (err.message.includes('重复') || err.message.includes('已签') || err.message.includes('请勿')) {
                 e.reply('📋 今日已签到')
             } else if (err.message.includes('失效') || err.message.includes('重新绑定')) {
                 e.reply(`❌ ${err.message}\n请私聊发送 #终末地绑定 <新token> 重新绑定`)

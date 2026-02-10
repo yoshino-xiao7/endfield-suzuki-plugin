@@ -56,8 +56,13 @@ class EndfieldApi {
             const data = await this.request(path, method, body)
             return { data, refreshed: false }
         } catch (err) {
+            // 先排除业务错误（如重复签到），它们的 message 里也可能包含 10001
+            const msg = err.message || ''
+            if (msg.includes('重复') || msg.includes('已签') || msg.includes('请勿')) {
+                throw err // 业务错误，不要尝试刷新凭证
+            }
             // 判断是否为凭证过期 (403 / 10001 / Unauthorized)
-            if (err.message?.includes('403') || err.message?.includes('Unauthorized') || err.message?.includes('10001')) {
+            if (msg.includes('403') || msg.includes('Unauthorized') || msg.includes('10001')) {
                 try {
                     await this.refreshCred()
                     const data = await this.request(path, method, body)
