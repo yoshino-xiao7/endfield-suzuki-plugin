@@ -99,9 +99,11 @@ export default class Render {
         })
     }
 
-    static resize(url, size = 100) {
+    static resize(url, size = 200) {
         if (!url) return ''
         if (url.includes('x-oss-process')) return url
-        return `${url}?x-oss-process=image/resize,s_${size}`
+
+        const operator = url.includes('?') ? '&' : '?'
+        return `${url}${operator}x-oss-process=image/resize,w_${size}`
     }
 }
