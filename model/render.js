@@ -113,6 +113,8 @@ export default class Render {
         const cssPath = path.join(PLUGIN_ROOT, 'resources', 'style.css')
         const css = fs.readFileSync(cssPath, 'utf8')
 
+        logger.info(`[Endfield] Injected CSS length: ${css.length}`)
+
         // Generate Image using Yunzai puppeteer
         // We will READ the html template manually, and use art-template to render it to a string
         // Then pass the full HTML to puppeteer. 

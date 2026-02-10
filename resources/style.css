@@ -102,7 +102,7 @@ body {
     padding: 10px;
     position: relative;
     overflow: hidden;
-    height: 120px;
+    height: 120px !important;
     /* Fixed height to prevent expansion */
 }
 
