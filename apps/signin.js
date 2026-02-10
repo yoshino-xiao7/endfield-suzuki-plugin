@@ -2,6 +2,18 @@ import plugin from '../../../lib/plugins/plugin.js'
 import api from '../model/api.js'
 import data from '../model/data.js'
 
+/**
+ * 将 HH:MM 格式的时间转换为 Cron 表达式
+ * @param {string} time - 时间字符串，格式为 HH:MM，如 '08:05'
+ * @returns {string} Cron 表达式
+ */
+function timeToCron(time) {
+    const match = time?.match(/^(\d{1,2}):(\d{2})$/)
+    if (!match) return '0 5 8 * * ?' // 解析失败则使用默认 08:05
+    const [, hour, minute] = match
+    return `0 ${parseInt(minute)} ${parseInt(hour)} * * ?`
+}
+
 export class SigninApp extends plugin {
     constructor() {
         super({
@@ -13,9 +25,9 @@ export class SigninApp extends plugin {
                 { reg: '^#(终末地|endfield)刷新$', fnc: 'refresh' }
             ]
         })
-        // 自动签到定时任务
+        // 自动签到定时任务 (从 HH:MM 格式的 autoSignTime 转换为 Cron)
         this.task = {
-            cron: api.config.autoSignCron || '0 5 8 * * ?',
+            cron: timeToCron(api.config.autoSignTime),
             name: 'Endfield自动签到',
             fnc: () => this.autoSignAll()
         }

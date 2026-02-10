@@ -21,7 +21,7 @@ export function supportGuoba() {
                 { field: 'apiKey', label: 'API Key', bottomHelpMessage: '在 Endfield Cloud 后台生成', component: 'Input', required: true },
                 { field: 'apiBaseUrl', label: 'API 地址', bottomHelpMessage: '默认 https://api.suzuki.ink/api', component: 'Input' },
                 { field: 'autoSignEnabled', label: '自动签到', component: 'Switch' },
-                { field: 'autoSignCron', label: '签到时间(Cron)', bottomHelpMessage: '默认每天 08:05', component: 'Input' }
+                { field: 'autoSignTime', label: '签到时间', bottomHelpMessage: '格式 HH:MM，如 08:05 表示每天早上 8 点 5 分', component: 'Input', componentProps: { placeholder: '08:05' } }
             ],
             getConfigData() {
                 const defPath = path.join(process.cwd(), 'plugins/endfield-plugin/defSet/config.yaml')
