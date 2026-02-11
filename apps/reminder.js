@@ -38,7 +38,7 @@ export class ReminderApp extends plugin {
 
         for (const { qq, bindingId } of all) {
             try {
-                const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+                const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
                 const dungeon = result.data?.detail?.dungeon
                 if (!dungeon) continue
 
@@ -70,7 +70,7 @@ export class ReminderApp extends plugin {
 
         for (const { qq, bindingId } of all) {
             try {
-                const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+                const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
                 const daily = result.data?.detail?.dailyMission
                 if (!daily) continue
 

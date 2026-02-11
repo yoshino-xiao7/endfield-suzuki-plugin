@@ -22,7 +22,7 @@ export class SpaceshipApp extends plugin {
 
         try {
             e.reply('⏳ 正在获取帝江号信息...')
-            const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+            const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
 
             const img = await Render.renderSpaceship(result.data)
             e.reply(img)

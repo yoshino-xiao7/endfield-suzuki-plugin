@@ -26,7 +26,7 @@ export class CardApp extends plugin {
 
         try {
             e.reply('⏳ 正在获取终末地信息...')
-            const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+            const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
 
             // Render Profile Image
             const img = await Render.renderProfile(result.data)
@@ -51,7 +51,7 @@ export class CardApp extends plugin {
 
         try {
             e.reply(`⏳ 正在获取 ${name} 的信息...`)
-            const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+            const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
 
             // Render Character Image
             const img = await Render.renderCharacter(result.data, name)

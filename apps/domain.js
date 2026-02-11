@@ -22,7 +22,7 @@ export class DomainApp extends plugin {
 
         try {
             e.reply('⏳ 正在获取领地基建信息...')
-            const { data: result } = await api.requestWithAutoRefresh('/skland/endfield/card', 'GET', null, bindingId)
+            const { data: result } = await api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId)
 
             const img = await Render.renderDomain(result.data)
             e.reply(img)
