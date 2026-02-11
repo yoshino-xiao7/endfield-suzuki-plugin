@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 700px;
+            background: transparent;
+        }
+
+        .domain-card {
+            background: #121214;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+        }
+
+        .domain-header {
+            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
+            padding: 20px 25px;
+            border-bottom: 2px solid #fbce06;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .domain-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .domain-subtitle {
+            font-size: 13px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .domain-player {
+            text-align: right;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        .domain-player .name {
+            font-size: 16px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .domains-list {
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .region-card {
+            background: #1e1e20;
+            border-radius: 10px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .region-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #252527 0%, #1e1e20 100%);
+            border-bottom: 1px solid #333;
+        }
+
+        .region-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .region-level {
+            font-size: 12px;
+            color: #000;
+            background: #fbce06;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .region-body {
+            padding: 12px 18px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            color: #fbce06;
+            font-weight: bold;
+            border-left: 3px solid #fbce06;
+            padding-left: 8px;
+            margin-bottom: 8px;
+            margin-top: 10px;
+        }
+
+        .section-label:first-child {
+            margin-top: 0;
+        }
+
+        /* Settlements */
+        .settlements {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .settlement {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #252527;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+
+        .stm-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stm-name {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .stm-officer {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        .stm-level {
+            font-size: 12px;
+            color: #fbce06;
+            font-weight: bold;
+            background: #2a2a00;
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #fbce06;
+        }
+
+        /* Collections */
+        .collections {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .collect-item {
+            background: #252527;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .collect-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .collect-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .collect-value.puzzle {
+            color: #55aaff;
+        }
+
+        .collect-value.chest {
+            color: #ffaa55;
+        }
+
+        .collect-value.piece {
+            color: #aa55ff;
+        }
+
+        .collect-value.blackbox {
+            color: #ff5577;
+        }
+
+        .domain-footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+            color: #444;
+            background: #151517;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="domain-card">
+        <div class="domain-header">
+            <div>
+                <div class="domain-title">领地基建</div>
+                <div class="domain-subtitle">城市总览</div>
+            </div>
+            <div class="domain-player">
+                <div class="name">{{playerName}}</div>
+            </div>
+        </div>
+
+        <div class="domains-list">
+            {{each domains dm}}
+            <div class="region-card">
+                <div class="region-header">
+                    <div class="region-name">{{dm.name}}</div>
+                    <div class="region-level">Lv.{{dm.level}}</div>
+                </div>
+                <div class="region-body">
+                    <!-- Settlements -->
+                    <div class="section-label">定居点</div>
+                    <div class="settlements">
+                        {{each dm.settlements stm}}
+                        <div class="settlement">
+                            <div class="stm-left">
+                                <div class="stm-name">{{stm.name}}</div>
+                                {{if stm.officer}}
+                                <div class="stm-officer">👤 {{stm.officer}}</div>
+                                {{/if}}
+                            </div>
+                            <div class="stm-level">Lv.{{stm.level}}</div>
+                        </div>
+                        {{/each}}
+                    </div>
+
+                    <!-- Collections -->
+                    <div class="section-label">收集进度</div>
+                    <div class="collections">
+                        <div class="collect-item">
+                            <div class="collect-value puzzle">{{dm.totalPuzzle}}</div>
+                            <div class="collect-label">谜题</div>
+                        </div>
+                        <div class="collect-item">
+                            <div class="collect-value chest">{{dm.totalChest}}</div>
+                            <div class="collect-label">宝箱</div>
+                        </div>
+                        <div class="collect-item">
+                            <div class="collect-value piece">{{dm.totalPiece}}</div>
+                            <div class="collect-label">醚质</div>
+                        </div>
+                        <div class="collect-item">
+                            <div class="collect-value blackbox">{{dm.totalBlackbox}}</div>
+                            <div class="collect-label">黑箱</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="domain-footer">Powered by Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>

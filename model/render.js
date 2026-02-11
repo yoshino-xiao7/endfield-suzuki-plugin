@@ -145,4 +145,52 @@ export default class Render {
             rooms
         })
     }
+
+    static async renderDomain(data) {
+        const base = data.detail.base
+        const domainList = data.detail.domain || []
+        const charList = data.detail.chars || []
+
+        // 通过 charId 查找角色名称
+        const resolveCharName = (charId) => {
+            if (!charId || charId === '0') return null
+            for (const c of charList) {
+                if (c.charData && (c.charId === charId || c.charData.id === charId)) {
+                    return c.charData.name
+                }
+            }
+            return charId.substring(0, 8) + '...'
+        }
+
+        const domains = domainList.map(dm => {
+            // 汇总收集进度
+            let totalPuzzle = 0, totalChest = 0, totalPiece = 0, totalBlackbox = 0
+            for (const col of (dm.collections || [])) {
+                totalPuzzle += col.puzzleCount || 0
+                totalChest += col.trchestCount || 0
+                totalPiece += col.pieceCount || 0
+                totalBlackbox += col.blackboxCount || 0
+            }
+
+            return {
+                name: dm.name || dm.domainId,
+                level: dm.level,
+                settlements: (dm.settlements || []).map(stm => ({
+                    name: stm.name,
+                    level: stm.level,
+                    officer: resolveCharName(stm.officerCharIds)
+                })),
+                totalPuzzle,
+                totalChest,
+                totalPiece,
+                totalBlackbox
+            }
+        })
+
+        return await puppeteer.screenshot('endfield-domain', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'domain.html'),
+            playerName: base.name,
+            domains
+        })
+    }
 }

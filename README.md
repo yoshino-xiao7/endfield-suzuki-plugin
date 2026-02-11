@@ -2,7 +2,7 @@
 
 # endfield-suzuki-plugin
 
-基于 [Endfield Cloud](https://endfield.suzuki.ink) 的 Yunzai-Bot **终末地**助手插件 · 绑定 / 签到 / 角色查询
+基于 [Endfield Cloud](https://endfield.suzuki.ink) 的 Yunzai-Bot **终末地**助手插件 · 绑定 / 签到 / 角色查询 / 基建 / 理智提醒
 
 [安装](#安装插件) · [功能](#当前功能) · [配置](#配置)
 
@@ -12,7 +12,7 @@
 
 - 一个适用于 [Yunzai 系列机器人框架](https://github.com/yhArcadia/Yunzai-Bot-plugins-index) 的明日方舟：终末地游戏助手插件
 
-- 支持 Token / 手机验证码绑定，支持每日自动签到、凭证自动刷新、角色信息查询
+- 支持 Token / 手机验证码绑定，支持每日自动签到、凭证自动刷新、角色信息查询、基建查询、理智溢出提醒、每日任务提醒
 
 - 兼容 [锅巴面板](https://github.com/guoba-yunzai/guoba-plugin) 可视化配置
 
@@ -55,6 +55,7 @@ git clone https://github.com/yoshino-xiao7/endfield-suzuki-plugin ./plugins/endf
 ```yaml
 apiKey: ef_xxxxxxxxxxxxxxxx  # 你的 API Key
 autoSignEnabled: true         # 开启自动签到
+staminaThreshold: 240         # 理智提醒阈值（可选）
 ```
 
 ---
@@ -88,7 +89,17 @@ autoSignEnabled: true         # 开启自动签到
 
 | 命令 | 说明 |
 |------|------|
-| `#终末地角色` / `#终末地卡片` | 查询角色信息（昵称、等级、UID 等） |
+| `#终末地信息` | 查询玩家资料卡（等级、理智、每日任务、武器/干员数量等） |
+| `#终末地角色 <角色名>` | 查询角色详情卡（立绘、等级、武器、技能、装备等） |
+| `#终末地帝江号` | 查询帝江号基建（各房间等级、驻守干员、好感度） |
+| `#终末地基建` | 查询领地基建（区域等级、定居点、收集进度） |
+
+### 自动提醒
+
+| 功能 | 说明 |
+|------|------|
+| ⚡ 理智提醒 | 每 30 分钟检查，理智 ≥ 阈值（默认 240）时私聊提醒 |
+| 📋 每日任务提醒 | 每天 21:00 检查，未完成每日任务时私聊提醒 |
 
 ### 管理员
 
@@ -109,6 +120,7 @@ autoSignEnabled: true         # 开启自动签到
 | `apiBaseUrl` | `https://api.suzuki.ink/api` | API 地址 |
 | `autoSignEnabled` | `true` | 是否开启自动签到 |
 | `autoSignTime` | `08:05` | 自动签到时间（HH:MM 格式，如 `08:05` 表示每天 8:05） |
+| `staminaThreshold` | `240` | 理智提醒阈值（达到此值时私聊提醒） |
 
 ### 目录结构
 
@@ -118,10 +130,20 @@ plugins/endfield-plugin/
 ├── apps/
 │   ├── bind.js              # 绑定 / 解绑指令
 │   ├── signin.js            # 签到指令 + 自动签到
-│   └── card.js              # 角色信息查询
+│   ├── card.js              # 信息/角色查询
+│   ├── spaceship.js         # 帝江号基建查询
+│   ├── domain.js            # 领地基建查询
+│   ├── reminder.js          # 理智/每日任务提醒
+│   └── update.js            # 插件更新
 ├── model/
 │   ├── api.js               # API 请求封装
-│   └── data.js              # QQ↔bindingId 存储
+│   ├── data.js              # QQ↔bindingId 存储
+│   └── render.js            # 卡片渲染
+├── resources/
+│   ├── profile.html         # 玩家资料卡模板
+│   ├── character.html       # 角色详情卡模板
+│   ├── spaceship.html       # 帝江号卡模板
+│   └── domain.html          # 领地基建卡模板
 ├── config/
 │   └── config.yaml          # 用户配置（锅巴可编辑）
 ├── defSet/
@@ -138,6 +160,9 @@ plugins/endfield-plugin/
 - 🔑 **双重绑定方式**：Token 一步绑定 / 手机验证码两步绑定
 - ⏰ **自动签到**：支持自定义时间（HH:MM 格式），每天自动为所有用户签到
 - 🔄 **凭证自动刷新**：请求失败时自动刷新凭证并重试，减少手动操作
+- 🖼️ **丰富卡片**：资料卡、角色详情卡、帝江号卡、领地基建卡（全部图片渲染）
+- ⚡ **理智提醒**：每 30 分钟检查理智，接近溢出时私聊提醒（阈值可配置）
+- 📋 **每日任务提醒**：每天 21:00 自动检查，未完成时私聊提醒
 - 🔒 **隐私保护**：群聊中发送敏感信息时自动提醒私聊，并尝试撤回消息
 - ⚙️ **锅巴面板**：可通过可视化界面管理所有配置项
 
