@@ -40,28 +40,16 @@ export class SigninApp extends plugin {
         try {
             // 使用自动刷新封装，凭证过期时自动重试
             const { data: result, refreshed } = await api.requestWithAutoRefresh(
-                `/skland/bindings/${bindingId}/signin`, 'POST'
+                `/skland/bindings/${bindingId}/signin`, 'POST', null, bindingId
             )
 
-            // 后端对重复签到也返回 code:200，需要通过 message/data 判断
+            // 后端现在直接返回签到结果字符串
             const signinData = result.data
-            if (typeof signinData === 'string' || result.message?.includes('已签到')) {
+            if (typeof signinData === 'string' && signinData.includes('已签到')) {
                 return e.reply('📋 今日已签到')
             }
 
-            let msg = '✅ 签到成功！'
-
-            // 解析签到奖励: awardIds + resourceInfoMap
-            if (signinData?.awardIds && signinData?.resourceInfoMap) {
-                const awards = signinData.awardIds
-                    .map(a => signinData.resourceInfoMap[a.id])
-                    .filter(Boolean)
-                    .map(item => `${item.name} ×${item.count}`)
-                if (awards.length > 0) {
-                    msg += `\n🎁 获得: ${awards.join('、')}`
-                }
-            }
-
+            let msg = `✅ ${signinData || '签到成功！'}`
             if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
             e.reply(msg)
         } catch (err) {
@@ -77,8 +65,10 @@ export class SigninApp extends plugin {
 
     // ========== 手动刷新凭证 ==========
     async refresh(e) {
+        const bindingId = data.getBindingId(e.user_id)
+        if (!bindingId) return e.reply('❌ 请先绑定')
         try {
-            await api.refreshCred()
+            await api.refreshCred(bindingId)
             e.reply('✅ 凭证刷新成功！')
         } catch (err) {
             e.reply(`❌ 刷新失败: ${err.message}\n如果持续失败，请重新绑定`)
@@ -92,26 +82,16 @@ export class SigninApp extends plugin {
         for (const { qq, bindingId } of all) {
             try {
                 const { data: result, refreshed } = await api.requestWithAutoRefresh(
-                    `/skland/bindings/${bindingId}/signin`, 'POST'
+                    `/skland/bindings/${bindingId}/signin`, 'POST', null, bindingId
                 )
 
                 const signinData = result.data
-                // 重复签到检测（后端返回 code:200 但 data 为字符串）
-                if (typeof signinData === 'string' || result.message?.includes('已签到')) {
+                // 重复签到检测
+                if (typeof signinData === 'string' && signinData.includes('已签到')) {
                     logger.info(`[Endfield] 📋 QQ=${qq}: 今日已签到`)
                     Bot.pickUser(qq).sendMsg('📋 终末地自动签到: 今日已签到')
                 } else {
-                    // 签到成功，解析奖励
-                    let msg = '✅ 终末地自动签到成功！'
-                    if (signinData?.awardIds && signinData?.resourceInfoMap) {
-                        const awards = signinData.awardIds
-                            .map(a => signinData.resourceInfoMap[a.id])
-                            .filter(Boolean)
-                            .map(item => `${item.name} ×${item.count}`)
-                        if (awards.length > 0) {
-                            msg += `\n🎁 获得: ${awards.join('、')}`
-                        }
-                    }
+                    let msg = `✅ 终末地自动签到成功！\n${signinData || ''}`
                     if (refreshed) msg += '\n⚠️ 凭证已自动刷新'
                     logger.info(`[Endfield] ✅ QQ=${qq}${refreshed ? ' (凭证已刷新)' : ''}`)
                     Bot.pickUser(qq).sendMsg(msg)
