@@ -2,6 +2,9 @@ import plugin from '../../../lib/plugins/plugin.js'
 import api from '../model/api.js'
 import data from '../model/data.js'
 
+// 模块级标志：防止多实例重复注册 setInterval
+let _staminaStarted = false
+
 export class ReminderApp extends plugin {
     constructor() {
         super({
@@ -19,10 +22,15 @@ export class ReminderApp extends plugin {
             fnc: () => this.checkDaily()
         }
 
-        // 每 30 分钟检查理智 (用 setInterval，因为 this.task 只能有一个)
-        this._staminaTimer = setInterval(() => this.checkStamina(), 30 * 60 * 1000)
-        // 启动后 2 分钟先检查一次
-        setTimeout(() => this.checkStamina(), 2 * 60 * 1000)
+        // 防止多实例重复注册定时器（Yunzai 可能创建多个插件实例）
+        if (!_staminaStarted) {
+            _staminaStarted = true
+            // 每 30 分钟检查理智
+            setInterval(() => this.checkStamina(), 30 * 60 * 1000)
+            // 启动后 2 分钟先检查一次
+            setTimeout(() => this.checkStamina(), 2 * 60 * 1000)
+            logger.info('[Endfield] 理智定时检查已注册')
+        }
     }
 
     /**
