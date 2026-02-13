@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 700px;
+            background: transparent;
+        }
+
+        .stats-card {
+            background: #121214;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+        }
+
+        .stats-header {
+            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
+            padding: 18px 25px;
+            border-bottom: 2px solid #fbce06;
+        }
+
+        .stats-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .stats-sub {
+            font-size: 13px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        /* ===== 总览区 ===== */
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            padding: 15px 20px;
+        }
+
+        .ov-item {
+            background: #1e1e20;
+            border-radius: 10px;
+            padding: 14px 10px;
+            text-align: center;
+            border: 1px solid #333;
+        }
+
+        .ov-value {
+            font-size: 26px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .ov-label {
+            font-size: 11px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* ===== 池区域 ===== */
+        .pool-section {
+            margin: 0 15px 15px;
+            background: #1a1a1c;
+            border-radius: 10px;
+            border: 1px solid #333;
+            overflow: hidden;
+        }
+
+        .pool-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            background: linear-gradient(135deg, #252527, #1e1e20);
+            border-bottom: 1px solid #333;
+        }
+
+        .pool-name {
+            font-size: 17px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .pool-count-badge {
+            font-size: 12px;
+            color: #000;
+            background: #fbce06;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .pool-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2c;
+        }
+
+        .ps-item {
+            text-align: center;
+        }
+
+        .ps-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .ps-label {
+            font-size: 10px;
+            color: #777;
+            margin-top: 2px;
+        }
+
+        /* ===== 6星条形图 ===== */
+        .six-star-list {
+            padding: 10px 16px 14px;
+        }
+
+        .six-star-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            height: 28px;
+        }
+
+        .ss-name {
+            width: 80px;
+            font-size: 12px;
+            color: #ccc;
+            text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .ss-bar-bg {
+            flex: 1;
+            height: 22px;
+            background: #252527;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ss-bar {
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 8px;
+            font-size: 11px;
+            font-weight: bold;
+            color: #fff;
+            min-width: 40px;
+            box-sizing: border-box;
+        }
+
+        .bar-green {
+            background: linear-gradient(90deg, #2e7d32, #4caf50);
+        }
+
+        .bar-yellow {
+            background: linear-gradient(90deg, #e65100, #ff9800);
+        }
+
+        .bar-red {
+            background: linear-gradient(90deg, #b71c1c, #f44336);
+        }
+
+        .ss-up {
+            width: 36px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .ss-up-yes {
+            color: #4caf50;
+        }
+
+        .ss-up-no {
+            color: #f44336;
+        }
+
+        .pity-info {
+            padding: 8px 16px 12px;
+            font-size: 12px;
+            color: #888;
+            border-top: 1px solid #2a2a2c;
+        }
+
+        .pity-info span {
+            color: #fbce06;
+            font-weight: bold;
+        }
+
+        .no-six {
+            padding: 14px 16px;
+            font-size: 13px;
+            color: #666;
+            text-align: center;
+        }
+
+        .stats-footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+            color: #444;
+            background: #151517;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stats-card">
+        <div class="stats-header">
+            <div class="stats-title">抽卡统计</div>
+            <div class="stats-sub">共 {{totalPulls}} 抽 · {{totalSixStar}} 个6★</div>
+        </div>
+
+        <!-- 总览 -->
+        <div class="overview">
+            <div class="ov-item">
+                <div class="ov-value">{{totalPulls}}</div>
+                <div class="ov-label">总抽数</div>
+            </div>
+            <div class="ov-item">
+                <div class="ov-value">{{totalSixStar}}</div>
+                <div class="ov-label">6★数量</div>
+            </div>
+            <div class="ov-item">
+                <div class="ov-value">{{avgPerSix}}</div>
+                <div class="ov-label">平均每金</div>
+            </div>
+            <div class="ov-item">
+                <div class="ov-value">{{upRate}}</div>
+                <div class="ov-label">UP不歪率</div>
+            </div>
+        </div>
+
+        <!-- 各池统计 -->
+        {{each poolStats ps}}
+        <div class="pool-section">
+            <div class="pool-header">
+                <div class="pool-name">{{ps.poolName}}</div>
+                <div class="pool-count-badge">{{ps.totalPulls}} 抽</div>
+            </div>
+            <div class="pool-stats">
+                <div class="ps-item">
+                    <div class="ps-value">{{ps.totalPulls}}</div>
+                    <div class="ps-label">总抽数</div>
+                </div>
+                <div class="ps-item">
+                    <div class="ps-value">{{ps.sixCount}}</div>
+                    <div class="ps-label">6★数量</div>
+                </div>
+                <div class="ps-item">
+                    <div class="ps-value">{{ps.avgPull}}</div>
+                    <div class="ps-label">平均出金</div>
+                </div>
+                <div class="ps-item">
+                    <div class="ps-value">{{ps.upInfo}}</div>
+                    <div class="ps-label">歪/出卡</div>
+                </div>
+            </div>
+
+            {{if ps.sixStars.length > 0}}
+            <div class="six-star-list">
+                {{each ps.sixStars ss}}
+                <div class="six-star-row">
+                    <div class="ss-name">{{ss.name}}</div>
+                    <div class="ss-bar-bg">
+                        <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%">{{ss.pulls}}抽</div>
+                    </div>
+                    <div class="ss-up {{ss.upClass}}">{{ss.upText}}</div>
+                </div>
+                {{/each}}
+            </div>
+            {{/if}}
+
+            {{if ps.sixStars.length === 0}}
+            <div class="no-six">暂无6★记录</div>
+            {{/if}}
+
+            <div class="pity-info">当前已垫 <span>{{ps.currentPity}}</span> 抽</div>
+        </div>
+        {{/each}}
+
+        <div class="stats-footer">Powered by Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>

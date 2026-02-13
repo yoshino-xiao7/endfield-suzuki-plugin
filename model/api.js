@@ -29,14 +29,14 @@ class EndfieldApi {
     get apiKey() { return this.config.apiKey }
     get baseUrl() { return this.config.apiBaseUrl }
 
-    async request(reqPath, method = 'GET', body = null) {
+    async request(reqPath, method = 'GET', body = null, timeout = 15000) {
         if (!this.apiKey) throw new Error('未配置 API Key，请联系管理员')
         const url = `${this.baseUrl}${reqPath}`
         const res = await fetch(url, {
             method,
             headers: { 'X-API-Key': this.apiKey, 'Content-Type': 'application/json' },
             body: body ? JSON.stringify(body) : null,
-            timeout: 15000
+            timeout
         })
 
         if (!res.ok) {
@@ -68,6 +68,16 @@ class EndfieldApi {
     unbind(bindingId) { return this.request(`/skland/bindings/${bindingId}`, 'DELETE') }
     getCard(bindingId) { return this.request(`/skland/endfield/card?bindingId=${bindingId}`) }
 
+    // ===== 抽卡 =====
+    syncGacha(bindingId) { return this.request(`/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, 60000) }
+    getGacha(bindingId, poolType, poolId) {
+        let url = `/skland/endfield/gacha?bindingId=${bindingId}`
+        if (poolType) url += `&poolType=${poolType}`
+        if (poolId) url += `&poolId=${encodeURIComponent(poolId)}`
+        return this.request(url)
+    }
+    getGachaPools(bindingId) { return this.request(`/skland/endfield/gacha/pools?bindingId=${bindingId}`) }
+
     // ===== 凭证维护（必须传 bindingId，否则会刷新所有用户） =====
     refreshCred(bindingId) { return this.request(`/skland/refresh?bindingId=${bindingId}`, 'POST') }
 
@@ -85,9 +95,9 @@ class EndfieldApi {
      * @param {string|number|null} bindingId - 绑定ID，用于刷新凭证
      * @returns {{ data, refreshed: boolean }}
      */
-    async requestWithAutoRefresh(reqPath, method = 'GET', body = null, bindingId = null) {
+    async requestWithAutoRefresh(reqPath, method = 'GET', body = null, bindingId = null, timeout = 15000) {
         try {
-            const data = await this.request(reqPath, method, body)
+            const data = await this.request(reqPath, method, body, timeout)
             return { data, refreshed: false }
         } catch (err) {
             const msg = err.message || ''
@@ -122,7 +132,7 @@ class EndfieldApi {
 
                 // 刷新完成，重试
                 try {
-                    const data = await this.request(reqPath, method, body)
+                    const data = await this.request(reqPath, method, body, timeout)
                     return { data, refreshed: true }
                 } catch (retryErr) {
                     throw new Error(`凭证已失效，请重新绑定 (${retryErr.message})`)

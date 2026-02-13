@@ -193,4 +193,134 @@ export default class Render {
             domains
         })
     }
+
+    // ===== 抽卡记录列表 =====
+    static async renderGachaRecords(records, poolName = '全部') {
+        // 按时间倒序，取最近 30 条显示
+        const sorted = [...records].sort((a, b) => (b.gachaTs || 0) - (a.gachaTs || 0))
+        const showList = sorted.slice(0, 30)
+
+        const fmtRecords = showList.map(r => ({
+            itemName: r.itemName || '???',
+            rarity: r.rarity || 3,
+            poolName: r.poolName ? r.poolName.replace('寻访', '') : '',
+            time: r.gachaTs ? new Date(r.gachaTs).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : '',
+            isUp: r.isUp
+        }))
+
+        return await puppeteer.screenshot('endfield-gacha-records', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
+            records: fmtRecords,
+            poolName,
+            totalCount: records.length,
+            showCount: showList.length
+        })
+    }
+
+    // ===== 抽卡统计（鸣潮风格） =====
+    static async renderGachaStats(records, pools) {
+        // 按池分组
+        const poolMap = new Map()
+        for (const p of pools) {
+            poolMap.set(p.poolId || p.poolName, {
+                poolName: p.poolName,
+                poolType: p.poolType,
+                records: []
+            })
+        }
+
+        // 分配记录到池
+        for (const r of records) {
+            const key = r.poolId || r.poolName
+            if (poolMap.has(key)) {
+                poolMap.get(key).records.push(r)
+            } else {
+                // 没匹配到的池，创建新的
+                poolMap.set(key, {
+                    poolName: r.poolName || key,
+                    poolType: r.poolType,
+                    records: [r]
+                })
+            }
+        }
+
+        let totalPulls = records.length
+        let totalSixStar = 0
+        let totalUp = 0
+        let totalUpEligible = 0 // isUp !== null 的 6 星数
+
+        const poolStats = []
+
+        for (const [, pool] of poolMap) {
+            if (pool.records.length === 0) continue
+
+            // 按时间升序排列
+            const sorted = [...pool.records].sort((a, b) => (a.gachaTs || 0) - (b.gachaTs || 0))
+
+            // 计算每个 6 星的抽数
+            let pullsSinceLast = 0
+            const sixStars = []
+
+            for (const r of sorted) {
+                pullsSinceLast++
+                if (r.rarity === 6) {
+                    sixStars.push({
+                        name: r.itemName || '???',
+                        pulls: pullsSinceLast,
+                        isUp: r.isUp
+                    })
+                    totalSixStar++
+                    if (r.isUp !== null && r.isUp !== undefined) {
+                        totalUpEligible++
+                        if (r.isUp === true) totalUp++
+                    }
+                    pullsSinceLast = 0
+                }
+            }
+
+            const currentPity = pullsSinceLast
+            const sixCount = sixStars.length
+            const avgPull = sixCount > 0 ? (sorted.length / sixCount).toFixed(1) : '-'
+            const upCount = sixStars.filter(s => s.isUp === true).length
+            const lostCount = sixStars.filter(s => s.isUp === false).length
+            const upInfo = (upCount + lostCount) > 0 ? `${lostCount}/${upCount + lostCount}` : '-'
+
+            // 格式化 6 星条形图数据
+            const maxPull = 90 // 软保底基准
+            const fmtSixStars = sixStars.map(s => {
+                const barWidth = Math.min(Math.max((s.pulls / maxPull) * 100, 8), 100)
+                let barColor = 'bar-green'
+                if (s.pulls > 70) barColor = 'bar-red'
+                else if (s.pulls > 50) barColor = 'bar-yellow'
+
+                let upText = '', upClass = ''
+                if (s.isUp === true) { upText = '✅UP'; upClass = 'ss-up-yes' }
+                else if (s.isUp === false) { upText = '❌歪'; upClass = 'ss-up-no' }
+
+                return { name: s.name, pulls: s.pulls, barWidth, barColor, upText, upClass }
+            })
+
+            poolStats.push({
+                poolName: pool.poolName,
+                totalPulls: sorted.length,
+                sixCount,
+                avgPull,
+                upInfo,
+                sixStars: fmtSixStars,
+                currentPity
+            })
+        }
+
+        const avgPerSix = totalSixStar > 0 ? (totalPulls / totalSixStar).toFixed(1) : '-'
+        const upRate = totalUpEligible > 0 ? `${(totalUp / totalUpEligible * 100).toFixed(1)}%` : '-'
+
+        return await puppeteer.screenshot('endfield-gacha-stats', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
+            totalPulls,
+            totalSixStar,
+            avgPerSix,
+            upRate,
+            poolStats
+        })
+    }
 }

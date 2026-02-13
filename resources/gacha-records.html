@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 700px;
+            background: transparent;
+        }
+
+        .gacha-card {
+            background: #121214;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid #333;
+        }
+
+        .gacha-header {
+            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
+            padding: 18px 25px;
+            border-bottom: 2px solid #fbce06;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .gacha-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #fbce06;
+        }
+
+        .gacha-count {
+            font-size: 13px;
+            color: #888;
+            margin-top: 3px;
+        }
+
+        .gacha-pool-name {
+            font-size: 14px;
+            color: #aaa;
+            background: #252527;
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+
+        .records-list {
+            padding: 8px 15px;
+        }
+
+        .record-row {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-bottom: 1px solid #1e1e20;
+            gap: 12px;
+        }
+
+        .record-row:last-child {
+            border-bottom: none;
+        }
+
+        .record-rarity {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .rarity-6 {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            color: #000;
+        }
+
+        .rarity-5 {
+            background: linear-gradient(135deg, #9c27b0, #ba68c8);
+            color: #fff;
+        }
+
+        .rarity-4 {
+            background: linear-gradient(135deg, #2196f3, #64b5f6);
+            color: #fff;
+        }
+
+        .rarity-3 {
+            background: #555;
+            color: #ccc;
+        }
+
+        .record-name {
+            flex: 1;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .record-name.r6 {
+            color: #ffb74d;
+        }
+
+        .record-name.r5 {
+            color: #ce93d8;
+        }
+
+        .record-name.r4 {
+            color: #90caf9;
+        }
+
+        .record-name.r3 {
+            color: #999;
+        }
+
+        .record-pool {
+            font-size: 11px;
+            color: #777;
+            width: 65px;
+            text-align: center;
+        }
+
+        .record-time {
+            font-size: 11px;
+            color: #666;
+            width: 90px;
+            text-align: right;
+        }
+
+        .record-up {
+            font-size: 11px;
+            width: 45px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .up-yes {
+            color: #4caf50;
+        }
+
+        .up-no {
+            color: #f44336;
+        }
+
+        .gacha-footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 10px;
+            color: #444;
+            background: #151517;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="gacha-card">
+        <div class="gacha-header">
+            <div>
+                <div class="gacha-title">抽卡记录</div>
+                <div class="gacha-count">共 {{totalCount}} 条，显示最近 {{showCount}} 条</div>
+            </div>
+            <div class="gacha-pool-name">{{poolName}}</div>
+        </div>
+
+        <div class="records-list">
+            {{each records r}}
+            <div class="record-row">
+                <div class="record-rarity rarity-{{r.rarity}}">{{r.rarity}}★</div>
+                <div class="record-name r{{r.rarity}}">{{r.itemName}}</div>
+                <div class="record-pool">{{r.poolName}}</div>
+                <div class="record-time">{{r.time}}</div>
+                <div class="record-up">
+                    {{if r.isUp === true}}<span class="up-yes">✅UP</span>{{/if}}
+                    {{if r.isUp === false}}<span class="up-no">❌歪</span>{{/if}}
+                </div>
+            </div>
+            {{/each}}
+        </div>
+
+        <div class="gacha-footer">Powered by Endfield Suzuki Plugin</div>
+    </div>
+</body>
+
+</html>
