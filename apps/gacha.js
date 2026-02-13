@@ -9,7 +9,7 @@ export class GachaApp extends plugin {
             name: 'Endfield抽卡',
             dsc: '终末地抽卡记录与统计',
             event: 'message',
-            priority: 500,
+            priority: 400,
             rule: [
                 { reg: '^#终末地同步抽卡$', fnc: 'sync' },
                 { reg: '^#终末地抽卡记录(.*)$', fnc: 'records' },
