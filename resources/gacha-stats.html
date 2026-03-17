@@ -8,71 +8,161 @@
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             margin: 0;
             padding: 0;
-            width: 700px;
+            width: 720px;
             background: transparent;
         }
 
         .stats-card {
-            background: #121214;
-            border-radius: 12px;
+            background: linear-gradient(180deg, #0f0f12 0%, #16161a 100%);
+            border-radius: 14px;
             overflow: hidden;
             color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            border: 1px solid #333;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(251, 206, 6, 0.15);
         }
 
+        /* ===== Header ===== */
         .stats-header {
-            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
-            padding: 18px 25px;
+            background: linear-gradient(135deg, #1e1c14 0%, #12110e 100%);
+            padding: 22px 28px 18px;
             border-bottom: 2px solid #fbce06;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
+
 
         .stats-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fbce06;
+            font-size: 26px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbce06, #fff0a0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
         }
 
         .stats-sub {
             font-size: 13px;
-            color: #888;
-            margin-top: 3px;
+            color: #998;
+            margin-top: 4px;
         }
 
-        /* ===== 总览区 ===== */
+        .luck-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .luck-eu {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .luck-normal {
+            background: linear-gradient(135deg, #e65100, #ff9800);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        }
+
+        .luck-fei {
+            background: linear-gradient(135deg, #b71c1c, #f44336);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
+        }
+
+        /* ===== Overview ===== */
         .overview {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 10px;
-            padding: 15px 20px;
+            padding: 16px 20px;
         }
 
         .ov-item {
-            background: #1e1e20;
+            background: linear-gradient(180deg, #1c1c20, #161618);
             border-radius: 10px;
-            padding: 14px 10px;
+            padding: 16px 8px 12px;
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ov-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fbce06, transparent);
         }
 
         .ov-value {
-            font-size: 26px;
-            font-weight: bold;
+            font-size: 28px;
+            font-weight: 900;
             color: #fbce06;
         }
 
         .ov-label {
             font-size: 11px;
-            color: #888;
+            color: #777;
             margin-top: 4px;
+            letter-spacing: 1px;
         }
 
-        /* ===== 池区域 ===== */
+        /* ===== 额外统计行 ===== */
+        .extra-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 0 20px 14px;
+        }
+
+        .es-item {
+            background: #1a1a1e;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #2a2a2e;
+        }
+
+        .es-value {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .es-label {
+            font-size: 10px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .es-green {
+            color: #4caf50;
+        }
+
+        .es-orange {
+            color: #ff9800;
+        }
+
+        .es-red {
+            color: #f44336;
+        }
+
+        .es-blue {
+            color: #42a5f5;
+        }
+
+        /* ===== Pool Section ===== */
         .pool-section {
-            margin: 0 15px 15px;
-            background: #1a1a1c;
-            border-radius: 10px;
-            border: 1px solid #333;
+            margin: 0 16px 14px;
+            background: linear-gradient(180deg, #18181c, #141416);
+            border-radius: 12px;
+            border: 1px solid #2a2a2e;
             overflow: hidden;
         }
 
@@ -81,110 +171,122 @@
             align-items: center;
             justify-content: space-between;
             padding: 14px 18px;
-            background: linear-gradient(135deg, #252527, #1e1e20);
-            border-bottom: 1px solid #333;
+            background: linear-gradient(135deg, #1f1f22, #18181c);
+            border-bottom: 1px solid #2a2a2e;
         }
 
         .pool-name {
             font-size: 17px;
             font-weight: bold;
-            color: #fff;
+            color: #eee;
         }
 
         .pool-count-badge {
             font-size: 12px;
             color: #000;
-            background: #fbce06;
-            padding: 3px 10px;
-            border-radius: 10px;
+            background: linear-gradient(135deg, #fbce06, #ffd740);
+            padding: 4px 12px;
+            border-radius: 12px;
             font-weight: bold;
+            box-shadow: 0 2px 6px rgba(251, 206, 6, 0.2);
         }
 
         .pool-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            padding: 12px 16px;
-            border-bottom: 1px solid #2a2a2c;
+            gap: 6px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #222225;
         }
 
         .ps-item {
             text-align: center;
+            padding: 4px 0;
         }
 
         .ps-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #fff;
         }
 
         .ps-label {
             font-size: 10px;
-            color: #777;
+            color: #666;
             margin-top: 2px;
         }
 
-        /* ===== 6星条形图 ===== */
+        /* ===== 6★ Bar Chart ===== */
         .six-star-list {
-            padding: 10px 16px 14px;
+            padding: 12px 14px 6px;
         }
 
         .six-star-row {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
-            height: 28px;
+            gap: 8px;
+            margin-bottom: 5px;
+            height: 30px;
+        }
+
+        .ss-idx {
+            width: 18px;
+            font-size: 10px;
+            color: #555;
+            text-align: center;
+            flex-shrink: 0;
         }
 
         .ss-name {
-            width: 80px;
+            width: 72px;
             font-size: 12px;
-            color: #ccc;
+            color: #bbb;
             text-align: right;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             flex-shrink: 0;
+            font-weight: 500;
         }
 
         .ss-bar-bg {
             flex: 1;
-            height: 22px;
-            background: #252527;
-            border-radius: 4px;
+            height: 24px;
+            background: #1e1e22;
+            border-radius: 5px;
             overflow: hidden;
             position: relative;
         }
 
         .ss-bar {
             height: 100%;
-            border-radius: 4px;
+            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
             padding-right: 8px;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             color: #fff;
-            min-width: 40px;
+            min-width: 44px;
             box-sizing: border-box;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .bar-green {
-            background: linear-gradient(90deg, #2e7d32, #4caf50);
+            background: linear-gradient(90deg, #1b5e20, #43a047, #66bb6a);
         }
 
         .bar-yellow {
-            background: linear-gradient(90deg, #e65100, #ff9800);
+            background: linear-gradient(90deg, #e65100, #fb8c00, #ffa726);
         }
 
         .bar-red {
-            background: linear-gradient(90deg, #b71c1c, #f44336);
+            background: linear-gradient(90deg, #b71c1c, #e53935, #ef5350);
         }
 
         .ss-up {
-            width: 36px;
+            width: 40px;
             text-align: center;
             font-size: 11px;
             font-weight: bold;
@@ -192,50 +294,88 @@
         }
 
         .ss-up-yes {
-            color: #4caf50;
+            color: #66bb6a;
         }
 
         .ss-up-no {
-            color: #f44336;
+            color: #ef5350;
         }
 
+        /* ===== Pity Info ===== */
         .pity-info {
-            padding: 8px 16px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px 14px;
             font-size: 12px;
-            color: #888;
-            border-top: 1px solid #2a2a2c;
+            color: #777;
+            border-top: 1px solid #222225;
         }
 
-        .pity-info span {
+        .pity-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: #222225;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .pity-bar {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .pity-bar-safe {
+            background: linear-gradient(90deg, #2e7d32, #4caf50);
+        }
+
+        .pity-bar-warn {
+            background: linear-gradient(90deg, #e65100, #ff9800);
+        }
+
+        .pity-bar-danger {
+            background: linear-gradient(90deg, #b71c1c, #f44336);
+        }
+
+        .pity-count {
             color: #fbce06;
             font-weight: bold;
+            font-size: 14px;
+            flex-shrink: 0;
         }
 
         .no-six {
-            padding: 14px 16px;
+            padding: 18px 16px;
             font-size: 13px;
-            color: #666;
+            color: #555;
             text-align: center;
         }
 
+        /* ===== Footer ===== */
         .stats-footer {
-            text-align: center;
-            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
             font-size: 10px;
-            color: #444;
-            background: #151517;
+            color: #3a3a3e;
+            background: #0e0e10;
         }
     </style>
 </head>
 
 <body>
     <div class="stats-card">
+        <!-- Header with luck badge -->
         <div class="stats-header">
-            <div class="stats-title">抽卡统计</div>
-            <div class="stats-sub">共 {{totalPulls}} 抽 · {{totalSixStar}} 个6★</div>
+            <div class="header-left">
+                <div class="stats-title">抽卡统计</div>
+                <div class="stats-sub">共 {{totalPulls}} 抽 · {{totalSixStar}} 个6★ · 平均 {{avgPerSix}} 抽/金</div>
+            </div>
+            <div class="luck-badge {{luckClass}}">{{luckText}}</div>
         </div>
 
-        <!-- 总览 -->
+        <!-- Overview -->
         <div class="overview">
             <div class="ov-item">
                 <div class="ov-value">{{totalPulls}}</div>
@@ -255,7 +395,23 @@
             </div>
         </div>
 
-        <!-- 各池统计 -->
+        <!-- Extra stats row -->
+        <div class="extra-stats">
+            <div class="es-item">
+                <div class="es-value es-green">{{totalFiveStar}}</div>
+                <div class="es-label">5★数量</div>
+            </div>
+            <div class="es-item">
+                <div class="es-value es-orange">{{minPull}}</div>
+                <div class="es-label">最少出金</div>
+            </div>
+            <div class="es-item">
+                <div class="es-value es-red">{{maxPull}}</div>
+                <div class="es-label">最多出金</div>
+            </div>
+        </div>
+
+        <!-- Pool sections -->
         {{each poolStats ps}}
         <div class="pool-section">
             <div class="pool-header">
@@ -285,6 +441,7 @@
             <div class="six-star-list">
                 {{each ps.sixStars ss}}
                 <div class="six-star-row">
+                    <div class="ss-idx">{{ss.idx}}</div>
                     <div class="ss-name">{{ss.name}}</div>
                     <div class="ss-bar-bg">
                         <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%">{{ss.pulls}}抽</div>
@@ -299,11 +456,20 @@
             <div class="no-six">暂无6★记录</div>
             {{/if}}
 
-            <div class="pity-info">当前已垫 <span>{{ps.currentPity}}</span> 抽</div>
+            <div class="pity-info">
+                <span>已垫</span>
+                <div class="pity-bar-bg">
+                    <div class="pity-bar {{ps.pityBarColor}}" style="width: {{ps.pityBarWidth}}%"></div>
+                </div>
+                <div class="pity-count">{{ps.currentPity}} 抽</div>
+            </div>
         </div>
         {{/each}}
 
-        <div class="stats-footer">Powered by Endfield Suzuki Plugin</div>
+        <div class="stats-footer">
+            <span>Powered by Endfield Suzuki Plugin</span>
+            <span>{{updateTime}}</span>
+        </div>
     </div>
 </body>
 

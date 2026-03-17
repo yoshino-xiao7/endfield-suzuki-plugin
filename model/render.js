@@ -217,7 +217,7 @@ export default class Render {
         })
     }
 
-    // ===== 抽卡统计（鸣潮风格） =====
+    // ===== 抽卡统计（鸣潮风格 · 增强版） =====
     static async renderGachaStats(records, pools) {
         // 按池分组
         const poolMap = new Map()
@@ -229,13 +229,11 @@ export default class Render {
             })
         }
 
-        // 分配记录到池
         for (const r of records) {
             const key = r.poolId || r.poolName
             if (poolMap.has(key)) {
                 poolMap.get(key).records.push(r)
             } else {
-                // 没匹配到的池，创建新的
                 poolMap.set(key, {
                     poolName: r.poolName || key,
                     poolType: r.poolType,
@@ -246,18 +244,18 @@ export default class Render {
 
         let totalPulls = records.length
         let totalSixStar = 0
+        let totalFiveStar = records.filter(r => r.rarity === 5).length
         let totalUp = 0
-        let totalUpEligible = 0 // isUp !== null 的 6 星数
+        let totalUpEligible = 0
+        let allSixPulls = [] // 收集所有6星的抽数，用于全局 min/max
 
         const poolStats = []
 
         for (const [, pool] of poolMap) {
             if (pool.records.length === 0) continue
 
-            // 按时间升序排列
             const sorted = [...pool.records].sort((a, b) => (a.gachaTs || 0) - (b.gachaTs || 0))
 
-            // 计算每个 6 星的抽数
             let pullsSinceLast = 0
             const sixStars = []
 
@@ -269,6 +267,7 @@ export default class Render {
                         pulls: pullsSinceLast,
                         isUp: r.isUp
                     })
+                    allSixPulls.push(pullsSinceLast)
                     totalSixStar++
                     if (r.isUp !== null && r.isUp !== undefined) {
                         totalUpEligible++
@@ -285,10 +284,10 @@ export default class Render {
             const lostCount = sixStars.filter(s => s.isUp === false).length
             const upInfo = (upCount + lostCount) > 0 ? `${lostCount}/${upCount + lostCount}` : '-'
 
-            // 格式化 6 星条形图数据
-            const maxPull = 90 // 软保底基准
-            const fmtSixStars = sixStars.map(s => {
-                const barWidth = Math.min(Math.max((s.pulls / maxPull) * 100, 8), 100)
+            // 格式化条形图
+            const maxPullBase = 90
+            const fmtSixStars = sixStars.map((s, i) => {
+                const barWidth = Math.min(Math.max((s.pulls / maxPullBase) * 100, 8), 100)
                 let barColor = 'bar-green'
                 if (s.pulls > 70) barColor = 'bar-red'
                 else if (s.pulls > 50) barColor = 'bar-yellow'
@@ -297,8 +296,14 @@ export default class Render {
                 if (s.isUp === true) { upText = '✅UP'; upClass = 'ss-up-yes' }
                 else if (s.isUp === false) { upText = '❌歪'; upClass = 'ss-up-no' }
 
-                return { name: s.name, pulls: s.pulls, barWidth, barColor, upText, upClass }
+                return { idx: i + 1, name: s.name, pulls: s.pulls, barWidth, barColor, upText, upClass }
             })
+
+            // 垫抽进度条
+            const pityBarWidth = Math.min((currentPity / maxPullBase) * 100, 100)
+            let pityBarColor = 'pity-bar-safe'
+            if (currentPity > 70) pityBarColor = 'pity-bar-danger'
+            else if (currentPity > 50) pityBarColor = 'pity-bar-warn'
 
             poolStats.push({
                 poolName: pool.poolName,
@@ -307,20 +312,43 @@ export default class Render {
                 avgPull,
                 upInfo,
                 sixStars: fmtSixStars,
-                currentPity
+                currentPity,
+                pityBarWidth,
+                pityBarColor
             })
         }
 
         const avgPerSix = totalSixStar > 0 ? (totalPulls / totalSixStar).toFixed(1) : '-'
         const upRate = totalUpEligible > 0 ? `${(totalUp / totalUpEligible * 100).toFixed(1)}%` : '-'
+        const minPull = allSixPulls.length > 0 ? `${Math.min(...allSixPulls)}抽` : '-'
+        const maxPull = allSixPulls.length > 0 ? `${Math.max(...allSixPulls)}抽` : '-'
+
+        // 欧非评价
+        const avgNum = totalSixStar > 0 ? totalPulls / totalSixStar : 999
+        let luckText = '数据不足', luckClass = 'luck-normal'
+        if (totalSixStar >= 2) {
+            if (avgNum <= 45) { luckText = '🍀 欧皇'; luckClass = 'luck-eu' }
+            else if (avgNum <= 60) { luckText = '😊 小欧'; luckClass = 'luck-eu' }
+            else if (avgNum <= 70) { luckText = '😐 普通'; luckClass = 'luck-normal' }
+            else if (avgNum <= 80) { luckText = '😢 小非'; luckClass = 'luck-fei' }
+            else { luckText = '💀 非酋'; luckClass = 'luck-fei' }
+        }
+
+        const updateTime = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
 
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
             totalPulls,
             totalSixStar,
+            totalFiveStar,
             avgPerSix,
             upRate,
-            poolStats
+            minPull,
+            maxPull,
+            luckText,
+            luckClass,
+            poolStats,
+            updateTime
         })
     }
 }
