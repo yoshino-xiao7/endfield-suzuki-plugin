@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
             margin: 0;
@@ -12,83 +16,128 @@
             background: transparent;
         }
 
+        /* ===== Main Card ===== */
         .stats-card {
-            background: linear-gradient(180deg, #0f0f12 0%, #16161a 100%);
-            border-radius: 14px;
+            background: #0a0a0c;
+            background-image:
+                linear-gradient(rgba(255, 107, 0, 0.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 0, 0.025) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #c8c8cc;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+            position: relative;
             overflow: hidden;
-            color: #fff;
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(251, 206, 6, 0.15);
+        }
+
+        /* scanline overlay */
+        .stats-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255, 255, 255, 0.008) 3px, rgba(255, 255, 255, 0.008) 4px);
+            pointer-events: none;
+            z-index: 1;
         }
 
         /* ===== Header ===== */
         .stats-header {
-            background: linear-gradient(135deg, #1e1c14 0%, #12110e 100%);
-            padding: 22px 28px 18px;
-            border-bottom: 2px solid #fbce06;
+            background: linear-gradient(180deg, #12110e 0%, #0c0c0e 100%);
+            padding: 16px 24px 14px;
+            border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+            position: relative;
+        }
+
+        .stats-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 120px;
+            height: 1px;
+            background: #FF6B00;
+            box-shadow: 0 0 8px #FF6B00;
+        }
+
+        .header-meta {
+            font-size: 9px;
+            color: #3a3a40;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            font-family: 'Consolas', 'Courier New', monospace;
+        }
+
+        .header-main {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
         }
 
-
         .stats-title {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 900;
-            background: linear-gradient(135deg, #fbce06, #fff0a0);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: 2px;
+            color: #FF6B00;
+            letter-spacing: 3px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .title-deco {
+            display: inline-block;
+            width: 28px;
+            height: 2px;
+            background: #FF6B00;
+            box-shadow: 0 0 4px rgba(255, 107, 0, 0.4);
+            vertical-align: middle;
         }
 
         .stats-sub {
-            font-size: 13px;
-            color: #998;
+            font-size: 10px;
+            color: #4a4a50;
+            font-family: 'Consolas', 'Courier New', monospace;
+            letter-spacing: 1px;
             margin-top: 4px;
         }
 
         .luck-badge {
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 4px 14px;
+            font-size: 12px;
             font-weight: bold;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+            flex-shrink: 0;
         }
 
         .luck-eu {
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            background: #00BFA5;
+            color: #000;
         }
 
         .luck-normal {
-            background: linear-gradient(135deg, #e65100, #ff9800);
-            color: #fff;
-            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+            background: #5a5a60;
+            color: #ddd;
         }
 
         .luck-fei {
-            background: linear-gradient(135deg, #b71c1c, #f44336);
+            background: #D32F2F;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(244, 67, 54, 0.3);
         }
 
-        /* ===== Overview ===== */
+        /* ===== Overview Grid ===== */
         .overview {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            padding: 16px 20px;
+            gap: 1px;
+            padding: 16px 20px 8px;
         }
 
         .ov-item {
-            background: linear-gradient(180deg, #1c1c20, #161618);
-            border-radius: 10px;
-            padding: 16px 8px 12px;
+            background: #0e0e12;
+            border: 1px solid #1a1a20;
+            padding: 14px 6px 10px;
             text-align: center;
-            border: 1px solid #2a2a2e;
             position: relative;
-            overflow: hidden;
         }
 
         .ov-item::before {
@@ -96,259 +145,301 @@
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, #fbce06, transparent);
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #FF6B00, transparent);
         }
 
         .ov-value {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 900;
-            color: #fbce06;
+            color: #FF6B00;
+            font-family: 'Consolas', 'Courier New', monospace;
+            line-height: 1;
         }
 
         .ov-label {
-            font-size: 11px;
-            color: #777;
-            margin-top: 4px;
-            letter-spacing: 1px;
+            font-size: 9px;
+            color: #4a4a50;
+            margin-top: 6px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
-        /* ===== 额外统计行 ===== */
+        /* ===== Extra Stats ===== */
         .extra-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            padding: 0 20px 14px;
+            gap: 1px;
+            padding: 8px 20px 14px;
         }
 
         .es-item {
-            background: #1a1a1e;
-            border-radius: 8px;
-            padding: 10px;
+            background: #0e0e12;
+            border: 1px solid #1a1a20;
+            padding: 10px 6px 8px;
             text-align: center;
-            border: 1px solid #2a2a2e;
         }
 
         .es-value {
             font-size: 18px;
             font-weight: bold;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .es-label {
-            font-size: 10px;
-            color: #666;
-            margin-top: 2px;
+            font-size: 9px;
+            color: #3a3a40;
+            margin-top: 3px;
+            letter-spacing: 1px;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
-        .es-green {
-            color: #4caf50;
+        .es-cyan {
+            color: #00BFA5;
         }
 
         .es-orange {
-            color: #ff9800;
+            color: #FF6B00;
         }
 
         .es-red {
-            color: #f44336;
-        }
-
-        .es-blue {
-            color: #42a5f5;
+            color: #FF3D00;
         }
 
         /* ===== Pool Section ===== */
         .pool-section {
-            margin: 0 16px 14px;
-            background: linear-gradient(180deg, #18181c, #141416);
-            border-radius: 12px;
-            border: 1px solid #2a2a2e;
-            overflow: hidden;
+            margin: 0 16px 12px;
+            background: #0c0c0f;
+            border: 1px solid #1a1a20;
+            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+            position: relative;
         }
 
         .pool-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 18px;
-            background: linear-gradient(135deg, #1f1f22, #18181c);
-            border-bottom: 1px solid #2a2a2e;
+            padding: 12px 18px;
+            background: linear-gradient(90deg, rgba(255, 107, 0, 0.06), transparent);
+            border-bottom: 1px solid #1a1a20;
+        }
+
+        .pool-name-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pool-deco {
+            width: 20px;
+            height: 2px;
+            background: #FF6B00;
         }
 
         .pool-name {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
-            color: #eee;
+            color: #e0e0e4;
+            letter-spacing: 1px;
+        }
+
+        .pool-meta {
+            font-size: 8px;
+            color: #2a2a30;
+            font-family: 'Consolas', 'Courier New', monospace;
+            letter-spacing: 1px;
         }
 
         .pool-count-badge {
             font-size: 12px;
-            color: #000;
-            background: linear-gradient(135deg, #fbce06, #ffd740);
-            padding: 4px 12px;
-            border-radius: 12px;
+            color: #FF6B00;
+            border: 1px solid rgba(255, 107, 0, 0.4);
+            padding: 3px 10px;
             font-weight: bold;
-            box-shadow: 0 2px 6px rgba(251, 206, 6, 0.2);
+            font-family: 'Consolas', 'Courier New', monospace;
+            letter-spacing: 1px;
         }
 
         .pool-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 6px;
-            padding: 12px 14px;
-            border-bottom: 1px solid #222225;
+            gap: 0;
+            border-bottom: 1px solid #1a1a20;
         }
 
         .ps-item {
             text-align: center;
-            padding: 4px 0;
+            padding: 10px 4px;
+            border-right: 1px solid #1a1a20;
+        }
+
+        .ps-item:last-child {
+            border-right: none;
         }
 
         .ps-value {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            color: #fff;
+            color: #e0e0e4;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ps-label {
-            font-size: 10px;
-            color: #666;
+            font-size: 8px;
+            color: #3a3a40;
             margin-top: 2px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         /* ===== 6★ Bar Chart ===== */
         .six-star-list {
-            padding: 12px 14px 6px;
+            padding: 12px 16px 6px;
         }
 
         .six-star-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-            height: 30px;
+            gap: 6px;
+            margin-bottom: 4px;
+            height: 26px;
         }
 
         .ss-idx {
-            width: 18px;
-            font-size: 10px;
-            color: #555;
-            text-align: center;
+            width: 22px;
+            font-size: 9px;
+            color: #3a3a40;
+            text-align: right;
             flex-shrink: 0;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ss-name {
-            width: 72px;
-            font-size: 12px;
-            color: #bbb;
+            width: 70px;
+            font-size: 11px;
+            color: #909098;
             text-align: right;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
             flex-shrink: 0;
-            font-weight: 500;
         }
 
         .ss-bar-bg {
             flex: 1;
-            height: 24px;
-            background: #1e1e22;
-            border-radius: 5px;
+            height: 20px;
+            background: #111116;
+            border: 1px solid #1a1a20;
             overflow: hidden;
             position: relative;
         }
 
         .ss-bar {
             height: 100%;
-            border-radius: 5px;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 8px;
-            font-size: 12px;
+            padding-right: 6px;
+            font-size: 10px;
             font-weight: bold;
             color: #fff;
-            min-width: 44px;
-            box-sizing: border-box;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            min-width: 38px;
+            clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%);
+            font-family: 'Consolas', 'Courier New', monospace;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
         }
 
         .bar-green {
-            background: linear-gradient(90deg, #1b5e20, #43a047, #66bb6a);
+            background: linear-gradient(90deg, #004D40, #00897B, #00BFA5);
         }
 
         .bar-yellow {
-            background: linear-gradient(90deg, #e65100, #fb8c00, #ffa726);
+            background: linear-gradient(90deg, #BF360C, #E65100, #FF6B00);
         }
 
         .bar-red {
-            background: linear-gradient(90deg, #b71c1c, #e53935, #ef5350);
+            background: linear-gradient(90deg, #B71C1C, #D32F2F, #FF3D00);
         }
 
         .ss-up {
-            width: 40px;
+            width: 52px;
             text-align: center;
-            font-size: 11px;
+            font-size: 9px;
             font-weight: bold;
             flex-shrink: 0;
+            letter-spacing: 1px;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ss-up-yes {
-            color: #66bb6a;
+            color: #00BFA5;
         }
 
         .ss-up-no {
-            color: #ef5350;
+            color: #FF3D00;
         }
 
-        /* ===== Pity Info ===== */
-        .pity-info {
+        /* ===== Pity ===== */
+        .pity-section {
             display: flex;
             align-items: center;
             gap: 8px;
             padding: 10px 18px 14px;
-            font-size: 12px;
-            color: #777;
-            border-top: 1px solid #222225;
+            border-top: 1px solid #1a1a20;
+        }
+
+        .pity-label {
+            font-size: 8px;
+            color: #3a3a40;
+            letter-spacing: 2px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            flex-shrink: 0;
+            text-transform: uppercase;
         }
 
         .pity-bar-bg {
             flex: 1;
-            height: 6px;
-            background: #222225;
-            border-radius: 3px;
+            height: 4px;
+            background: #151518;
+            border: 1px solid #1a1a20;
             overflow: hidden;
         }
 
         .pity-bar {
             height: 100%;
-            border-radius: 3px;
         }
 
         .pity-bar-safe {
-            background: linear-gradient(90deg, #2e7d32, #4caf50);
+            background: linear-gradient(90deg, #004D40, #00BFA5);
         }
 
         .pity-bar-warn {
-            background: linear-gradient(90deg, #e65100, #ff9800);
+            background: linear-gradient(90deg, #E65100, #FF6B00);
         }
 
         .pity-bar-danger {
-            background: linear-gradient(90deg, #b71c1c, #f44336);
+            background: linear-gradient(90deg, #B71C1C, #FF3D00);
         }
 
         .pity-count {
-            color: #fbce06;
+            color: #FF6B00;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             flex-shrink: 0;
+            font-family: 'Consolas', 'Courier New', monospace;
+            letter-spacing: 1px;
         }
 
         .no-six {
-            padding: 18px 16px;
-            font-size: 13px;
-            color: #555;
+            padding: 16px;
+            font-size: 11px;
+            color: #3a3a40;
             text-align: center;
+            letter-spacing: 2px;
+            font-family: 'Consolas', 'Courier New', monospace;
         }
 
         /* ===== Footer ===== */
@@ -356,84 +447,97 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            font-size: 10px;
-            color: #3a3a3e;
-            background: #0e0e10;
+            padding: 10px 24px;
+            font-size: 8px;
+            color: #2a2a30;
+            border-top: 1px solid #1a1a20;
+            letter-spacing: 2px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            text-transform: uppercase;
         }
     </style>
 </head>
 
 <body>
     <div class="stats-card">
-        <!-- Header with luck badge -->
+        <!-- Header -->
         <div class="stats-header">
-            <div class="header-left">
-                <div class="stats-title">抽卡统计</div>
-                <div class="stats-sub">共 {{totalPulls}} 抽 · {{totalSixStar}} 个6★ · 平均 {{avgPerSix}} 抽/金</div>
+            <div class="header-meta">SYS.GACHA_ANALYSIS // PROTOCOL VER 2.1</div>
+            <div class="header-main">
+                <div>
+                    <div class="stats-title">
+                        <span class="title-deco"></span>
+                        抽卡统计
+                    </div>
+                    <div class="stats-sub">TOTAL: {{totalPulls}} PULLS // {{totalSixStar}} AU.UNITS // AVG {{avgPerSix}}</div>
+                </div>
+                <div class="luck-badge {{luckClass}}">{{luckText}}</div>
             </div>
-            <div class="luck-badge {{luckClass}}">{{luckText}}</div>
         </div>
 
-        <!-- Overview -->
+        <!-- Overview Readouts -->
         <div class="overview">
             <div class="ov-item">
                 <div class="ov-value">{{totalPulls}}</div>
-                <div class="ov-label">总抽数</div>
+                <div class="ov-label">TOTAL</div>
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{totalSixStar}}</div>
-                <div class="ov-label">6★数量</div>
+                <div class="ov-label">6★.COUNT</div>
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{avgPerSix}}</div>
-                <div class="ov-label">平均每金</div>
+                <div class="ov-label">AVG/AU</div>
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{upRate}}</div>
-                <div class="ov-label">UP不歪率</div>
+                <div class="ov-label">UP.RATE</div>
             </div>
         </div>
 
-        <!-- Extra stats row -->
+        <!-- Extra -->
         <div class="extra-stats">
             <div class="es-item">
-                <div class="es-value es-green">{{totalFiveStar}}</div>
-                <div class="es-label">5★数量</div>
+                <div class="es-value es-cyan">{{totalFiveStar}}</div>
+                <div class="es-label">5★.COUNT</div>
             </div>
             <div class="es-item">
                 <div class="es-value es-orange">{{minPull}}</div>
-                <div class="es-label">最少出金</div>
+                <div class="es-label">MIN.PULL</div>
             </div>
             <div class="es-item">
                 <div class="es-value es-red">{{maxPull}}</div>
-                <div class="es-label">最多出金</div>
+                <div class="es-label">MAX.PULL</div>
             </div>
         </div>
 
-        <!-- Pool sections -->
+        <!-- Pool Sections -->
         {{each poolStats ps}}
         <div class="pool-section">
             <div class="pool-header">
-                <div class="pool-name">{{ps.poolName}}</div>
-                <div class="pool-count-badge">{{ps.totalPulls}} 抽</div>
+                <div class="pool-name-area">
+                    <div class="pool-deco"></div>
+                    <div class="pool-name">{{ps.poolName}}</div>
+                </div>
+                <div class="pool-meta">FREQ: {{ps.avgPull}} // IDX: {{ps.sixCount}}</div>
+                <div class="pool-count-badge">{{ps.totalPulls}} PULLS</div>
             </div>
             <div class="pool-stats">
                 <div class="ps-item">
                     <div class="ps-value">{{ps.totalPulls}}</div>
-                    <div class="ps-label">总抽数</div>
+                    <div class="ps-label">TOTAL</div>
                 </div>
                 <div class="ps-item">
                     <div class="ps-value">{{ps.sixCount}}</div>
-                    <div class="ps-label">6★数量</div>
+                    <div class="ps-label">6★</div>
                 </div>
                 <div class="ps-item">
                     <div class="ps-value">{{ps.avgPull}}</div>
-                    <div class="ps-label">平均出金</div>
+                    <div class="ps-label">AVG/AU</div>
                 </div>
                 <div class="ps-item">
                     <div class="ps-value">{{ps.upInfo}}</div>
-                    <div class="ps-label">歪/出卡</div>
+                    <div class="ps-label">MISS/OUT</div>
                 </div>
             </div>
 
@@ -441,10 +545,10 @@
             <div class="six-star-list">
                 {{each ps.sixStars ss}}
                 <div class="six-star-row">
-                    <div class="ss-idx">{{ss.idx}}</div>
+                    <div class="ss-idx">#{{ss.idx}}</div>
                     <div class="ss-name">{{ss.name}}</div>
                     <div class="ss-bar-bg">
-                        <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%">{{ss.pulls}}抽</div>
+                        <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%">{{ss.pulls}}</div>
                     </div>
                     <div class="ss-up {{ss.upClass}}">{{ss.upText}}</div>
                 </div>
@@ -453,21 +557,21 @@
             {{/if}}
 
             {{if ps.sixStars.length === 0}}
-            <div class="no-six">暂无6★记录</div>
+            <div class="no-six">NO 6★ DATA RECORDED</div>
             {{/if}}
 
-            <div class="pity-info">
-                <span>已垫</span>
+            <div class="pity-section">
+                <div class="pity-label">PITY //</div>
                 <div class="pity-bar-bg">
                     <div class="pity-bar {{ps.pityBarColor}}" style="width: {{ps.pityBarWidth}}%"></div>
                 </div>
-                <div class="pity-count">{{ps.currentPity}} 抽</div>
+                <div class="pity-count">{{ps.currentPity}}/90</div>
             </div>
         </div>
         {{/each}}
 
         <div class="stats-footer">
-            <span>Powered by Endfield Suzuki Plugin</span>
+            <span>ENDFIELD SUZUKI PLUGIN // TERMINAL OUTPUT</span>
             <span>{{updateTime}}</span>
         </div>
     </div>

@@ -293,8 +293,8 @@ export default class Render {
                 else if (s.pulls > 50) barColor = 'bar-yellow'
 
                 let upText = '', upClass = ''
-                if (s.isUp === true) { upText = '✅UP'; upClass = 'ss-up-yes' }
-                else if (s.isUp === false) { upText = '❌歪'; upClass = 'ss-up-no' }
+                if (s.isUp === true) { upText = '▲ UP'; upClass = 'ss-up-yes' }
+                else if (s.isUp === false) { upText = '△ MISS'; upClass = 'ss-up-no' }
 
                 return { idx: i + 1, name: s.name, pulls: s.pulls, barWidth, barColor, upText, upClass }
             })
@@ -320,18 +320,18 @@ export default class Render {
 
         const avgPerSix = totalSixStar > 0 ? (totalPulls / totalSixStar).toFixed(1) : '-'
         const upRate = totalUpEligible > 0 ? `${(totalUp / totalUpEligible * 100).toFixed(1)}%` : '-'
-        const minPull = allSixPulls.length > 0 ? `${Math.min(...allSixPulls)}抽` : '-'
-        const maxPull = allSixPulls.length > 0 ? `${Math.max(...allSixPulls)}抽` : '-'
+        const minPull = allSixPulls.length > 0 ? `${Math.min(...allSixPulls)}` : '-'
+        const maxPull = allSixPulls.length > 0 ? `${Math.max(...allSixPulls)}` : '-'
 
-        // 欧非评价
+        // 欧非评价（工业风标识）
         const avgNum = totalSixStar > 0 ? totalPulls / totalSixStar : 999
-        let luckText = '数据不足', luckClass = 'luck-normal'
+        let luckText = 'PENDING', luckClass = 'luck-normal'
         if (totalSixStar >= 2) {
-            if (avgNum <= 45) { luckText = '🍀 欧皇'; luckClass = 'luck-eu' }
-            else if (avgNum <= 60) { luckText = '😊 小欧'; luckClass = 'luck-eu' }
-            else if (avgNum <= 70) { luckText = '😐 普通'; luckClass = 'luck-normal' }
-            else if (avgNum <= 80) { luckText = '😢 小非'; luckClass = 'luck-fei' }
-            else { luckText = '💀 非酋'; luckClass = 'luck-fei' }
+            if (avgNum <= 45) { luckText = 'S · 欧皇'; luckClass = 'luck-eu' }
+            else if (avgNum <= 60) { luckText = 'A · 小欧'; luckClass = 'luck-eu' }
+            else if (avgNum <= 70) { luckText = 'B · 普通'; luckClass = 'luck-normal' }
+            else if (avgNum <= 80) { luckText = 'C · 小非'; luckClass = 'luck-fei' }
+            else { luckText = 'D · 非酋'; luckClass = 'luck-fei' }
         }
 
         const updateTime = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
