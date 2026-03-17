@@ -338,6 +338,7 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
+            scale: 2,
             totalPulls,
             totalSixStar,
             totalFiveStar,

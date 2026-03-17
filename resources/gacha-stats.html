@@ -14,99 +14,107 @@
             padding: 0;
             width: 720px;
             background: transparent;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== Main Card ===== */
         .stats-card {
-            background: #0a0a0c;
+            background: #0F1112;
             background-image:
-                linear-gradient(rgba(255, 107, 0, 0.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 107, 0, 0.025) 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: #c8c8cc;
-            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+                linear-gradient(rgba(0, 229, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.015) 1px, transparent 1px);
+            background-size: 28px 28px;
+            color: #b0b0b4;
+            clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+            position: relative;
+        }
+
+        /* ===== Header Banner ===== */
+        .banner {
+            height: 220px;
+            background: linear-gradient(135deg, #0a0e10 0%, #0F1216 40%, #101418 100%);
             position: relative;
             overflow: hidden;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.12);
         }
 
-        /* scanline overlay */
-        .stats-card::after {
+        /* diagonal scan line decoration */
+        .banner::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(255, 255, 255, 0.008) 3px, rgba(255, 255, 255, 0.008) 4px);
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 8px,
+                rgba(0, 229, 255, 0.015) 8px,
+                rgba(0, 229, 255, 0.015) 9px
+            );
             pointer-events: none;
-            z-index: 1;
         }
 
-        /* ===== Header ===== */
-        .stats-header {
-            background: linear-gradient(180deg, #12110e 0%, #0c0c0e 100%);
-            padding: 16px 24px 14px;
-            border-bottom: 1px solid rgba(255, 107, 0, 0.3);
-            position: relative;
-        }
-
-        .stats-header::after {
+        /* subtle bottom glow line */
+        .banner::after {
             content: '';
             position: absolute;
-            bottom: -1px;
+            bottom: 0;
             left: 0;
-            width: 120px;
+            width: 200px;
             height: 1px;
             background: #FF6B00;
-            box-shadow: 0 0 8px #FF6B00;
+            box-shadow: 0 0 12px rgba(255, 107, 0, 0.3);
         }
 
-        .header-meta {
+        .banner-content {
+            position: absolute;
+            bottom: 24px;
+            left: 28px;
+            right: 28px;
+        }
+
+        .banner-meta {
             font-size: 9px;
-            color: #3a3a40;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 6px;
+            color: #2a2e30;
+            letter-spacing: 4px;
             font-family: 'Consolas', 'Courier New', monospace;
+            text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
-        .header-main {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-
-        .stats-title {
-            font-size: 22px;
+        .banner-title {
+            font-size: 28px;
             font-weight: 900;
             color: #FF6B00;
-            letter-spacing: 3px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+            letter-spacing: 4px;
+            margin-bottom: 6px;
         }
 
-        .title-deco {
+        .banner-title::before {
+            content: '';
             display: inline-block;
-            width: 28px;
-            height: 2px;
+            width: 32px;
+            height: 3px;
             background: #FF6B00;
-            box-shadow: 0 0 4px rgba(255, 107, 0, 0.4);
             vertical-align: middle;
+            margin-right: 12px;
         }
 
-        .stats-sub {
-            font-size: 10px;
-            color: #4a4a50;
+        .banner-sub {
+            font-size: 11px;
+            color: #3a3e42;
             font-family: 'Consolas', 'Courier New', monospace;
             letter-spacing: 1px;
-            margin-top: 4px;
         }
 
         .luck-badge {
-            padding: 4px 14px;
-            font-size: 12px;
+            position: absolute;
+            bottom: 28px;
+            right: 28px;
+            padding: 5px 18px;
+            font-size: 13px;
             font-weight: bold;
-            letter-spacing: 2px;
-            clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-            flex-shrink: 0;
+            letter-spacing: 3px;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
         }
 
         .luck-eu {
@@ -115,8 +123,8 @@
         }
 
         .luck-normal {
-            background: #5a5a60;
-            color: #ddd;
+            background: #3a3e42;
+            color: #aaa;
         }
 
         .luck-fei {
@@ -124,20 +132,24 @@
             color: #fff;
         }
 
-        /* ===== Overview Grid ===== */
+        /* ===== Overview Readouts ===== */
         .overview {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            padding: 16px 20px 8px;
+            gap: 0;
+            margin: 20px 24px 0;
+            border: 1px solid #1a1e22;
         }
 
         .ov-item {
-            background: #0e0e12;
-            border: 1px solid #1a1a20;
-            padding: 14px 6px 10px;
+            padding: 18px 8px 14px;
             text-align: center;
+            border-right: 1px solid #1a1e22;
             position: relative;
+        }
+
+        .ov-item:last-child {
+            border-right: none;
         }
 
         .ov-item::before {
@@ -147,93 +159,84 @@
             left: 0;
             width: 3px;
             height: 100%;
-            background: linear-gradient(180deg, #FF6B00, transparent);
+            background: linear-gradient(180deg, rgba(255, 107, 0, 0.5), transparent);
         }
 
         .ov-value {
-            font-size: 30px;
+            font-size: 32px;
             font-weight: 900;
-            color: #FF6B00;
+            color: #00E5FF;
             font-family: 'Consolas', 'Courier New', monospace;
             line-height: 1;
         }
 
         .ov-label {
-            font-size: 9px;
-            color: #4a4a50;
-            margin-top: 6px;
-            letter-spacing: 2px;
+            font-size: 8px;
+            color: #3a3e42;
+            margin-top: 8px;
+            letter-spacing: 3px;
             text-transform: uppercase;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
-        /* ===== Extra Stats ===== */
+        /* ===== Extra Stats Row ===== */
         .extra-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1px;
-            padding: 8px 20px 14px;
+            gap: 0;
+            margin: 0 24px 24px;
+            border: 1px solid #1a1e22;
+            border-top: none;
         }
 
         .es-item {
-            background: #0e0e12;
-            border: 1px solid #1a1a20;
-            padding: 10px 6px 8px;
+            padding: 12px 8px 10px;
             text-align: center;
+            border-right: 1px solid #1a1e22;
+        }
+
+        .es-item:last-child {
+            border-right: none;
         }
 
         .es-value {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: bold;
             font-family: 'Consolas', 'Courier New', monospace;
+            color: #00E5FF;
         }
 
         .es-label {
-            font-size: 9px;
-            color: #3a3a40;
+            font-size: 8px;
+            color: #2a2e30;
             margin-top: 3px;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             font-family: 'Consolas', 'Courier New', monospace;
-        }
-
-        .es-cyan {
-            color: #00BFA5;
-        }
-
-        .es-orange {
-            color: #FF6B00;
-        }
-
-        .es-red {
-            color: #FF3D00;
         }
 
         /* ===== Pool Section ===== */
         .pool-section {
-            margin: 0 16px 12px;
-            background: #0c0c0f;
-            border: 1px solid #1a1a20;
-            clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-            position: relative;
+            margin: 0 24px 18px;
+            border: 1px solid #1a1e22;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
         }
 
         .pool-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 18px;
-            background: linear-gradient(90deg, rgba(255, 107, 0, 0.06), transparent);
-            border-bottom: 1px solid #1a1a20;
+            padding: 14px 20px;
+            border-bottom: 1px solid #1a1e22;
         }
 
         .pool-name-area {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .pool-deco {
-            width: 20px;
+            width: 24px;
             height: 2px;
             background: #FF6B00;
         }
@@ -241,23 +244,15 @@
         .pool-name {
             font-size: 16px;
             font-weight: bold;
-            color: #e0e0e4;
-            letter-spacing: 1px;
-        }
-
-        .pool-meta {
-            font-size: 8px;
-            color: #2a2a30;
-            font-family: 'Consolas', 'Courier New', monospace;
-            letter-spacing: 1px;
+            color: #d0d0d4;
+            letter-spacing: 2px;
         }
 
         .pool-count-badge {
-            font-size: 12px;
-            color: #FF6B00;
-            border: 1px solid rgba(255, 107, 0, 0.4);
-            padding: 3px 10px;
-            font-weight: bold;
+            font-size: 11px;
+            color: #00E5FF;
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            padding: 3px 12px;
             font-family: 'Consolas', 'Courier New', monospace;
             letter-spacing: 1px;
         }
@@ -265,14 +260,13 @@
         .pool-stats {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 0;
-            border-bottom: 1px solid #1a1a20;
+            border-bottom: 1px solid #1a1e22;
         }
 
         .ps-item {
             text-align: center;
-            padding: 10px 4px;
-            border-right: 1px solid #1a1a20;
+            padding: 14px 4px;
+            border-right: 1px solid #1a1e22;
         }
 
         .ps-item:last-child {
@@ -280,47 +274,47 @@
         }
 
         .ps-value {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            color: #e0e0e4;
+            color: #d0d0d4;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ps-label {
             font-size: 8px;
-            color: #3a3a40;
-            margin-top: 2px;
-            letter-spacing: 1px;
+            color: #2a2e30;
+            margin-top: 4px;
+            letter-spacing: 2px;
             text-transform: uppercase;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
         /* ===== 6★ Bar Chart ===== */
         .six-star-list {
-            padding: 12px 16px 6px;
+            padding: 16px 20px 10px;
         }
 
         .six-star-row {
             display: flex;
             align-items: center;
-            gap: 6px;
-            margin-bottom: 4px;
+            gap: 8px;
+            margin-bottom: 6px;
             height: 26px;
         }
 
         .ss-idx {
             width: 22px;
             font-size: 9px;
-            color: #3a3a40;
+            color: #2a2e30;
             text-align: right;
             flex-shrink: 0;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ss-name {
-            width: 70px;
+            width: 72px;
             font-size: 11px;
-            color: #909098;
+            color: #808088;
             text-align: right;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -331,9 +325,9 @@
         .ss-bar-bg {
             flex: 1;
             height: 20px;
-            background: #111116;
-            border: 1px solid #1a1a20;
-            overflow: hidden;
+            background: #141618;
+            border: 1px solid #1a1e22;
+            overflow: visible;
             position: relative;
         }
 
@@ -342,14 +336,14 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            padding-right: 6px;
+            padding-right: 10px;
             font-size: 10px;
             font-weight: bold;
             color: #fff;
             min-width: 38px;
-            clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 50%, calc(100% - 6px) 100%, 0 100%);
+            clip-path: polygon(0 0, calc(100% - 7px) 0, 100% 50%, calc(100% - 7px) 100%, 0 100%);
             font-family: 'Consolas', 'Courier New', monospace;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
         }
 
         .bar-green {
@@ -361,40 +355,38 @@
         }
 
         .bar-red {
-            background: linear-gradient(90deg, #B71C1C, #D32F2F, #FF3D00);
+            background: linear-gradient(90deg, #B71C1C, #C62828, #D32F2F);
         }
 
         .ss-up {
-            width: 52px;
+            width: 44px;
             text-align: center;
             font-size: 9px;
-            font-weight: bold;
             flex-shrink: 0;
-            letter-spacing: 1px;
             font-family: 'Consolas', 'Courier New', monospace;
         }
 
         .ss-up-yes {
-            color: #00BFA5;
+            color: #00E5FF;
         }
 
         .ss-up-no {
-            color: #FF3D00;
+            color: #D32F2F;
         }
 
-        /* ===== Pity ===== */
+        /* ===== Pity Gauge ===== */
         .pity-section {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 18px 14px;
-            border-top: 1px solid #1a1a20;
+            gap: 10px;
+            padding: 14px 20px 16px;
+            border-top: 1px solid #1a1e22;
         }
 
         .pity-label {
             font-size: 8px;
-            color: #3a3a40;
-            letter-spacing: 2px;
+            color: #2a2e30;
+            letter-spacing: 3px;
             font-family: 'Consolas', 'Courier New', monospace;
             flex-shrink: 0;
             text-transform: uppercase;
@@ -403,13 +395,14 @@
         .pity-bar-bg {
             flex: 1;
             height: 4px;
-            background: #151518;
-            border: 1px solid #1a1a20;
+            background: #141618;
+            border: 1px solid #1a1e22;
             overflow: hidden;
         }
 
         .pity-bar {
             height: 100%;
+            clip-path: polygon(0 0, calc(100% - 3px) 0, 100% 100%, 0 100%);
         }
 
         .pity-bar-safe {
@@ -417,29 +410,30 @@
         }
 
         .pity-bar-warn {
-            background: linear-gradient(90deg, #E65100, #FF6B00);
+            background: linear-gradient(90deg, #BF360C, #FF6B00);
         }
 
         .pity-bar-danger {
-            background: linear-gradient(90deg, #B71C1C, #FF3D00);
+            background: linear-gradient(90deg, #B71C1C, #D32F2F);
         }
 
         .pity-count {
-            color: #FF6B00;
+            color: #00E5FF;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             flex-shrink: 0;
             font-family: 'Consolas', 'Courier New', monospace;
             letter-spacing: 1px;
         }
 
         .no-six {
-            padding: 16px;
-            font-size: 11px;
-            color: #3a3a40;
+            padding: 20px;
+            font-size: 10px;
+            color: #2a2e30;
             text-align: center;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             font-family: 'Consolas', 'Courier New', monospace;
+            text-transform: uppercase;
         }
 
         /* ===== Footer ===== */
@@ -447,11 +441,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 24px;
+            padding: 12px 28px;
             font-size: 8px;
-            color: #2a2a30;
-            border-top: 1px solid #1a1a20;
-            letter-spacing: 2px;
+            color: #1e2224;
+            border-top: 1px solid #1a1e22;
+            letter-spacing: 3px;
             font-family: 'Consolas', 'Courier New', monospace;
             text-transform: uppercase;
         }
@@ -460,22 +454,17 @@
 
 <body>
     <div class="stats-card">
-        <!-- Header -->
-        <div class="stats-header">
-            <div class="header-meta">SYS.GACHA_ANALYSIS // PROTOCOL VER 2.1</div>
-            <div class="header-main">
-                <div>
-                    <div class="stats-title">
-                        <span class="title-deco"></span>
-                        抽卡统计
-                    </div>
-                    <div class="stats-sub">TOTAL: {{totalPulls}} PULLS // {{totalSixStar}} AU.UNITS // AVG {{avgPerSix}}</div>
-                </div>
-                <div class="luck-badge {{luckClass}}">{{luckText}}</div>
+        <!-- Banner -->
+        <div class="banner">
+            <div class="banner-content">
+                <div class="banner-meta">SYS.GACHA_ANALYSIS // ENDFIELD PROTOCOL</div>
+                <div class="banner-title">协议回收记录</div>
+                <div class="banner-sub">TOTAL: {{totalPulls}} PULLS // {{totalSixStar}} AU.UNITS // AVG {{avgPerSix}}</div>
             </div>
+            <div class="luck-badge {{luckClass}}">{{luckText}}</div>
         </div>
 
-        <!-- Overview Readouts -->
+        <!-- Overview -->
         <div class="overview">
             <div class="ov-item">
                 <div class="ov-value">{{totalPulls}}</div>
@@ -483,31 +472,30 @@
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{totalSixStar}}</div>
-                <div class="ov-label">6★.COUNT</div>
+                <div class="ov-label">6★ COUNT</div>
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{avgPerSix}}</div>
-                <div class="ov-label">AVG/AU</div>
+                <div class="ov-label">AVG / AU</div>
             </div>
             <div class="ov-item">
                 <div class="ov-value">{{upRate}}</div>
-                <div class="ov-label">UP.RATE</div>
+                <div class="ov-label">UP RATE</div>
             </div>
         </div>
 
-        <!-- Extra -->
         <div class="extra-stats">
             <div class="es-item">
-                <div class="es-value es-cyan">{{totalFiveStar}}</div>
-                <div class="es-label">5★.COUNT</div>
+                <div class="es-value">{{totalFiveStar}}</div>
+                <div class="es-label">5★ COUNT</div>
             </div>
             <div class="es-item">
-                <div class="es-value es-orange">{{minPull}}</div>
-                <div class="es-label">MIN.PULL</div>
+                <div class="es-value">{{minPull}}</div>
+                <div class="es-label">MIN PULL</div>
             </div>
             <div class="es-item">
-                <div class="es-value es-red">{{maxPull}}</div>
-                <div class="es-label">MAX.PULL</div>
+                <div class="es-value">{{maxPull}}</div>
+                <div class="es-label">MAX PULL</div>
             </div>
         </div>
 
@@ -519,9 +507,9 @@
                     <div class="pool-deco"></div>
                     <div class="pool-name">{{ps.poolName}}</div>
                 </div>
-                <div class="pool-meta">FREQ: {{ps.avgPull}} // IDX: {{ps.sixCount}}</div>
                 <div class="pool-count-badge">{{ps.totalPulls}} PULLS</div>
             </div>
+
             <div class="pool-stats">
                 <div class="ps-item">
                     <div class="ps-value">{{ps.totalPulls}}</div>
@@ -533,11 +521,11 @@
                 </div>
                 <div class="ps-item">
                     <div class="ps-value">{{ps.avgPull}}</div>
-                    <div class="ps-label">AVG/AU</div>
+                    <div class="ps-label">AVG / AU</div>
                 </div>
                 <div class="ps-item">
                     <div class="ps-value">{{ps.upInfo}}</div>
-                    <div class="ps-label">MISS/OUT</div>
+                    <div class="ps-label">MISS / OUT</div>
                 </div>
             </div>
 
@@ -561,17 +549,17 @@
             {{/if}}
 
             <div class="pity-section">
-                <div class="pity-label">PITY //</div>
+                <div class="pity-label">PITY</div>
                 <div class="pity-bar-bg">
                     <div class="pity-bar {{ps.pityBarColor}}" style="width: {{ps.pityBarWidth}}%"></div>
                 </div>
-                <div class="pity-count">{{ps.currentPity}}/90</div>
+                <div class="pity-count">{{ps.currentPity}} / 90</div>
             </div>
         </div>
         {{/each}}
 
         <div class="stats-footer">
-            <span>ENDFIELD SUZUKI PLUGIN // TERMINAL OUTPUT</span>
+            <span>ENDFIELD SUZUKI PLUGIN // TERMINAL</span>
             <span>{{updateTime}}</span>
         </div>
     </div>
