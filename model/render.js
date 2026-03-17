@@ -9,6 +9,13 @@ const __dirname = path.dirname(__filename)
 const PLUGIN_ROOT = path.resolve(__dirname, '..')
 
 export default class Render {
+    static async renderHelp() {
+        return await puppeteer.screenshot('endfield-help', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'help.html'),
+            scale: 2
+        })
+    }
+
     static async renderProfile(data) {
         const base = data.detail.base
         const dungeon = data.detail.dungeon || {}

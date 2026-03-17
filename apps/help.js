@@ -1,20 +1,26 @@
 import plugin from '../../../lib/plugins/plugin.js'
+import Render from '../model/render.js'
 
 export class HelpApp extends plugin {
-  constructor() {
-    super({
-      name: 'Endfield帮助',
-      dsc: '终末地帮助指令',
-      event: 'message',
-      priority: 500,
-      rule: [
-        { reg: '^#终末地帮助$', fnc: 'help' }
-      ]
-    })
-  }
+    constructor() {
+        super({
+            name: 'Endfield帮助',
+            dsc: '终末地帮助指令',
+            event: 'message',
+            priority: 500,
+            rule: [
+                { reg: '^#终末地帮助$', fnc: 'help' }
+            ]
+        })
+    }
 
-  async help(e) {
-    const msg = `📖 终末地助手 · 指令帮助
+    async help(e) {
+        try {
+            const img = await Render.renderHelp()
+            e.reply(img)
+        } catch (err) {
+            logger.warn(`[Endfield] 帮助渲染失败: ${err.message}`)
+            e.reply(`📖 终末地助手 · 指令帮助
 
 📌 账号绑定
   #终末地绑定 <token>　Token绑定(私聊)
@@ -47,8 +53,7 @@ export class HelpApp extends plugin {
   #终末地更新　　更新插件
   #终末地强制更新　强制更新
 
-Powered by Endfield Suzuki Plugin`
-
-    e.reply(msg)
-  }
+Powered by Endfield Suzuki Plugin`)
+        }
+    }
 }

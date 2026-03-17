@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 600px;
+            background: transparent;
+            text-rendering: optimizeLegibility;
+        }
+
+        .help-card {
+            background: #0F1112;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.015) 1px, transparent 1px);
+            background-size: 28px 28px;
+            color: #b0b0b4;
+            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+        }
+
+        /* Header */
+        .help-header {
+            padding: 22px 28px 16px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.12);
+            position: relative;
+        }
+
+        .help-header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 160px;
+            height: 1px;
+            background: #FF6B00;
+            box-shadow: 0 0 8px rgba(255, 107, 0, 0.3);
+        }
+
+        .help-meta {
+            font-size: 9px;
+            color: #2a2e30;
+            letter-spacing: 4px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin-bottom: 8px;
+        }
+
+        .help-title {
+            font-size: 22px;
+            font-weight: 900;
+            color: #FF6B00;
+            letter-spacing: 3px;
+        }
+
+        .help-title::before {
+            content: '';
+            display: inline-block;
+            width: 28px;
+            height: 3px;
+            background: #FF6B00;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+
+        .help-sub {
+            font-size: 10px;
+            color: #3a3e42;
+            font-family: 'Consolas', 'Courier New', monospace;
+            margin-top: 6px;
+            letter-spacing: 1px;
+        }
+
+        /* Section */
+        .help-section {
+            margin: 14px 20px;
+            border: 1px solid #1a1e22;
+            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-bottom: 1px solid #1a1e22;
+        }
+
+        .section-deco {
+            width: 18px;
+            height: 2px;
+            background: #FF6B00;
+            flex-shrink: 0;
+        }
+
+        .section-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #d0d0d4;
+            letter-spacing: 2px;
+        }
+
+        /* Command rows */
+        .cmd-list {
+            padding: 6px 0;
+        }
+
+        .cmd-row {
+            display: flex;
+            align-items: baseline;
+            padding: 5px 16px;
+            gap: 12px;
+        }
+
+        .cmd-name {
+            font-size: 12px;
+            color: #00E5FF;
+            font-family: 'Consolas', 'Courier New', monospace;
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 200px;
+        }
+
+        .cmd-desc {
+            font-size: 11px;
+            color: #606468;
+        }
+
+        /* Note row (non-command info) */
+        .note-row {
+            padding: 6px 16px;
+            font-size: 11px;
+            color: #606468;
+        }
+
+        .note-row .note-label {
+            color: #FF6B00;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 10px;
+        }
+
+        /* Footer */
+        .help-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 28px;
+            font-size: 8px;
+            color: #1e2224;
+            border-top: 1px solid #1a1e22;
+            letter-spacing: 3px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="help-card">
+        <div class="help-header">
+            <div class="help-meta">SYS.COMMAND_INDEX // ENDFIELD PROTOCOL</div>
+            <div class="help-title">指令帮助</div>
+            <div class="help-sub">ENDFIELD SUZUKI PLUGIN // ALL AVAILABLE COMMANDS</div>
+        </div>
+
+        <!-- 账号绑定 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">📌</div>
+                <div class="section-title">账号绑定</div>
+            </div>
+            <div class="cmd-list">
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地绑定 &lt;token&gt;</div>
+                    <div class="cmd-desc">Token 绑定（仅私聊）</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地手机绑定 &lt;手机号&gt;</div>
+                    <div class="cmd-desc">手机验证码绑定（仅私聊）</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地解绑</div>
+                    <div class="cmd-desc">解除当前绑定</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 签到 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">📋</div>
+                <div class="section-title">签到</div>
+            </div>
+            <div class="cmd-list">
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地签到</div>
+                    <div class="cmd-desc">手动签到</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地刷新</div>
+                    <div class="cmd-desc">手动刷新凭证</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 信息查询 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">🔍</div>
+                <div class="section-title">信息查询</div>
+            </div>
+            <div class="cmd-list">
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地信息</div>
+                    <div class="cmd-desc">玩家资料卡</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地角色 &lt;名称&gt;</div>
+                    <div class="cmd-desc">角色详情卡</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地帝江号</div>
+                    <div class="cmd-desc">帝江号基建</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地基建</div>
+                    <div class="cmd-desc">领地基建</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 抽卡 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">🎰</div>
+                <div class="section-title">抽卡统计</div>
+            </div>
+            <div class="cmd-list">
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地同步抽卡</div>
+                    <div class="cmd-desc">同步抽卡记录</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地抽卡记录</div>
+                    <div class="cmd-desc">查看全部统计</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地抽卡记录 &lt;池名&gt;</div>
+                    <div class="cmd-desc">按池名查看</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地角色池记录</div>
+                    <div class="cmd-desc">角色池统计</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地武器池记录</div>
+                    <div class="cmd-desc">武器池统计</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地抽卡统计</div>
+                    <div class="cmd-desc">抽卡数据统计</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 自动提醒 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">⚡</div>
+                <div class="section-title">自动提醒</div>
+            </div>
+            <div class="cmd-list">
+                <div class="note-row"><span class="note-label">STAMINA //</span> 每30分钟检查，理智 ≥ 240 时私聊提醒</div>
+                <div class="note-row"><span class="note-label">DAILY //</span> 每天 21:00 检查，未完成时私聊提醒</div>
+            </div>
+        </div>
+
+        <!-- 管理员 -->
+        <div class="help-section">
+            <div class="section-header">
+                <div class="section-deco"></div>
+                <div class="section-icon">🔧</div>
+                <div class="section-title">管理员</div>
+            </div>
+            <div class="cmd-list">
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地更新</div>
+                    <div class="cmd-desc">更新插件</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地强制更新</div>
+                    <div class="cmd-desc">强制更新插件</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="help-footer">
+            <span>ENDFIELD SUZUKI PLUGIN // TERMINAL</span>
+            <span>VER 2.1</span>
+        </div>
+    </div>
+</body>
+
+</html>
