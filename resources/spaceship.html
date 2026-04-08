@@ -4,160 +4,45 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 650px;
-            background: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 650px; background: transparent; }
+        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
 
-        .ship-card {
-            background: #121214;
-            border-radius: 12px;
-            overflow: hidden;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            border: 1px solid #333;
-        }
+        .header { background: #242840; border-radius: 12px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #f97316, #ea580c, #dc2626); }
+        .header-title { font-size: 20px; font-weight: bold; color: #e8e8f0; }
+        .header-sub { font-size: 11px; color: #6a6e8a; margin-top: 3px; }
+        .header-player { font-size: 14px; color: #b0b4d0; font-weight: bold; }
 
-        .ship-header {
-            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
-            padding: 20px 25px;
-            border-bottom: 2px solid #fbce06;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .rooms-list { display: flex; flex-direction: column; gap: 10px; }
 
-        .ship-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fbce06;
-        }
+        .room-card { background: #242840; border-radius: 10px; overflow: hidden; }
+        .room-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #2e3250; }
+        .room-name { font-size: 15px; font-weight: bold; color: #e0e0f0; }
+        .room-level { font-size: 11px; color: #fff; background: linear-gradient(135deg, #f97316, #ea580c); padding: 3px 10px; border-radius: 12px; font-weight: bold; }
 
-        .ship-subtitle {
-            font-size: 13px;
-            color: #888;
-            margin-top: 3px;
-        }
+        .room-chars { padding: 10px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+        .room-char { display: flex; align-items: center; gap: 8px; background: #1a1d2e; padding: 6px 12px; border-radius: 8px; }
+        .char-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3a3e5a; object-fit: cover; background: #2e3250; }
+        .char-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: #2e3250; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6a6e8a; border: 2px solid #3a3e5a; }
+        .char-detail { display: flex; flex-direction: column; }
+        .char-name-tag { font-size: 13px; color: #d0d0e0; font-weight: 500; }
+        .char-fav { font-size: 10px; color: #f472b6; }
 
-        .ship-player {
-            text-align: right;
-            font-size: 14px;
-            color: #aaa;
-        }
+        .room-empty { padding: 12px 16px; font-size: 12px; color: #4a4e6a; }
 
-        .ship-player .name {
-            font-size: 16px;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .rooms-list {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .room-card {
-            background: #1e1e20;
-            border-radius: 10px;
-            border: 1px solid #333;
-            overflow: hidden;
-        }
-
-        .room-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            background: #252527;
-            border-bottom: 1px solid #333;
-        }
-
-        .room-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .room-level {
-            font-size: 12px;
-            color: #000;
-            background: #fbce06;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .room-chars {
-            padding: 10px 16px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .room-char {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: #2a2a2d;
-            padding: 6px 12px;
-            border-radius: 6px;
-            border: 1px solid #3a3a3d;
-        }
-
-        .char-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 1px solid #555;
-        }
-
-        .char-detail {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .char-name-tag {
-            font-size: 13px;
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .char-fav {
-            font-size: 10px;
-            color: #fbce06;
-        }
-
-        .room-empty {
-            padding: 10px 16px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .ship-footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 10px;
-            color: #444;
-            background: #151517;
-        }
+        .stats-footer { text-align: center; padding: 14px 0 2px; font-size: 10px; color: #3a3e5a; font-style: italic; }
     </style>
 </head>
 
 <body>
-    <div class="ship-card">
-        <div class="ship-header">
+    <div class="page">
+        <div class="header">
             <div>
-                <div class="ship-title">帝江号</div>
-                <div class="ship-subtitle">基建总览</div>
+                <div class="header-title">🚀 帝江号</div>
+                <div class="header-sub">基建总览</div>
             </div>
-            <div class="ship-player">
-                <div class="name">{{playerName}}</div>
-            </div>
+            <div class="header-player">{{playerName}}</div>
         </div>
 
         <div class="rooms-list">
@@ -174,7 +59,7 @@
                         {{if ch.avatar}}
                         <img class="char-avatar" src="{{ch.avatar}}" onerror="this.style.display='none'">
                         {{else}}
-                        <div class="char-avatar" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:14px;color:#888;">?</div>
+                        <div class="char-avatar-placeholder">?</div>
                         {{/if}}
                         <div class="char-detail">
                             <div class="char-name-tag">{{ch.name}}</div>
@@ -192,7 +77,7 @@
             {{/each}}
         </div>
 
-        <div class="ship-footer">Powered by Endfield Suzuki Plugin</div>
+        <div class="stats-footer">Generated by endfield-suzuki-plugin</div>
     </div>
 </body>
 

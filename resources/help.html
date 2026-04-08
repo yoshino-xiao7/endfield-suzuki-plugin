@@ -4,180 +4,54 @@
 <head>
     <meta charset="utf-8">
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 600px; background: transparent; text-rendering: optimizeLegibility; }
+        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
 
-        body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 600px;
-            background: transparent;
-            text-rendering: optimizeLegibility;
-        }
+        .header { background: #242840; border-radius: 12px; padding: 20px 24px; margin-bottom: 14px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #f97316, #ef4444, #a855f7); }
+        .help-meta { font-size: 9px; color: #3a3e5a; letter-spacing: 3px; font-family: 'Consolas', monospace; margin-bottom: 6px; }
+        .help-title { font-size: 22px; font-weight: 900; color: #e8e8f0; display: flex; align-items: center; gap: 10px; }
+        .help-title-bar { width: 28px; height: 3px; background: linear-gradient(90deg, #f97316, #ef4444); border-radius: 2px; }
+        .help-sub { font-size: 10px; color: #5a5e7a; font-family: 'Consolas', monospace; margin-top: 6px; letter-spacing: 1px; }
 
-        .help-card {
-            background: #0F1112;
-            background-image:
-                linear-gradient(rgba(0, 229, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 229, 255, 0.015) 1px, transparent 1px);
-            background-size: 28px 28px;
-            color: #b0b0b4;
-            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-        }
+        .help-section { background: #242840; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
 
-        /* Header */
-        .help-header {
-            padding: 22px 28px 16px;
-            border-bottom: 1px solid rgba(0, 229, 255, 0.12);
-            position: relative;
-        }
+        .section-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #2e3250; }
+        .section-dot { width: 4px; height: 14px; border-radius: 2px; }
+        .dot-orange { background: #f97316; }
+        .dot-cyan { background: #06b6d4; }
+        .dot-purple { background: #a855f7; }
+        .dot-green { background: #22c55e; }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #eab308; }
+        .section-icon { font-size: 14px; flex-shrink: 0; }
+        .section-title { font-size: 13px; font-weight: bold; color: #d0d0e0; letter-spacing: 1px; }
 
-        .help-header::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 160px;
-            height: 1px;
-            background: #FF6B00;
-            box-shadow: 0 0 8px rgba(255, 107, 0, 0.3);
-        }
+        .cmd-list { padding: 6px 0; }
+        .cmd-row { display: flex; align-items: baseline; padding: 5px 18px; gap: 14px; }
+        .cmd-name { font-size: 12px; color: #22d3ee; font-family: 'Consolas', monospace; white-space: nowrap; flex-shrink: 0; min-width: 200px; }
+        .cmd-desc { font-size: 11px; color: #6a6e8a; }
 
-        .help-meta {
-            font-size: 9px;
-            color: #2a2e30;
-            letter-spacing: 4px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            margin-bottom: 8px;
-        }
+        .note-row { padding: 6px 18px; font-size: 11px; color: #6a6e8a; }
+        .note-label { color: #f97316; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold; }
 
-        .help-title {
-            font-size: 22px;
-            font-weight: 900;
-            color: #FF6B00;
-            letter-spacing: 3px;
-        }
-
-        .help-title::before {
-            content: '';
-            display: inline-block;
-            width: 28px;
-            height: 3px;
-            background: #FF6B00;
-            vertical-align: middle;
-            margin-right: 10px;
-        }
-
-        .help-sub {
-            font-size: 10px;
-            color: #3a3e42;
-            font-family: 'Consolas', 'Courier New', monospace;
-            margin-top: 6px;
-            letter-spacing: 1px;
-        }
-
-        /* Section */
-        .help-section {
-            margin: 14px 20px;
-            border: 1px solid #1a1e22;
-            clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 16px;
-            border-bottom: 1px solid #1a1e22;
-        }
-
-        .section-deco {
-            width: 18px;
-            height: 2px;
-            background: #FF6B00;
-            flex-shrink: 0;
-        }
-
-        .section-icon {
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .section-title {
-            font-size: 13px;
-            font-weight: bold;
-            color: #d0d0d4;
-            letter-spacing: 2px;
-        }
-
-        /* Command rows */
-        .cmd-list {
-            padding: 6px 0;
-        }
-
-        .cmd-row {
-            display: flex;
-            align-items: baseline;
-            padding: 5px 16px;
-            gap: 12px;
-        }
-
-        .cmd-name {
-            font-size: 12px;
-            color: #00E5FF;
-            font-family: 'Consolas', 'Courier New', monospace;
-            white-space: nowrap;
-            flex-shrink: 0;
-            min-width: 200px;
-        }
-
-        .cmd-desc {
-            font-size: 11px;
-            color: #606468;
-        }
-
-        /* Note row (non-command info) */
-        .note-row {
-            padding: 6px 16px;
-            font-size: 11px;
-            color: #606468;
-        }
-
-        .note-row .note-label {
-            color: #FF6B00;
-            font-family: 'Consolas', 'Courier New', monospace;
-            font-size: 10px;
-        }
-
-        /* Footer */
-        .help-footer {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 28px;
-            font-size: 8px;
-            color: #1e2224;
-            border-top: 1px solid #1a1e22;
-            letter-spacing: 3px;
-            font-family: 'Consolas', 'Courier New', monospace;
-            text-transform: uppercase;
-        }
+        .help-footer { display: flex; justify-content: space-between; padding: 12px 0 2px; font-size: 9px; color: #3a3e5a; font-family: 'Consolas', monospace; letter-spacing: 2px; }
     </style>
 </head>
 
 <body>
-    <div class="help-card">
-        <div class="help-header">
+    <div class="page">
+        <div class="header">
             <div class="help-meta">SYS.COMMAND_INDEX // ENDFIELD PROTOCOL</div>
-            <div class="help-title">指令帮助</div>
+            <div class="help-title"><div class="help-title-bar"></div>指令帮助</div>
             <div class="help-sub">ENDFIELD SUZUKI PLUGIN // ALL AVAILABLE COMMANDS</div>
         </div>
 
         <!-- 账号绑定 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-orange"></div>
                 <div class="section-icon">📌</div>
                 <div class="section-title">账号绑定</div>
             </div>
@@ -200,7 +74,7 @@
         <!-- 签到 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-cyan"></div>
                 <div class="section-icon">📋</div>
                 <div class="section-title">签到</div>
             </div>
@@ -219,7 +93,7 @@
         <!-- 信息查询 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-purple"></div>
                 <div class="section-icon">🔍</div>
                 <div class="section-title">信息查询</div>
             </div>
@@ -246,7 +120,7 @@
         <!-- 抽卡 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-green"></div>
                 <div class="section-icon">🎰</div>
                 <div class="section-title">抽卡统计</div>
             </div>
@@ -281,7 +155,7 @@
         <!-- 自动提醒 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-yellow"></div>
                 <div class="section-icon">⚡</div>
                 <div class="section-title">自动提醒</div>
             </div>
@@ -294,7 +168,7 @@
         <!-- 管理员 -->
         <div class="help-section">
             <div class="section-header">
-                <div class="section-deco"></div>
+                <div class="section-dot dot-red"></div>
                 <div class="section-icon">🔧</div>
                 <div class="section-title">管理员</div>
             </div>

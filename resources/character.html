@@ -4,339 +4,146 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 900px;
-            background: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 900px; background: transparent; }
+        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
 
-        .char-card {
-            display: grid;
-            grid-template-columns: 500px 400px;
-            background: #121214;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid #333;
-            height: 600px;
-        }
+        .char-card { display: grid; grid-template-columns: 500px 1fr; background: #242840; border-radius: 12px; overflow: hidden; min-height: 580px; }
 
         /* Left Column */
-        .portrait-col {
-            position: relative;
-            background: radial-gradient(circle at center, #2e2e32 0%, #1a1a1c 100%);
-            overflow: hidden;
-        }
-
-        .portrait {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center top;
-        }
-
-        .char-info-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0) 100%);
-            padding: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .char-name {
-            font-size: 48px;
-            font-weight: bold;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .char-meta {
-            display: flex;
-            gap: 10px;
-            font-size: 16px;
-            color: #ddd;
-        }
-
-        .rarity {
-            color: #fbce06;
-        }
-
-        .property.char_property_fire {
-            color: #ff5555;
-        }
-
-        .property.char_property_cryst {
-            color: #55aaff;
-        }
-
-        .property.char_property_pulse {
-            color: #aa55ff;
-        }
-
-        .property.char_property_natural {
-            color: #55ff55;
-        }
-
-        .property.char_property_physical {
-            color: #aaaaaa;
-        }
+        .portrait-col { position: relative; background: radial-gradient(circle at 50% 30%, #2e3250 0%, #1a1d2e 100%); overflow: hidden; }
+        .portrait { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+        .char-info-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(26, 29, 46, 0.95) 0%, rgba(26, 29, 46, 0) 100%); padding: 24px; }
+        .char-name { font-size: 42px; font-weight: bold; color: #e8e8f0; }
+        .char-meta { display: flex; gap: 12px; font-size: 15px; margin-top: 4px; }
+        .rarity { color: #fbbf24; }
+        .property.char_property_fire { color: #f87171; }
+        .property.char_property_cryst { color: #60a5fa; }
+        .property.char_property_pulse { color: #c084fc; }
+        .property.char_property_natural { color: #4ade80; }
+        .property.char_property_physical { color: #94a3b8; }
 
         /* Right Column */
-        .detail-col {
-            padding: 25px;
-            background: #1a1a1c;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+        .detail-col { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
 
-        .section-title {
-            font-size: 14px;
-            color: #fbce06;
-            text-transform: uppercase;
-            border-left: 3px solid #fbce06;
-            padding-left: 8px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+        .section-title { font-size: 12px; color: #8a8eaa; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .section-dot { width: 4px; height: 14px; border-radius: 2px; }
+        .dot-cyan { background: #06b6d4; }
+        .dot-orange { background: #f97316; }
+        .dot-purple { background: #a855f7; }
+        .dot-green { background: #22c55e; }
 
         /* Stats */
-        .stats-row {
-            display: flex;
-            gap: 15px;
-        }
-
-        .stat-box {
-            background: #252527;
-            padding: 10px;
-            border-radius: 6px;
-            flex: 1;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #888;
-        }
-
-        .stat-value {
-            font-size: 18px;
-            color: #fff;
-            font-weight: bold;
-        }
+        .stats-row { display: flex; gap: 10px; }
+        .stat-box { background: #1a1d2e; padding: 12px 10px; border-radius: 8px; flex: 1; text-align: center; }
+        .stat-label { font-size: 10px; color: #5a5e7a; }
+        .stat-value { font-size: 18px; color: #e0e0f0; font-weight: bold; font-family: 'Consolas', monospace; margin-top: 2px; }
 
         /* Weapon */
-        .weapon-box {
-            display: flex;
-            align-items: center;
-            background: #252527;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
+        .weapon-box { display: flex; align-items: center; background: #1a1d2e; padding: 12px 14px; border-radius: 8px; gap: 14px; }
+        .weapon-icon { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #2e3250; flex-shrink: 0; }
+        .weapon-info { flex: 1; }
+        .weapon-name { font-size: 15px; color: #e0e0f0; font-weight: bold; }
+        .weapon-meta { font-size: 12px; color: #6a6e8a; margin-top: 2px; }
+        .refine { color: #fbbf24; font-weight: bold; margin-left: 6px; }
 
-        .weapon-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 4px;
-            margin-right: 15px;
-            background: #000;
-        }
-
-        .weapon-name {
-            font-size: 16px;
-            color: #fff;
-            font-weight: bold;
-        }
-
-        .weapon-meta {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 2px;
-        }
-
-        .refine {
-            color: #fbce06;
-            margin-left: 5px;
-        }
+        .empty-box { background: #1a1d2e; padding: 14px; border-radius: 8px; color: #4a4e6a; text-align: center; font-size: 13px; }
 
         /* Skills */
-        .skills-list {
-            display: flex;
-            gap: 10px;
-        }
-
-        .skill-item {
-            position: relative;
-            width: 60px;
-            height: 60px;
-            background: #252527;
-            border-radius: 8px;
-            border: 1px solid #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .skill-icon {
-            width: 40px;
-            height: 40px;
-        }
-
-        .skill-level {
-            position: absolute;
-            bottom: -5px;
-            right: -5px;
-            background: #000;
-            color: #fbce06;
-            font-size: 10px;
-            padding: 2px 5px;
-            border-radius: 4px;
-            border: 1px solid #fbce06;
-        }
+        .skills-list { display: flex; gap: 10px; }
+        .skill-item { position: relative; width: 56px; height: 56px; background: #1a1d2e; border-radius: 10px; display: flex; justify-content: center; align-items: center; }
+        .skill-icon { width: 38px; height: 38px; }
+        .skill-level { position: absolute; bottom: -4px; right: -4px; background: #242840; color: #fbbf24; font-size: 10px; padding: 2px 6px; border-radius: 6px; border: 1px solid #3a3e5a; font-weight: bold; }
 
         /* Equips */
-        .equips-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
-        }
+        .equips-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .equip-item { background: #1a1d2e; border-radius: 8px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        .equip-icon { width: 80%; height: 80%; object-fit: contain; }
+        .equip-level { position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: #d0d0e0; background: rgba(26, 29, 46, 0.85); padding: 1px 5px; border-radius: 4px; font-family: 'Consolas', monospace; }
+        .equip-empty { width: 80%; height: 80%; background: #2e3250; border-radius: 6px; }
 
-        .equip-item {
-            background: #252527;
-            border-radius: 8px;
-            aspect-ratio: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border: 1px solid #333;
-            position: relative;
-        }
-
-        .equip-icon {
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-
-        .equip-level {
-            position: absolute;
-            bottom: 2px;
-            right: 2px;
-            font-size: 10px;
-            color: #fff;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 1px 3px;
-            border-radius: 3px;
-        }
-
-        .empty-box {
-            background: #252527;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            color: #555;
-            text-align: center;
-        }
-
-        .equip-empty {
-            width: 80%;
-            height: 80%;
-            background: #333;
-            border-radius: 4px;
-        }
-
-        .copyright {
-            margin-top: auto;
-            text-align: right;
-            font-size: 10px;
-            color: #444;
-        }
+        .copyright { margin-top: auto; text-align: right; font-size: 10px; color: #3a3e5a; font-style: italic; }
     </style>
 </head>
 
 <body>
-    <div class="char-card">
-        <!-- Left Column: Portrait -->
-        <div class="portrait-col">
-            <img class="portrait" src="{{character.illustrationUrl || character.avatarRtUrl}}">
-            <div class="char-info-overlay">
-                <div class="char-name">{{character.name}}</div>
-                <div class="char-meta">
-                    <span class="rarity">★{{character.rarity.value}}</span>
-                    <span class="profession">{{character.profession.value}}</span>
-                    <span class="property {{character.property.key}}">{{character.property.value}}</span>
+    <div class="page">
+        <div class="char-card">
+            <!-- Left Column: Portrait -->
+            <div class="portrait-col">
+                <img class="portrait" src="{{character.illustrationUrl || character.avatarRtUrl}}">
+                <div class="char-info-overlay">
+                    <div class="char-name">{{character.name}}</div>
+                    <div class="char-meta">
+                        <span class="rarity">★{{character.rarity.value}}</span>
+                        <span class="profession">{{character.profession.value}}</span>
+                        <span class="property {{character.property.key}}">{{character.property.value}}</span>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Right Column: Details -->
+            <div class="detail-col">
+                <!-- Stats -->
+                <div class="section-title"><div class="section-dot dot-cyan"></div>等级信息</div>
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-label">等级</div>
+                        <div class="stat-value">Lv.{{character.level}}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">潜能</div>
+                        <div class="stat-value">{{character.potentialLevel + 1}}</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">意识</div>
+                        <div class="stat-value">{{character.evolvePhase}}</div>
+                    </div>
+                </div>
+
+                <!-- Weapon -->
+                <div class="section-title"><div class="section-dot dot-orange"></div>武器</div>
+                {{if character.weapon}}
+                <div class="weapon-box">
+                    <img class="weapon-icon" src="{{character.weapon.icon}}">
+                    <div class="weapon-info">
+                        <div class="weapon-name">{{character.weapon.name}}</div>
+                        <div class="weapon-meta">Lv.{{character.weapon.level}} <span class="refine">精炼 {{character.weapon.refineLevel + 1}}</span></div>
+                    </div>
+                </div>
+                {{else}}
+                <div class="empty-box">未装备武器</div>
+                {{/if}}
+
+                <!-- Skills -->
+                <div class="section-title"><div class="section-dot dot-purple"></div>技能</div>
+                <div class="skills-list">
+                    {{each character.skills skill}}
+                    <div class="skill-item">
+                        <img class="skill-icon" src="{{skill.icon}}">
+                        <div class="skill-level">{{skill.level}}</div>
+                    </div>
+                    {{/each}}
+                </div>
+
+                <!-- Equips -->
+                <div class="section-title"><div class="section-dot dot-green"></div>装备</div>
+                <div class="equips-grid">
+                    {{each character.equips equip}}
+                    <div class="equip-item">
+                        {{if equip}}
+                        <img class="equip-icon" src="{{equip.icon}}">
+                        <div class="equip-level">+{{equip.level}}</div>
+                        {{else}}
+                        <div class="equip-empty"></div>
+                        {{/if}}
+                    </div>
+                    {{/each}}
+                </div>
+
+                <div class="copyright">Generated by endfield-suzuki-plugin</div>
             </div>
         </div>
-
-        <!-- Right Column: Details -->
-        <div class="detail-col">
-            <!-- Stats Row (Mimic) -->
-            <div class="section-title">等级信息</div>
-            <div class="stats-row">
-                <div class="stat-box">
-                    <div class="stat-label">等级</div>
-                    <div class="stat-value">Lv.{{character.level}}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">潜能</div>
-                    <div class="stat-value">{{character.potentialLevel + 1}}</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-label">意识</div>
-                    <div class="stat-value">{{character.evolvePhase}}</div>
-                </div>
-            </div>
-
-            <!-- Weapon -->
-            <div class="section-title">武器</div>
-            {{if character.weapon}}
-            <div class="weapon-box">
-                <img class="weapon-icon" src="{{character.weapon.icon}}">
-                <div class="weapon-info">
-                    <div class="weapon-name">{{character.weapon.name}}</div>
-                    <div class="weapon-meta">Lv.{{character.weapon.level}} <span class="refine">精炼
-                            {{character.weapon.refineLevel + 1}}</span></div>
-                </div>
-            </div>
-            {{else}}
-            <div class="empty-box">未装备武器</div>
-            {{/if}}
-
-            <!-- Skills -->
-            <div class="section-title">技能</div>
-            <div class="skills-list">
-                {{each character.skills skill}}
-                <div class="skill-item">
-                    <img class="skill-icon" src="{{skill.icon}}">
-                    <div class="skill-level">{{skill.level}}</div>
-                </div>
-                {{/each}}
-            </div>
-
-            <!-- Equips -->
-            <div class="section-title">装备</div>
-            <div class="equips-grid">
-                {{each character.equips equip}}
-                <div class="equip-item">
-                    {{if equip}}
-                    <img class="equip-icon" src="{{equip.icon}}">
-                    <div class="equip-level">+{{equip.level}}</div>
-                    {{else}}
-                    <div class="equip-empty"></div>
-                    {{/if}}
-                </div>
-                {{/each}}
-            </div>
-        </div>
-
-        <div class="copyright">Endfield Suzuki Plugin</div>
     </div>
 </body>
 

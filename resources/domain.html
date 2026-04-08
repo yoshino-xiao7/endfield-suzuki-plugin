@@ -4,222 +4,61 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 700px;
-            background: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 700px; background: transparent; }
+        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
 
-        .domain-card {
-            background: #121214;
-            border-radius: 12px;
-            overflow: hidden;
-            color: #fff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-            border: 1px solid #333;
-        }
+        .header { background: #242840; border-radius: 12px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #22c55e, #16a34a, #15803d); }
+        .header-title { font-size: 20px; font-weight: bold; color: #e8e8f0; }
+        .header-sub { font-size: 11px; color: #6a6e8a; margin-top: 3px; }
+        .header-player { font-size: 14px; color: #b0b4d0; font-weight: bold; }
 
-        .domain-header {
-            background: linear-gradient(135deg, #2b2b2e 0%, #1a1a1c 100%);
-            padding: 20px 25px;
-            border-bottom: 2px solid #fbce06;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+        .regions-list { display: flex; flex-direction: column; gap: 14px; }
 
-        .domain-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fbce06;
-        }
+        .region-card { background: #242840; border-radius: 10px; overflow: hidden; }
+        .region-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #2e3250; }
+        .region-name { font-size: 17px; font-weight: bold; color: #e0e0f0; }
+        .region-level { font-size: 11px; color: #fff; background: linear-gradient(135deg, #22c55e, #16a34a); padding: 3px 10px; border-radius: 12px; font-weight: bold; }
 
-        .domain-subtitle {
-            font-size: 13px;
-            color: #888;
-            margin-top: 3px;
-        }
+        .region-body { padding: 14px 18px; }
 
-        .domain-player {
-            text-align: right;
-            font-size: 14px;
-            color: #aaa;
-        }
+        .section-label { font-size: 12px; color: #8a8eaa; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 10px; margin-top: 12px; }
+        .section-label:first-child { margin-top: 0; }
+        .section-dot { width: 4px; height: 14px; border-radius: 2px; background: #06b6d4; }
 
-        .domain-player .name {
-            font-size: 16px;
-            color: #fff;
-            font-weight: bold;
-        }
+        .settlements { display: flex; flex-direction: column; gap: 8px; }
+        .settlement { display: flex; align-items: center; justify-content: space-between; background: #1a1d2e; padding: 10px 14px; border-radius: 8px; }
+        .stm-left { display: flex; align-items: center; gap: 10px; }
+        .stm-name { font-size: 14px; color: #d0d0e0; font-weight: 500; }
+        .stm-officer { font-size: 11px; color: #6a6e8a; }
+        .stm-level { font-size: 11px; color: #4ade80; font-weight: bold; background: rgba(34, 197, 94, 0.1); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(34, 197, 94, 0.3); }
 
-        .domains-list {
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
+        .collections { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+        .collect-item { background: #1a1d2e; padding: 12px 8px; border-radius: 8px; text-align: center; }
+        .collect-value { font-size: 20px; font-weight: bold; font-family: 'Consolas', monospace; }
+        .collect-label { font-size: 10px; color: #5a5e7a; margin-top: 4px; }
 
-        .region-card {
-            background: #1e1e20;
-            border-radius: 10px;
-            border: 1px solid #333;
-            overflow: hidden;
-        }
+        .collect-value.puzzle { color: #60a5fa; }
+        .collect-value.chest { color: #fb923c; }
+        .collect-value.piece { color: #c084fc; }
+        .collect-value.blackbox { color: #fb7185; }
 
-        .region-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 18px;
-            background: linear-gradient(135deg, #252527 0%, #1e1e20 100%);
-            border-bottom: 1px solid #333;
-        }
-
-        .region-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .region-level {
-            font-size: 12px;
-            color: #000;
-            background: #fbce06;
-            padding: 3px 10px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-
-        .region-body {
-            padding: 12px 18px;
-        }
-
-        .section-label {
-            font-size: 12px;
-            color: #fbce06;
-            font-weight: bold;
-            border-left: 3px solid #fbce06;
-            padding-left: 8px;
-            margin-bottom: 8px;
-            margin-top: 10px;
-        }
-
-        .section-label:first-child {
-            margin-top: 0;
-        }
-
-        /* Settlements */
-        .settlements {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .settlement {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #252527;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #333;
-        }
-
-        .stm-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .stm-name {
-            font-size: 14px;
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .stm-officer {
-            font-size: 12px;
-            color: #aaa;
-        }
-
-        .stm-level {
-            font-size: 12px;
-            color: #fbce06;
-            font-weight: bold;
-            background: #2a2a00;
-            padding: 2px 8px;
-            border-radius: 4px;
-            border: 1px solid #fbce06;
-        }
-
-        /* Collections */
-        .collections {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-        }
-
-        .collect-item {
-            background: #252527;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .collect-value {
-            font-size: 20px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .collect-label {
-            font-size: 11px;
-            color: #888;
-            margin-top: 3px;
-        }
-
-        .collect-value.puzzle {
-            color: #55aaff;
-        }
-
-        .collect-value.chest {
-            color: #ffaa55;
-        }
-
-        .collect-value.piece {
-            color: #aa55ff;
-        }
-
-        .collect-value.blackbox {
-            color: #ff5577;
-        }
-
-        .domain-footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 10px;
-            color: #444;
-            background: #151517;
-        }
+        .stats-footer { text-align: center; padding: 14px 0 2px; font-size: 10px; color: #3a3e5a; font-style: italic; }
     </style>
 </head>
 
 <body>
-    <div class="domain-card">
-        <div class="domain-header">
+    <div class="page">
+        <div class="header">
             <div>
-                <div class="domain-title">领地基建</div>
-                <div class="domain-subtitle">城市总览</div>
+                <div class="header-title">🏗️ 领地基建</div>
+                <div class="header-sub">城市总览</div>
             </div>
-            <div class="domain-player">
-                <div class="name">{{playerName}}</div>
-            </div>
+            <div class="header-player">{{playerName}}</div>
         </div>
 
-        <div class="domains-list">
+        <div class="regions-list">
             {{each domains dm}}
             <div class="region-card">
                 <div class="region-header">
@@ -227,8 +66,7 @@
                     <div class="region-level">Lv.{{dm.level}}</div>
                 </div>
                 <div class="region-body">
-                    <!-- Settlements -->
-                    <div class="section-label">定居点</div>
+                    <div class="section-label"><div class="section-dot"></div>定居点</div>
                     <div class="settlements">
                         {{each dm.settlements stm}}
                         <div class="settlement">
@@ -243,8 +81,7 @@
                         {{/each}}
                     </div>
 
-                    <!-- Collections -->
-                    <div class="section-label">收集进度</div>
+                    <div class="section-label"><div class="section-dot" style="background:#f97316;"></div>收集进度</div>
                     <div class="collections">
                         <div class="collect-item">
                             <div class="collect-value puzzle">{{dm.totalPuzzle}}</div>
@@ -268,7 +105,7 @@
             {{/each}}
         </div>
 
-        <div class="domain-footer">Powered by Endfield Suzuki Plugin</div>
+        <div class="stats-footer">Generated by endfield-suzuki-plugin</div>
     </div>
 </body>
 

@@ -4,148 +4,91 @@
 <head>
     <meta charset="utf-8">
     <style>
-        body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            margin: 0;
-            padding: 0;
-            width: 600px;
-            background: transparent;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 600px; background: transparent; }
+        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
 
-        .profile-card {
-            background: #1a1a1c;
-            border-radius: 12px;
-            overflow: hidden;
-            color: #fff;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            border: 1px solid #333;
-        }
+        .header { background: #242840; border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #a855f7, #7c3aed, #6366f1); }
+        .avatar { width: 72px; height: 72px; border-radius: 50%; border: 3px solid #4a4e6a; object-fit: cover; background: #2e3250; }
+        .player-info { flex: 1; }
+        .player-name { font-size: 22px; font-weight: bold; color: #e8e8f0; }
+        .player-uid { font-size: 12px; color: #6a6e8a; margin-top: 3px; font-family: 'Consolas', monospace; }
+        .level-badge { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; font-weight: bold; padding: 6px 16px; border-radius: 20px; font-size: 15px; }
 
-        .header-bg {
-            background: linear-gradient(135deg, #2b2b2e 0%, #1f1f21 100%);
-            padding: 30px;
-            display: flex;
-            align-items: center;
-            border-bottom: 2px solid #fbce06;
-            position: relative;
-        }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+        .stat-card { background: #242840; border-radius: 10px; padding: 16px 12px; text-align: center; position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #06b6d4, #0891b2); }
+        .stat-value { font-size: 24px; font-weight: 900; color: #e8e8f0; font-family: 'Consolas', monospace; }
+        .stat-label { font-size: 11px; color: #6a6e8a; margin-top: 6px; }
 
-        .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid #fbce06;
-            margin-right: 20px;
-        }
+        .progress-card { background: #242840; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+        .progress-icon { font-size: 22px; flex-shrink: 0; }
+        .progress-info { flex: 1; }
+        .progress-label { font-size: 11px; color: #6a6e8a; margin-bottom: 4px; }
+        .progress-text { font-size: 14px; color: #e8e8f0; font-weight: bold; }
+        .progress-bar-bg { height: 6px; background: #1a1d2e; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+        .progress-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #22c55e, #4ade80); }
 
-        .info {
-            flex: 1;
-        }
-
-        .name {
-            font-size: 28px;
-            font-weight: bold;
-            color: #fff;
-        }
-
-        .uid {
-            font-size: 14px;
-            color: #888;
-            margin-top: 5px;
-            font-family: monospace;
-        }
-
-        .level-badge {
-            background: #fbce06;
-            color: #000;
-            font-weight: bold;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 16px;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            padding: 25px;
-        }
-
-        .stat-item {
-            background: #252527;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            border: 1px solid #333;
-        }
-
-        .stat-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #fbce06;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 10px;
-            color: #555;
-            background: #151517;
-        }
+        .stats-footer { text-align: center; padding: 10px 0 2px; font-size: 10px; color: #3a3e5a; font-style: italic; }
     </style>
 </head>
 
 <body>
-    <div class="profile-card">
-        <!-- Background/Header -->
-        <div class="header-bg">
-            <img class="avatar" src="{{player.avatar}}">
-            <div class="info">
-                <div class="name">{{player.name}}</div>
-                <div class="uid">UID: {{player.uid}}</div>
+    <div class="page">
+        <div class="header">
+            <img class="avatar" src="{{player.avatar}}" onerror="this.style.display='none'">
+            <div class="player-info">
+                <div class="player-name">{{player.name}}</div>
+                <div class="player-uid">UID: {{player.uid}}</div>
             </div>
             <div class="level-badge">Lv.{{player.level}}</div>
         </div>
 
-        <!-- Stats Grid -->
         <div class="stats-grid">
-            <div class="stat-item">
+            <div class="stat-card">
                 <div class="stat-value">{{player.worldLevel}}</div>
                 <div class="stat-label">世界等级</div>
             </div>
-            <div class="stat-item">
+            <div class="stat-card">
                 <div class="stat-value">{{player.charNum}}</div>
                 <div class="stat-label">干员数量</div>
             </div>
-            <div class="stat-item">
+            <div class="stat-card">
                 <div class="stat-value">{{player.weaponNum}}</div>
                 <div class="stat-label">武器数量</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">{{player.stamina}}</div>
-                <div class="stat-label">理智</div>
+        </div>
+
+        <div class="progress-card">
+            <div class="progress-icon">⚡</div>
+            <div class="progress-info">
+                <div class="progress-label">理智</div>
+                <div class="progress-text">{{player.stamina}}</div>
+                <div class="progress-bar-bg"><div class="progress-bar" style="width: 60%"></div></div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">{{player.dailyMission}}</div>
-                <div class="stat-label">每日任务</div>
+        </div>
+
+        <div class="progress-card">
+            <div class="progress-icon">📋</div>
+            <div class="progress-info">
+                <div class="progress-label">每日任务</div>
+                <div class="progress-text">{{player.dailyMission}}</div>
             </div>
-            <div class="stat-item">
+        </div>
+
+        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
+            <div class="stat-card">
                 <div class="stat-value">{{player.days}}</div>
                 <div class="stat-label">活跃天数</div>
             </div>
-            <div class="stat-item">
-                <div class="stat-value">{{player.progress}}</div>
+            <div class="stat-card">
+                <div class="stat-value" style="font-size:14px;">{{player.progress}}</div>
                 <div class="stat-label">主线进度</div>
             </div>
         </div>
 
-        <div class="footer">Powered by Endfield Suzuki Plugin</div>
+        <div class="stats-footer">Generated by endfield-suzuki-plugin</div>
     </div>
 </body>
 
