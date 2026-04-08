@@ -119,79 +119,48 @@ export default class Render {
             return baseName
         }
 
-        // 构建 charId -> charData 的快速查找 Map
-        const charByHash = new Map()
+        // 构建查找 Map：同时支持 hash ID 和 chr_xxxx_name 格式
+        const charMap = new Map()
         for (const c of charList) {
             if (!c.charData) continue
-            charByHash.set(c.id, c)
+            // hash ID 映射
+            charMap.set(c.id, c)
             if (c.charData.id && c.charData.id !== c.id) {
-                charByHash.set(c.charData.id, c)
+                charMap.set(c.charData.id, c)
             }
-        }
-
-        // 从 reports 数据中建立 chr_xxxx_name -> hash ID 的映射
-        const chrCodeToHash = new Map()
-        for (const room of (ship.rooms || [])) {
-            if (!room.reports || !room.chars) continue
-            for (const [, report] of Object.entries(room.reports)) {
-                const reportChars = report.char || []
-                // reports.char 顺序通常对应当时房间的 chars 顺序
-                // 我们收集所有 chr_ 开头的 ID
-                for (let i = 0; i < reportChars.length; i++) {
-                    const chrCode = reportChars[i]
-                    if (chrCode && chrCode.startsWith('chr_') && !chrCodeToHash.has(chrCode)) {
-                        // 尝试通过同一房间当前的 chars 位置来映射
-                        if (i < room.chars.length) {
-                            const hashId = room.chars[i].charId
-                            // 只在 hashId 是 hash 格式时建立映射
-                            if (hashId && !hashId.startsWith('chr_')) {
-                                chrCodeToHash.set(chrCode, hashId)
-                            }
-                        }
-                    }
-                }
+            // chr_xxxx_name 映射：从 abilityTalents[0].id 提取
+            // 格式为 chr_0016_laevat_1，房间 charId 为 chr_0016_laevat（去掉最后 _N）
+            const talents = c.charData.abilityTalents || []
+            if (talents.length > 0 && talents[0].id) {
+                const talentId = talents[0].id  // e.g. "chr_0016_laevat_1"
+                // 去掉最后一个 _N 后缀得到 chr_xxxx_name
+                const chrCode = talentId.replace(/_\d+$/, '')  // e.g. "chr_0016_laevat"
+                charMap.set(chrCode, c)
+                // 也存一个仅含编号的 key (chr_0016)
+                const numOnly = talentId.match(/^(chr_\d+)/)
+                if (numOnly) charMap.set(numOnly[1], c)
             }
         }
 
         // 通过 charId 查找角色名称和头像
         const resolveChar = (charId) => {
-            // 1. 直接 hash 查找
-            if (charByHash.has(charId)) {
-                const c = charByHash.get(charId)
+            // 1. 直接精确查找（hash 或 chr_xxxx_name）
+            if (charMap.has(charId)) {
+                const c = charMap.get(charId)
                 return {
                     name: c.charData.name,
                     avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
                 }
             }
 
-            // 2. 如果是 chr_xxxx_name 格式，尝试通过 reports 映射查找
+            // 2. chr_xxxx_name 格式回退：尝试仅用编号部分匹配
             if (charId && charId.startsWith('chr_')) {
-                // 2a. 通过 chrCodeToHash 映射
-                for (const [chrCode, hashId] of chrCodeToHash) {
-                    if (charId === chrCode || charId.startsWith(chrCode)) {
-                        if (charByHash.has(hashId)) {
-                            const c = charByHash.get(hashId)
-                            return {
-                                name: c.charData.name,
-                                avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
-                            }
-                        }
-                    }
-                }
-
-                // 2b. 尝试用 chr 编号的数字部分做匹配（chr_0016 中的 16）
-                const numMatch = charId.match(/^chr_(\d+)/)
-                if (numMatch) {
-                    const chrNum = numMatch[1]
-                    for (const [chrCode, hashId] of chrCodeToHash) {
-                        const codeNum = chrCode.match(/^chr_(\d+)/)
-                        if (codeNum && codeNum[1] === chrNum && charByHash.has(hashId)) {
-                            const c = charByHash.get(hashId)
-                            return {
-                                name: c.charData.name,
-                                avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
-                            }
-                        }
+                const numOnly = charId.match(/^(chr_\d+)/)
+                if (numOnly && charMap.has(numOnly[1])) {
+                    const c = charMap.get(numOnly[1])
+                    return {
+                        name: c.charData.name,
+                        avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
                     }
                 }
             }
