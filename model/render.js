@@ -102,19 +102,32 @@ export default class Render {
         // 房间类型映射
         const ROOM_NAMES = {
             0: '总控中枢',
-            1: '培养仓',
-            2: '制造仓',
+            1: '制造仓',
+            2: '培养仓',
             3: '会客厅',
             5: '线索交换'
         }
 
-        // 房间 ID 后缀映射编号
+        // 房间显示排序优先级
+        const ROOM_ORDER = { 0: 0, 5: 1, 1: 2, 2: 3, 3: 4 }
+
+        // 罗马数字
+        const ROMAN = ['I', 'II', 'III', 'IV', 'V']
+
+        // 为同类型房间分配编号
+        const roomList = ship.rooms || []
+        const typeCount = {}
+        for (const r of roomList) {
+            typeCount[r.type] = (typeCount[r.type] || 0) + 1
+        }
+        const typeIndex = {}
+
         const getRoomDisplayName = (room) => {
             const baseName = ROOM_NAMES[room.type] || `房间(${room.type})`
-            // 如果 id 有 _1, _2 后缀就加编号
-            const match = room.id.match(/_(\d+)$/)
-            if (match && (room.type === 1 || room.type === 2)) {
-                return `${baseName}${match[1]}`
+            // 同类型有多个房间时加罗马数字编号
+            if (typeCount[room.type] > 1) {
+                typeIndex[room.type] = (typeIndex[room.type] || 0) + 1
+                return `${baseName}${ROMAN[typeIndex[room.type] - 1] || typeIndex[room.type]}`
             }
             return baseName
         }
@@ -169,7 +182,15 @@ export default class Render {
             return { name: charId ? charId.substring(0, 12) + '...' : '???', avatar: '' }
         }
 
-        const rooms = (ship.rooms || []).map(room => ({
+        // 先按排序优先级排序房间，同类型按 id 排序
+        const sortedRooms = [...roomList].sort((a, b) => {
+            const oa = ROOM_ORDER[a.type] ?? 99
+            const ob = ROOM_ORDER[b.type] ?? 99
+            if (oa !== ob) return oa - ob
+            return (a.id || '').localeCompare(b.id || '')
+        })
+
+        const rooms = sortedRooms.map(room => ({
             name: getRoomDisplayName(room),
             level: room.level,
             chars: (room.chars || []).map(ch => {
