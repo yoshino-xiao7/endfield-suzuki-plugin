@@ -52,13 +52,15 @@ export class GachaApp extends plugin {
 
         try {
             e.reply('⏳ 正在生成抽卡统计...')
-            const [poolsRes, recordsRes] = await Promise.all([
+            const [poolsRes, recordsRes, cardRes] = await Promise.all([
                 api.requestWithAutoRefresh(`/skland/endfield/gacha/pools?bindingId=${bindingId}`, 'GET', null, bindingId),
-                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}`, 'GET', null, bindingId)
+                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}`, 'GET', null, bindingId),
+                api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId).catch(() => null)
             ])
 
             let pools = poolsRes.data.data || []
             let records = recordsRes.data.data || []
+            const playerInfo = this._extractPlayerInfo(cardRes)
 
             // 按池名过滤
             if (poolName) {
@@ -74,7 +76,7 @@ export class GachaApp extends plugin {
 
             if (records.length === 0) return e.reply('📋 暂无抽卡记录，请先同步: #终末地同步抽卡')
 
-            const img = await Render.renderGachaStats(records, pools)
+            const img = await Render.renderGachaStats(records, pools, playerInfo)
             e.reply(img)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
@@ -101,17 +103,19 @@ export class GachaApp extends plugin {
 
         try {
             e.reply(`⏳ 正在生成${displayName}统计...`)
-            const [poolsRes, recordsRes] = await Promise.all([
+            const [poolsRes, recordsRes, cardRes] = await Promise.all([
                 api.requestWithAutoRefresh(`/skland/endfield/gacha/pools?bindingId=${bindingId}`, 'GET', null, bindingId),
-                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}&poolType=${poolType}`, 'GET', null, bindingId)
+                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}&poolType=${poolType}`, 'GET', null, bindingId),
+                api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId).catch(() => null)
             ])
 
             const pools = (poolsRes.data.data || []).filter(p => p.poolType === poolType)
             const records = recordsRes.data.data || []
+            const playerInfo = this._extractPlayerInfo(cardRes)
 
             if (records.length === 0) return e.reply('📋 暂无记录，请先同步: #终末地同步抽卡')
 
-            const img = await Render.renderGachaStats(records, pools)
+            const img = await Render.renderGachaStats(records, pools, playerInfo)
             e.reply(img)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
@@ -129,18 +133,20 @@ export class GachaApp extends plugin {
 
         try {
             e.reply('⏳ 正在生成抽卡统计...')
-            // 获取池列表和全部记录
-            const [poolsRes, recordsRes] = await Promise.all([
+            // 获取池列表、全部记录和玩家信息
+            const [poolsRes, recordsRes, cardRes] = await Promise.all([
                 api.requestWithAutoRefresh(`/skland/endfield/gacha/pools?bindingId=${bindingId}`, 'GET', null, bindingId),
-                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}`, 'GET', null, bindingId)
+                api.requestWithAutoRefresh(`/skland/endfield/gacha?bindingId=${bindingId}`, 'GET', null, bindingId),
+                api.requestWithAutoRefresh(`/skland/endfield/card?bindingId=${bindingId}`, 'GET', null, bindingId).catch(() => null)
             ])
 
             const pools = poolsRes.data.data || []
             const records = recordsRes.data.data || []
+            const playerInfo = this._extractPlayerInfo(cardRes)
 
             if (records.length === 0) return e.reply('📋 暂无抽卡记录，请先同步: #终末地同步抽卡')
 
-            const img = await Render.renderGachaStats(records, pools)
+            const img = await Render.renderGachaStats(records, pools, playerInfo)
             e.reply(img)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
@@ -148,6 +154,22 @@ export class GachaApp extends plugin {
             } else {
                 e.reply(`❌ 统计失败: ${err.message || '未知错误'}`)
             }
+        }
+    }
+
+    // ========== 提取玩家信息 ==========
+    _extractPlayerInfo(cardRes) {
+        try {
+            if (!cardRes) return {}
+            const detail = cardRes.data?.data?.detail || cardRes.data?.detail || {}
+            const base = detail.base || {}
+            return {
+                name: base.name || '',
+                uid: base.roleId || '',
+                avatar: base.avatarUrl || ''
+            }
+        } catch {
+            return {}
         }
     }
 }

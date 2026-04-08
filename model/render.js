@@ -281,14 +281,47 @@ export default class Render {
         })
     }
 
-    // ===== 抽卡统计（鸣潮风格 · 增强版） =====
-    static async renderGachaStats(records, pools) {
-        // 按池分组
+    // ===== 抽卡统计（skland 风格） =====
+    static async renderGachaStats(records, pools, playerInfo = {}) {
+        const maxPullBase = 80 // Endfield 保底80
+
+        // ===== 辅助函数 =====
+        const getBarColor = (pulls) => {
+            if (pulls <= 30) return 'bar-lucky'
+            if (pulls <= 50) return 'bar-normal'
+            if (pulls <= 65) return 'bar-warn'
+            return 'bar-bad'
+        }
+
+        const getPityColor = (pity) => {
+            if (pity <= 40) return 'safe'
+            if (pity <= 60) return 'warn'
+            return 'danger'
+        }
+
+        // ===== 池分类 =====
+        const classifyPool = (poolId, poolType) => {
+            if (poolId === 'beginner') return 'beginner'
+            if (poolId === 'standard') return 'standard'
+            if (poolId && poolId.startsWith('special_')) return 'limited'
+            if (poolId && (poolId.startsWith('weponbox_') || poolId.startsWith('weaponbox_'))) {
+                if (poolId.includes('constant')) return 'standard_weapon'
+                return 'weapon'
+            }
+            // fallback by poolType
+            if (poolType === 'weapon') return 'weapon'
+            if (poolType === 'char') return 'limited'
+            return 'standard'
+        }
+
+        // ===== 按池分组 =====
         const poolMap = new Map()
         for (const p of pools) {
             poolMap.set(p.poolId || p.poolName, {
+                poolId: p.poolId,
                 poolName: p.poolName,
                 poolType: p.poolType,
+                category: classifyPool(p.poolId, p.poolType),
                 records: []
             })
         }
@@ -299,121 +332,174 @@ export default class Render {
                 poolMap.get(key).records.push(r)
             } else {
                 poolMap.set(key, {
+                    poolId: r.poolId,
                     poolName: r.poolName || key,
                     poolType: r.poolType,
+                    category: classifyPool(r.poolId, r.poolType),
                     records: [r]
                 })
             }
         }
 
-        let totalPulls = records.length
-        let totalSixStar = 0
-        let totalFiveStar = records.filter(r => r.rarity === 5).length
-        let totalUp = 0
-        let totalUpEligible = 0
-        let allSixPulls = [] // 收集所有6星的抽数，用于全局 min/max
-
-        const poolStats = []
-
-        for (const [, pool] of poolMap) {
-            if (pool.records.length === 0) continue
+        // ===== 计算每个池的统计 =====
+        const processPool = (pool) => {
+            if (pool.records.length === 0) return null
 
             const sorted = [...pool.records].sort((a, b) => (a.gachaTs || 0) - (b.gachaTs || 0))
 
             let pullsSinceLast = 0
             const sixStars = []
+            let fiveCount = 0
+            let hasFreeRecords = false
 
             for (const r of sorted) {
                 pullsSinceLast++
+                if (r.isFree) hasFreeRecords = true
+                if (r.rarity === 5) fiveCount++
                 if (r.rarity === 6) {
                     sixStars.push({
                         name: r.itemName || '???',
                         pulls: pullsSinceLast,
-                        isUp: r.isUp
+                        isUp: r.isUp,
+                        isNew: r.isNew,
+                        isFree: r.isFree
                     })
-                    allSixPulls.push(pullsSinceLast)
-                    totalSixStar++
-                    if (r.isUp !== null && r.isUp !== undefined) {
-                        totalUpEligible++
-                        if (r.isUp === true) totalUp++
-                    }
                     pullsSinceLast = 0
                 }
             }
 
             const currentPity = pullsSinceLast
             const sixCount = sixStars.length
-            const avgPull = sixCount > 0 ? (sorted.length / sixCount).toFixed(1) : '-'
             const upCount = sixStars.filter(s => s.isUp === true).length
             const lostCount = sixStars.filter(s => s.isUp === false).length
-            const upInfo = (upCount + lostCount) > 0 ? `${lostCount}/${upCount + lostCount}` : '-'
 
-            // 格式化条形图
-            const maxPullBase = 90
-            const fmtSixStars = sixStars.map((s, i) => {
-                const barWidth = Math.min(Math.max((s.pulls / maxPullBase) * 100, 8), 100)
-                let barColor = 'bar-green'
-                if (s.pulls > 70) barColor = 'bar-red'
-                else if (s.pulls > 50) barColor = 'bar-yellow'
+            // UP角色名推断：从 UP 的6★中取名
+            const upChars = sixStars.filter(s => s.isUp === true)
+            const upCharName = upChars.length > 0 ? upChars[0].name : ''
 
-                let upText = '', upClass = ''
-                if (s.isUp === true) { upText = '▲ UP'; upClass = 'ss-up-yes' }
-                else if (s.isUp === false) { upText = '△ MISS'; upClass = 'ss-up-no' }
-
-                return { idx: i + 1, name: s.name, pulls: s.pulls, barWidth, barColor, upText, upClass }
+            // 格式化6★条目
+            const fmtSixStars = sixStars.map(s => {
+                const barWidth = Math.min(Math.max((s.pulls / maxPullBase) * 100, 10), 100)
+                return {
+                    name: s.name,
+                    pulls: s.pulls,
+                    barWidth,
+                    barColor: getBarColor(s.pulls),
+                    isUp: s.isUp === true,
+                    isMiss: s.isUp === false,
+                    isNewChar: s.isNew === true,
+                    wasFree: s.isFree === true
+                }
             })
 
-            // 垫抽进度条
+            // 保底进度条
             const pityBarWidth = Math.min((currentPity / maxPullBase) * 100, 100)
-            let pityBarColor = 'pity-bar-safe'
-            if (currentPity > 70) pityBarColor = 'pity-bar-danger'
-            else if (currentPity > 50) pityBarColor = 'pity-bar-warn'
+            const pityBarColor = getPityColor(currentPity)
 
-            poolStats.push({
+            // 免费10连状态
+            const freeRecords = sorted.filter(r => r.isFree)
+            const freeSixStar = freeRecords.some(r => r.rarity === 6)
+            const freeStatus = hasFreeRecords ? (freeSixStar ? '出6★' : '未出6★') : ''
+
+            const sixInfo = `${sixCount}/${upCount + lostCount > 0 ? upCount + lostCount : sixCount}`
+            const upAvg = sixCount > 0 ? (sorted.length / sixCount).toFixed(1) : '-'
+
+            return {
                 poolName: pool.poolName,
+                poolId: pool.poolId,
+                category: pool.category,
                 totalPulls: sorted.length,
                 sixCount,
-                avgPull,
-                upInfo,
-                sixStars: fmtSixStars,
+                fiveCount,
+                sixInfo,
+                upAvg,
+                upCharName,
                 currentPity,
+                sixStars: fmtSixStars,
                 pityBarWidth,
-                pityBarColor
-            })
+                pityBarColor,
+                hasFree: hasFreeRecords,
+                freeStatus
+            }
         }
 
-        const avgPerSix = totalSixStar > 0 ? (totalPulls / totalSixStar).toFixed(1) : '-'
-        const upRate = totalUpEligible > 0 ? `${(totalUp / totalUpEligible * 100).toFixed(1)}%` : '-'
-        const minPull = allSixPulls.length > 0 ? `${Math.min(...allSixPulls)}` : '-'
-        const maxPull = allSixPulls.length > 0 ? `${Math.max(...allSixPulls)}` : '-'
-
-        // 欧非评价（工业风标识）
-        const avgNum = totalSixStar > 0 ? totalPulls / totalSixStar : 999
-        let luckText = 'PENDING', luckClass = 'luck-normal'
-        if (totalSixStar >= 2) {
-            if (avgNum <= 45) { luckText = 'S · 欧皇'; luckClass = 'luck-eu' }
-            else if (avgNum <= 60) { luckText = 'A · 小欧'; luckClass = 'luck-eu' }
-            else if (avgNum <= 70) { luckText = 'B · 普通'; luckClass = 'luck-normal' }
-            else if (avgNum <= 80) { luckText = 'C · 小非'; luckClass = 'luck-fei' }
-            else { luckText = 'D · 非酋'; luckClass = 'luck-fei' }
+        const allPoolStats = []
+        for (const [, pool] of poolMap) {
+            const stat = processPool(pool)
+            if (stat) allPoolStats.push(stat)
         }
 
-        const updateTime = new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+        // ===== 分类池 =====
+        const limitedPools = allPoolStats.filter(p => p.category === 'limited')
+        const weaponPools = allPoolStats.filter(p => p.category === 'weapon')
+        const beginnerPools = allPoolStats.filter(p => p.category === 'beginner')
+        const standardPools = allPoolStats.filter(p => p.category === 'standard' || p.category === 'standard_weapon')
+
+        // ===== 总计 =====
+        const totalPulls = records.length
+        const charPulls = records.filter(r => r.poolType === 'char').length
+        const weaponPullsCount = records.filter(r => r.poolType === 'weapon').length
+
+        const limitedTotalPulls = limitedPools.reduce((s, p) => s + p.totalPulls, 0)
+        const weaponTotalPulls = weaponPools.reduce((s, p) => s + p.totalPulls, 0)
+        const beginnerTotalPulls = beginnerPools.reduce((s, p) => s + p.totalPulls, 0)
+        const standardTotalPulls = standardPools.reduce((s, p) => s + p.totalPulls, 0)
+
+        // ===== 汇总卡片 =====
+        const buildCategorySummary = (label, cssClass, catPools, catTotalPulls) => {
+            const totalSix = catPools.reduce((s, p) => s + p.sixCount, 0)
+            const totalUpAll = catPools.reduce((s, p) => s + p.sixStars.filter(ss => ss.isUp).length, 0)
+            const totalUpMiss = catPools.reduce((s, p) => s + p.sixStars.filter(ss => ss.isMiss).length, 0)
+            const sixInfo = `${totalSix}/${totalUpAll + totalUpMiss > 0 ? totalUpAll + totalUpMiss : totalSix}`
+            const upAvg = totalSix > 0 ? (catTotalPulls / totalSix).toFixed(1) : '-'
+            // 合并当前最大已垫
+            const maxPity = catPools.length > 0 ? Math.max(...catPools.map(p => p.currentPity)) : 0
+            const pityWidth = Math.min((maxPity / maxPullBase) * 100, 100)
+            const pityColor = getPityColor(maxPity)
+
+            return {
+                label,
+                cssClass,
+                totalPulls: catTotalPulls,
+                sixInfo,
+                upAvg,
+                currentPity: maxPity,
+                hasPity: catTotalPulls > 0,
+                pityWidth,
+                pityColor,
+                pityText: `${maxPity}/80`
+            }
+        }
+
+        const categorySummary = [
+            buildCategorySummary('限定池', 'limited', limitedPools, limitedTotalPulls),
+            buildCategorySummary('武器池', 'weapon', weaponPools, weaponTotalPulls),
+            buildCategorySummary('常驻池', 'standard', standardPools, standardTotalPulls),
+            buildCategorySummary('新手池', 'beginner', beginnerPools, beginnerTotalPulls)
+        ]
 
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
             scale: 2,
+            // Header
+            playerName: playerInfo.name || '',
+            playerUid: playerInfo.uid || '',
+            playerAvatar: playerInfo.avatar || '',
+            // Totals
             totalPulls,
-            totalSixStar,
-            totalFiveStar,
-            avgPerSix,
-            upRate,
-            minPull,
-            maxPull,
-            luckText,
-            luckClass,
-            poolStats,
-            updateTime
+            charPulls,
+            weaponPulls: weaponPullsCount,
+            // Category summaries
+            categorySummary,
+            // Pool lists
+            limitedPools,
+            weaponPools,
+            beginnerPools,
+            standardPools,
+            limitedTotalPulls,
+            weaponTotalPulls,
+            beginnerTotalPulls,
+            standardTotalPulls
         })
     }
 }
