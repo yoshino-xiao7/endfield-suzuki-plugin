@@ -71,10 +71,10 @@ export default class Render {
         const dailyMax = dailyMission.maxDailyActivation || 100
         const dailyPercent = dailyMax > 0 ? Math.min((dailyCur / dailyMax) * 100, 100) : 0
 
-        // 通行证数据（如果接口有的话）
-        const pass = data.detail.passInfo || data.detail.pass || {}
-        const passCur = pass.curLevel || pass.level || 0
-        const passMax = pass.maxLevel || 60
+        // 通行证数据
+        const bpSystem = data.detail.bpSystem || {}
+        const passCur = bpSystem.curLevel || 0
+        const passMax = bpSystem.maxLevel || 60
 
         // ===== 干员列表（前8个，按稀有度+等级排序）=====
         const sortedChars = [...charList]
