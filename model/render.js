@@ -20,23 +20,123 @@ export default class Render {
         const base = data.detail.base
         const dungeon = data.detail.dungeon || {}
         const dailyMission = data.detail.dailyMission || {}
-        const player = {
-            name: base.name,
-            uid: base.roleId,
-            level: base.level,
-            worldLevel: base.worldLevel,
-            avatar: base.avatarUrl || '',
-            charNum: base.charNum,
-            weaponNum: base.weaponNum,
-            stamina: `${dungeon.curStamina || 0}/${dungeon.maxStamina || 0}`,
-            dailyMission: `${dailyMission.dailyActivation || 0}/${dailyMission.maxDailyActivation || 100}`,
-            progress: base.mainMission.description,
-            days: Math.ceil((Date.now() / 1000 - base.createTime) / 86400)
+        const domainList = data.detail.domain || []
+        const charList = data.detail.chars || []
+        const shipData = data.detail.spaceShip || {}
+
+        // ===== 理智恢复计算 =====
+        const curStamina = dungeon.curStamina || 0
+        const maxStamina = dungeon.maxStamina || 0
+        const STAMINA_RECOVERY_SECONDS = 7 * 60 + 12 // 7分12秒/点
+        let recoveryText = ''
+        let staminaPercent = maxStamina > 0 ? Math.min((curStamina / maxStamina) * 100, 100) : 0
+        let staminaFull = curStamina >= maxStamina
+
+        if (!staminaFull && maxStamina > 0) {
+            const remaining = maxStamina - curStamina
+            const totalSec = remaining * STAMINA_RECOVERY_SECONDS
+            const hours = Math.floor(totalSec / 3600)
+            const minutes = Math.floor((totalSec % 3600) / 60)
+            recoveryText = `${hours}h ${minutes}min`
+        }
+
+        // ===== 苏醒日 =====
+        const createDate = base.createTime
+            ? new Date(base.createTime * 1000).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+            : ''
+
+        // ===== 领地基建摘要 =====
+        const domains = domainList.map(dm => {
+            let totalPuzzle = 0, totalChest = 0, totalPiece = 0, totalBlackbox = 0
+            for (const col of (dm.collections || [])) {
+                totalPuzzle += col.puzzleCount || 0
+                totalChest += col.trchestCount || 0
+                totalPiece += col.pieceCount || 0
+                totalBlackbox += col.blackboxCount || 0
+            }
+            return {
+                name: dm.name || dm.domainId,
+                level: dm.level,
+                settlements: (dm.settlements || []).map(s => ({ name: s.name, level: s.level })),
+                totalPuzzle, totalChest, totalPiece, totalBlackbox
+            }
+        })
+
+        // ===== 帝江号总控中枢等级 =====
+        const hubRoom = (shipData.rooms || []).find(r => r.type === 0)
+        const hubLevel = hubRoom ? hubRoom.level : 0
+
+        // ===== 活跃度 & 通行证 =====
+        const dailyCur = dailyMission.dailyActivation || 0
+        const dailyMax = dailyMission.maxDailyActivation || 100
+        const dailyPercent = dailyMax > 0 ? Math.min((dailyCur / dailyMax) * 100, 100) : 0
+
+        // 通行证数据（如果接口有的话）
+        const pass = data.detail.passInfo || data.detail.pass || {}
+        const passCur = pass.curLevel || pass.level || 0
+        const passMax = pass.maxLevel || 60
+
+        // ===== 干员列表（前8个，按稀有度+等级排序）=====
+        const sortedChars = [...charList]
+            .filter(c => c.charData)
+            .sort((a, b) => {
+                const ra = a.charData.rarity?.value || 0
+                const rb = b.charData.rarity?.value || 0
+                if (rb !== ra) return rb - ra
+                return (b.level || 0) - (a.level || 0)
+            })
+
+        const topChars = sortedChars.slice(0, 8).map(c => ({
+            name: c.charData.name,
+            avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || '',
+            level: c.level || 1,
+            evolvePhase: c.evolvePhase || 0,
+            rarity: c.charData.rarity?.value || 3,
+            profession: c.charData.profession?.value || '',
+            property: c.charData.property?.key || ''
+        }))
+
+        // ===== 探索等阶 =====
+        const exploreLevel = dungeon.dungeonLevel || dungeon.exploreLevel || base.worldLevel || 0
+        const exploreRank = dungeon.dungeonRank || dungeon.exploreRank || 0
+
+        // ===== 汇总收集 =====
+        let totalPuzzle = 0, totalChest = 0, totalBlackbox = 0
+        for (const dm of domains) {
+            totalPuzzle += dm.totalPuzzle
+            totalChest += dm.totalChest
+            totalBlackbox += dm.totalBlackbox
         }
 
         return await puppeteer.screenshot('endfield-profile', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'profile.html'),
-            player
+            scale: 2,
+            // 玩家基础
+            playerName: base.name,
+            playerUid: base.roleId,
+            playerLevel: base.level,
+            playerAvatar: base.avatarUrl || '',
+            createDate,
+            days: Math.ceil((Date.now() / 1000 - base.createTime) / 86400),
+            progress: base.mainMission?.description || '',
+            // 理智
+            curStamina, maxStamina, staminaPercent, staminaFull, recoveryText,
+            // 数值统计
+            worldLevel: base.worldLevel,
+            exploreLevel,
+            exploreRank,
+            charNum: base.charNum,
+            weaponNum: base.weaponNum,
+            hubLevel,
+            totalPuzzle, totalChest, totalBlackbox,
+            // 活跃度
+            dailyCur, dailyMax, dailyPercent,
+            passCur, passMax,
+            // 领地
+            domains,
+            // 干员
+            topChars,
+            hasChars: topChars.length > 0
         })
     }
 

@@ -5,88 +5,284 @@
     <meta charset="utf-8">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 600px; background: transparent; }
-        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
+        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 660px; background: transparent; text-rendering: optimizeLegibility; }
+        .page { background: #1a1d2e; padding: 16px; }
 
-        .header { background: #242840; border-radius: 12px; padding: 20px 24px; display: flex; align-items: center; gap: 16px; margin-bottom: 16px; position: relative; overflow: hidden; }
-        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #a855f7, #7c3aed, #6366f1); }
-        .avatar { width: 72px; height: 72px; border-radius: 50%; border: 3px solid #4a4e6a; object-fit: cover; background: #2e3250; }
-        .player-info { flex: 1; }
-        .player-name { font-size: 22px; font-weight: bold; color: #e8e8f0; }
-        .player-uid { font-size: 12px; color: #6a6e8a; margin-top: 3px; font-family: 'Consolas', monospace; }
-        .level-badge { background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; font-weight: bold; padding: 6px 16px; border-radius: 20px; font-size: 15px; }
+        /* ===== Header ===== */
+        .header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding: 0 4px; }
+        .avatar-wrap { position: relative; flex-shrink: 0; }
+        .avatar { width: 64px; height: 64px; border-radius: 10px; border: 2px solid #4a4e6a; object-fit: cover; background: #2e3250; }
+        .header-info { flex: 1; }
+        .header-meta { font-size: 9px; color: #3a3e5a; letter-spacing: 3px; font-family: 'Consolas', monospace; margin-bottom: 4px; }
+        .player-name { font-size: 22px; font-weight: 900; color: #e8e8f0; }
+        .player-sub { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+        .create-badge { font-size: 10px; background: #22c55e; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
+        .create-date { font-size: 11px; color: #6a6e8a; font-family: 'Consolas', monospace; }
+        .header-right { text-align: right; flex-shrink: 0; }
+        .uid-text { font-size: 11px; color: #6a6e8a; font-family: 'Consolas', monospace; }
+        .endfield-logo { font-size: 10px; color: #3a3e5a; letter-spacing: 2px; margin-top: 4px; font-family: 'Consolas', monospace; font-weight: bold; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
-        .stat-card { background: #242840; border-radius: 10px; padding: 16px 12px; text-align: center; position: relative; overflow: hidden; }
-        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #06b6d4, #0891b2); }
-        .stat-value { font-size: 24px; font-weight: 900; color: #e8e8f0; font-family: 'Consolas', monospace; }
-        .stat-label { font-size: 11px; color: #6a6e8a; margin-top: 6px; }
+        /* ===== Main Grid ===== */
+        .main-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 10px; }
 
-        .progress-card { background: #242840; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
-        .progress-icon { font-size: 22px; flex-shrink: 0; }
-        .progress-info { flex: 1; }
-        .progress-label { font-size: 11px; color: #6a6e8a; margin-bottom: 4px; }
-        .progress-text { font-size: 14px; color: #e8e8f0; font-weight: bold; }
-        .progress-bar-bg { height: 6px; background: #1a1d2e; border-radius: 3px; overflow: hidden; margin-top: 6px; }
-        .progress-bar { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #22c55e, #4ade80); }
+        /* ===== Stamina Card ===== */
+        .stamina-card { background: #242840; border-radius: 10px; padding: 14px; position: relative; overflow: hidden; }
+        .stamina-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+        .stamina-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+        .stamina-nums { font-size: 24px; font-weight: 900; color: #e8e8f0; font-family: 'Consolas', monospace; }
+        .stamina-nums small { font-size: 14px; color: #5a5e7a; font-weight: normal; }
+        .stamina-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .stamina-icon { font-size: 20px; }
+        .stamina-label { font-size: 12px; color: #8a8eaa; font-weight: bold; }
+        .stamina-bar-bg { height: 8px; background: #1a1d2e; border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+        .stamina-bar { height: 100%; border-radius: 4px; transition: width 0.3s; }
+        .stamina-bar.full { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .stamina-bar.recovering { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+        .recovery-row { display: flex; align-items: center; gap: 5px; }
+        .recovery-dot { width: 6px; height: 6px; border-radius: 50%; }
+        .recovery-dot.full { background: #4ade80; }
+        .recovery-dot.recovering { background: #22d3ee; }
+        .recovery-text { font-size: 10px; color: #6a6e8a; font-family: 'Consolas', monospace; }
+        .recovery-text.full-text { color: #4ade80; }
 
-        .stats-footer { text-align: center; padding: 10px 0 2px; font-size: 10px; color: #3a3e5a; font-style: italic; }
+        /* ===== Stats Grid (Right of stamina) ===== */
+        .stats-right { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 6px; }
+        .stat-box { background: #242840; border-radius: 8px; padding: 10px 6px; text-align: center; }
+        .stat-value { font-size: 18px; font-weight: 900; color: #e8e8f0; font-family: 'Consolas', monospace; }
+        .stat-label { font-size: 9px; color: #5a5e7a; margin-top: 3px; }
+
+        /* ===== Bottom Row: Territory + Activity ===== */
+        .bottom-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 10px; }
+
+        /* Territory mini cards */
+        .territory-card { background: #242840; border-radius: 10px; padding: 12px; }
+        .territory-name { font-size: 13px; font-weight: bold; color: #e0e0f0; margin-bottom: 8px; }
+        .stm-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
+        .stm-icon { font-size: 10px; color: #5a5e7a; margin-right: 4px; }
+        .stm-name { font-size: 11px; color: #b0b4d0; }
+        .stm-level { font-size: 11px; color: #8a8eaa; font-family: 'Consolas', monospace; font-weight: bold; }
+
+        /* Activity card */
+        .activity-card { background: #242840; border-radius: 10px; padding: 12px; min-width: 160px; }
+        .act-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .act-row:last-child { margin-bottom: 0; }
+        .act-icon { font-size: 16px; flex-shrink: 0; }
+        .act-info { flex: 1; }
+        .act-label { font-size: 10px; color: #6a6e8a; margin-bottom: 3px; }
+        .act-bar-bg { height: 6px; background: #1a1d2e; border-radius: 3px; overflow: hidden; }
+        .act-bar { height: 100%; border-radius: 3px; }
+        .act-bar.bar-green { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .act-bar.bar-cyan { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+        .act-nums { font-size: 12px; color: #e0e0f0; font-weight: bold; font-family: 'Consolas', monospace; }
+
+        /* ===== Rainbow Divider ===== */
+        .rainbow-bar { height: 4px; background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #8b5cf6, #ec4899); border-radius: 2px; margin-bottom: 12px; }
+
+        /* ===== Characters Section ===== */
+        .chars-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 0 4px; }
+        .chars-icon { font-size: 18px; }
+        .chars-title { font-size: 16px; font-weight: bold; color: #e0e0f0; }
+        .chars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+        .char-tile { background: #242840; border-radius: 10px; overflow: hidden; position: relative; }
+        .char-portrait-wrap { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: radial-gradient(circle at 50% 40%, #2e3250, #1a1d2e); }
+        .char-portrait { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+        .char-evolve-badge { position: absolute; top: 6px; left: 6px; font-size: 9px; color: #fff; background: rgba(26, 29, 46, 0.8); padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .char-property-badge { position: absolute; top: 6px; right: 6px; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+        .prop-fire { background: rgba(248, 113, 113, 0.3); color: #f87171; }
+        .prop-cryst { background: rgba(96, 165, 250, 0.3); color: #60a5fa; }
+        .prop-pulse { background: rgba(192, 132, 252, 0.3); color: #c084fc; }
+        .prop-natural { background: rgba(74, 222, 128, 0.3); color: #4ade80; }
+        .prop-physical { background: rgba(148, 163, 184, 0.3); color: #94a3b8; }
+
+        .char-bottom { padding: 6px 8px 8px; display: flex; align-items: center; justify-content: space-between; }
+        .char-bottom-left { }
+        .char-level-row { display: flex; align-items: center; gap: 4px; }
+        .char-lv { font-size: 12px; color: #e0e0f0; font-weight: bold; font-family: 'Consolas', monospace; }
+        .char-prof { font-size: 8px; color: #5a5e7a; }
+        .char-tile-name { font-size: 12px; color: #b0b4d0; font-weight: bold; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .rarity-stars { display: flex; gap: 1px; }
+        .star { width: 7px; height: 7px; }
+        .star-6 { color: #fbbf24; font-size: 7px; }
+        .star-5 { color: #c084fc; font-size: 7px; }
+        .star-4 { color: #60a5fa; font-size: 7px; }
+
+        /* ===== Footer ===== */
+        .stats-footer { text-align: center; padding: 12px 0 4px; font-size: 10px; color: #3a3e5a; font-style: italic; }
     </style>
 </head>
 
 <body>
     <div class="page">
+        <!-- Header -->
         <div class="header">
-            <img class="avatar" src="{{player.avatar}}" onerror="this.style.display='none'">
-            <div class="player-info">
-                <div class="player-name">{{player.name}}</div>
-                <div class="player-uid">UID: {{player.uid}}</div>
+            <div class="avatar-wrap">
+                {{if playerAvatar}}
+                <img class="avatar" src="{{playerAvatar}}" onerror="this.style.display='none'">
+                {{/if}}
+                {{if !playerAvatar}}
+                <div class="avatar" style="display:flex;align-items:center;justify-content:center;font-size:24px;color:#6a6e8a;">👤</div>
+                {{/if}}
             </div>
-            <div class="level-badge">Lv.{{player.level}}</div>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">{{player.worldLevel}}</div>
-                <div class="stat-label">世界等级</div>
+            <div class="header-info">
+                <div class="header-meta">▼/// ARKNIGHTS: ENDFIELD</div>
+                <div class="player-name">{{playerName}}</div>
+                {{if createDate}}
+                <div class="player-sub">
+                    <span class="create-badge">苏醒日</span>
+                    <span class="create-date">{{createDate}}</span>
+                </div>
+                {{/if}}
             </div>
-            <div class="stat-card">
-                <div class="stat-value">{{player.charNum}}</div>
-                <div class="stat-label">干员数量</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">{{player.weaponNum}}</div>
-                <div class="stat-label">武器数量</div>
-            </div>
-        </div>
-
-        <div class="progress-card">
-            <div class="progress-icon">⚡</div>
-            <div class="progress-info">
-                <div class="progress-label">理智</div>
-                <div class="progress-text">{{player.stamina}}</div>
-                <div class="progress-bar-bg"><div class="progress-bar" style="width: 60%"></div></div>
+            <div class="header-right">
+                <div class="uid-text">UID:{{playerUid}}</div>
+                <div class="endfield-logo">ENDFIELD</div>
             </div>
         </div>
 
-        <div class="progress-card">
-            <div class="progress-icon">📋</div>
-            <div class="progress-info">
-                <div class="progress-label">每日任务</div>
-                <div class="progress-text">{{player.dailyMission}}</div>
+        <!-- Main Grid: Stamina + Stats -->
+        <div class="main-grid">
+            <!-- Stamina -->
+            <div class="stamina-card">
+                <div class="stamina-header">
+                    <div class="stamina-nums">{{curStamina}}<small>/{{maxStamina}}</small></div>
+                </div>
+                <div class="stamina-label-row">
+                    <span class="stamina-icon">⚡</span>
+                    <span class="stamina-label">理智</span>
+                </div>
+                <div class="stamina-bar-bg">
+                    <div class="stamina-bar {{staminaFull ? 'full' : 'recovering'}}" style="width: {{staminaPercent}}%"></div>
+                </div>
+                <div class="recovery-row">
+                    {{if staminaFull}}
+                    <div class="recovery-dot full"></div>
+                    <span class="recovery-text full-text">已满</span>
+                    {{/if}}
+                    {{if !staminaFull}}
+                    <div class="recovery-dot recovering"></div>
+                    <span class="recovery-text">回复时间</span>
+                    {{/if}}
+                </div>
+                {{if !staminaFull}}
+                <div style="margin-top:2px;">
+                    <span class="recovery-text" style="color:#22d3ee;font-weight:bold;font-size:12px;">● {{recoveryText}}</span>
+                </div>
+                {{/if}}
+            </div>
+
+            <!-- Stats Right Grid -->
+            <div class="stats-right">
+                <div class="stat-box">
+                    <div class="stat-value">{{worldLevel}}</div>
+                    <div class="stat-label">探索等阶</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{exploreRank}}</div>
+                    <div class="stat-label">探索等级</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{charNum}}</div>
+                    <div class="stat-label">干员</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{weaponNum}}</div>
+                    <div class="stat-label">武器</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{hubLevel}}</div>
+                    <div class="stat-label">总控中枢等级</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{totalPuzzle}}</div>
+                    <div class="stat-label">醚质</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{totalChest}}</div>
+                    <div class="stat-label">储藏箱</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">{{totalBlackbox}}</div>
+                    <div class="stat-label">光荣之路</div>
+                </div>
             </div>
         </div>
 
-        <div class="stats-grid" style="grid-template-columns: 1fr 1fr;">
-            <div class="stat-card">
-                <div class="stat-value">{{player.days}}</div>
-                <div class="stat-label">活跃天数</div>
+        <!-- Bottom Row: Territories + Activity -->
+        <div class="bottom-grid">
+            {{each domains dm}}
+            <div class="territory-card">
+                <div class="territory-name">{{dm.name}}</div>
+                {{each dm.settlements stm}}
+                <div class="stm-row">
+                    <div>
+                        <span class="stm-icon">▸</span>
+                        <span class="stm-name">{{stm.name}}</span>
+                    </div>
+                    <span class="stm-level">{{stm.level}}</span>
+                </div>
+                {{/each}}
             </div>
-            <div class="stat-card">
-                <div class="stat-value" style="font-size:14px;">{{player.progress}}</div>
-                <div class="stat-label">主线进度</div>
+            {{/each}}
+
+            <div class="activity-card">
+                <div class="act-row">
+                    <span class="act-icon">🏆</span>
+                    <div class="act-info">
+                        <div class="act-label">活跃度</div>
+                        <div class="act-bar-bg">
+                            <div class="act-bar bar-green" style="width: {{dailyPercent}}%"></div>
+                        </div>
+                    </div>
+                    <div class="act-nums">{{dailyCur}}/{{dailyMax}}</div>
+                </div>
+                <div class="act-row">
+                    <span class="act-icon">🎫</span>
+                    <div class="act-info">
+                        <div class="act-label">通行证</div>
+                        <div class="act-bar-bg">
+                            <div class="act-bar bar-cyan" style="width: {{passCur / passMax * 100}}%"></div>
+                        </div>
+                    </div>
+                    <div class="act-nums">{{passCur}}/{{passMax}}</div>
+                </div>
             </div>
         </div>
+
+        <!-- Rainbow Divider -->
+        <div class="rainbow-bar"></div>
+
+        <!-- Characters Grid -->
+        {{if hasChars}}
+        <div class="chars-header">
+            <span class="chars-icon">👥</span>
+            <span class="chars-title">干员</span>
+        </div>
+        <div class="chars-grid">
+            {{each topChars ch}}
+            <div class="char-tile">
+                <div class="char-portrait-wrap">
+                    {{if ch.avatar}}
+                    <img class="char-portrait" src="{{ch.avatar}}" onerror="this.style.display='none'">
+                    {{/if}}
+                    <div class="char-evolve-badge">E{{ch.evolvePhase}}</div>
+                    {{if ch.property}}
+                    <div class="char-property-badge prop-{{ch.property.replace('char_property_', '')}}">{{ch.profession}}</div>
+                    {{/if}}
+                </div>
+                <div class="char-bottom">
+                    <div class="char-bottom-left">
+                        <div class="char-level-row">
+                            <span class="char-lv">Lv.{{ch.level}}</span>
+                        </div>
+                        <div class="char-tile-name">{{ch.name}}</div>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        {{/if}}
 
         <div class="stats-footer">Generated by endfield-suzuki-plugin</div>
     </div>
