@@ -119,18 +119,85 @@ export default class Render {
             return baseName
         }
 
-        // 通过 charId 查找角色名称和头像
-        const resolveChar = (charId) => {
-            for (const c of charList) {
-                // charId 可能是 hash，尝试匹配
-                if (c.charData && (c.charId === charId || c.charData.id === charId)) {
-                    return {
-                        name: c.charData.name,
-                        avatar: c.charData.avatarUrl || c.charData.avatarRtUrl || ''
+        // 构建 charId -> charData 的快速查找 Map
+        const charByHash = new Map()
+        for (const c of charList) {
+            if (!c.charData) continue
+            charByHash.set(c.id, c)
+            if (c.charData.id && c.charData.id !== c.id) {
+                charByHash.set(c.charData.id, c)
+            }
+        }
+
+        // 从 reports 数据中建立 chr_xxxx_name -> hash ID 的映射
+        const chrCodeToHash = new Map()
+        for (const room of (ship.rooms || [])) {
+            if (!room.reports || !room.chars) continue
+            for (const [, report] of Object.entries(room.reports)) {
+                const reportChars = report.char || []
+                // reports.char 顺序通常对应当时房间的 chars 顺序
+                // 我们收集所有 chr_ 开头的 ID
+                for (let i = 0; i < reportChars.length; i++) {
+                    const chrCode = reportChars[i]
+                    if (chrCode && chrCode.startsWith('chr_') && !chrCodeToHash.has(chrCode)) {
+                        // 尝试通过同一房间当前的 chars 位置来映射
+                        if (i < room.chars.length) {
+                            const hashId = room.chars[i].charId
+                            // 只在 hashId 是 hash 格式时建立映射
+                            if (hashId && !hashId.startsWith('chr_')) {
+                                chrCodeToHash.set(chrCode, hashId)
+                            }
+                        }
                     }
                 }
             }
-            return { name: charId.substring(0, 8) + '...', avatar: '' }
+        }
+
+        // 通过 charId 查找角色名称和头像
+        const resolveChar = (charId) => {
+            // 1. 直接 hash 查找
+            if (charByHash.has(charId)) {
+                const c = charByHash.get(charId)
+                return {
+                    name: c.charData.name,
+                    avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
+                }
+            }
+
+            // 2. 如果是 chr_xxxx_name 格式，尝试通过 reports 映射查找
+            if (charId && charId.startsWith('chr_')) {
+                // 2a. 通过 chrCodeToHash 映射
+                for (const [chrCode, hashId] of chrCodeToHash) {
+                    if (charId === chrCode || charId.startsWith(chrCode)) {
+                        if (charByHash.has(hashId)) {
+                            const c = charByHash.get(hashId)
+                            return {
+                                name: c.charData.name,
+                                avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
+                            }
+                        }
+                    }
+                }
+
+                // 2b. 尝试用 chr 编号的数字部分做匹配（chr_0016 中的 16）
+                const numMatch = charId.match(/^chr_(\d+)/)
+                if (numMatch) {
+                    const chrNum = numMatch[1]
+                    for (const [chrCode, hashId] of chrCodeToHash) {
+                        const codeNum = chrCode.match(/^chr_(\d+)/)
+                        if (codeNum && codeNum[1] === chrNum && charByHash.has(hashId)) {
+                            const c = charByHash.get(hashId)
+                            return {
+                                name: c.charData.name,
+                                avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
+                            }
+                        }
+                    }
+                }
+            }
+
+            logger.warn(`[Endfield] 帝江号无法解析角色: ${charId}`)
+            return { name: charId ? charId.substring(0, 12) + '...' : '???', avatar: '' }
         }
 
         const rooms = (ship.rooms || []).map(room => ({

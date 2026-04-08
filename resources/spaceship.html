@@ -171,7 +171,11 @@
                 <div class="room-chars">
                     {{each room.chars ch}}
                     <div class="room-char">
-                        <img class="char-avatar" src="{{ch.avatar}}">
+                        {{if ch.avatar}}
+                        <img class="char-avatar" src="{{ch.avatar}}" onerror="this.style.display='none'">
+                        {{else}}
+                        <div class="char-avatar" style="background:#333;display:flex;align-items:center;justify-content:center;font-size:14px;color:#888;">?</div>
+                        {{/if}}
                         <div class="char-detail">
                             <div class="char-name-tag">{{ch.name}}</div>
                             {{if ch.favorability > 0}}
