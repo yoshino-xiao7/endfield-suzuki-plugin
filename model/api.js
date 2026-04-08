@@ -29,32 +29,75 @@ class EndfieldApi {
     get apiKey() { return this.config.apiKey }
     get baseUrl() { return this.config.apiBaseUrl }
 
-    async request(reqPath, method = 'GET', body = null, timeout = 15000) {
+    /**
+     * 可重试的 HTTP 状态码（均为瞬态 / 网关超时错误）
+     */
+    static RETRYABLE_STATUS = new Set([502, 503, 504, 524])
+
+    async request(reqPath, method = 'GET', body = null, timeout = 15000, maxRetries = 0) {
         if (!this.apiKey) throw new Error('未配置 API Key，请联系管理员')
         const url = `${this.baseUrl}${reqPath}`
-        const res = await fetch(url, {
-            method,
-            headers: { 'X-API-Key': this.apiKey, 'Content-Type': 'application/json' },
-            body: body ? JSON.stringify(body) : null,
-            timeout
-        })
 
-        if (!res.ok) {
-            let errMsg = `HTTP ${res.status}`
+        let lastErr
+        const attempts = 1 + maxRetries  // 首次 + 重试次数
+
+        for (let attempt = 1; attempt <= attempts; attempt++) {
             try {
-                const errData = await res.json()
-                errMsg = errData.message || errData.msg || JSON.stringify(errData)
-            } catch { }
-            throw new Error(errMsg)
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'X-API-Key': this.apiKey, 'Content-Type': 'application/json' },
+                    body: body ? JSON.stringify(body) : null,
+                    timeout
+                })
+
+                if (!res.ok) {
+                    let errMsg = `HTTP ${res.status}`
+                    try {
+                        const errData = await res.json()
+                        errMsg = errData.message || errData.msg || JSON.stringify(errData)
+                    } catch { }
+
+                    // 可重试的瞬态错误
+                    if (EndfieldApi.RETRYABLE_STATUS.has(res.status) && attempt < attempts) {
+                        const delay = Math.min(2000 * attempt, 10000) // 2s, 4s, 6s ... 最长 10s
+                        logger.warn(`[Endfield] ${method} ${reqPath} => HTTP ${res.status}，第 ${attempt}/${attempts} 次，${delay}ms 后重试...`)
+                        await new Promise(r => setTimeout(r, delay))
+                        lastErr = new Error(errMsg)
+                        continue
+                    }
+
+                    throw new Error(errMsg)
+                }
+
+                const data = await res.json()
+                if (attempt > 1) {
+                    logger.info(`[Endfield] ${method} ${reqPath} => 第 ${attempt} 次尝试成功`)
+                }
+                logger.info(`[Endfield] ${method} ${reqPath} => ${JSON.stringify(data)}`)
+
+                if (data.code !== 200 || data.success === false) {
+                    throw new Error(data.message || '请求失败')
+                }
+                return data
+            } catch (fetchErr) {
+                // node-fetch 超时抛出的是 AbortError / FetchError
+                const isTimeout = fetchErr.type === 'request-timeout' || fetchErr.name === 'AbortError'
+                    || (fetchErr.message && fetchErr.message.includes('timeout'))
+
+                if (isTimeout && attempt < attempts) {
+                    const delay = Math.min(3000 * attempt, 15000)
+                    logger.warn(`[Endfield] ${method} ${reqPath} => 请求超时，第 ${attempt}/${attempts} 次，${delay}ms 后重试...`)
+                    await new Promise(r => setTimeout(r, delay))
+                    lastErr = fetchErr
+                    continue
+                }
+
+                throw fetchErr
+            }
         }
 
-        const data = await res.json()
-        logger.info(`[Endfield] ${method} ${reqPath} => ${JSON.stringify(data)}`)
-
-        if (data.code !== 200 || data.success === false) {
-            throw new Error(data.message || '请求失败')
-        }
-        return data
+        // 所有重试都失败了
+        throw lastErr || new Error('请求失败，所有重试均已耗尽')
     }
 
     // ===== 绑定 =====
@@ -69,7 +112,7 @@ class EndfieldApi {
     getCard(bindingId) { return this.request(`/skland/endfield/card?bindingId=${bindingId}`) }
 
     // ===== 抽卡 =====
-    syncGacha(bindingId) { return this.request(`/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, 60000) }
+    syncGacha(bindingId) { return this.request(`/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, 120000, 2) }
     getGacha(bindingId, poolType, poolId) {
         let url = `/skland/endfield/gacha?bindingId=${bindingId}`
         if (poolType) url += `&poolType=${poolType}`
@@ -95,9 +138,9 @@ class EndfieldApi {
      * @param {string|number|null} bindingId - 绑定ID，用于刷新凭证
      * @returns {{ data, refreshed: boolean }}
      */
-    async requestWithAutoRefresh(reqPath, method = 'GET', body = null, bindingId = null, timeout = 15000) {
+    async requestWithAutoRefresh(reqPath, method = 'GET', body = null, bindingId = null, timeout = 15000, maxRetries = 0) {
         try {
-            const data = await this.request(reqPath, method, body, timeout)
+            const data = await this.request(reqPath, method, body, timeout, maxRetries)
             return { data, refreshed: false }
         } catch (err) {
             const msg = err.message || ''
@@ -105,6 +148,11 @@ class EndfieldApi {
             // 业务错误（重复签到等）不刷新
             if (msg.includes('重复') || msg.includes('已签') || msg.includes('请勿')) {
                 throw err
+            }
+
+            // 524 超时 — 给用户友好提示
+            if (msg.includes('524')) {
+                throw new Error('服务器繁忙（524超时），请稍后重试')
             }
 
             // 凭证过期: 403 / Unauthorized / 10001 / 请求异常
@@ -132,7 +180,7 @@ class EndfieldApi {
 
                 // 刷新完成，重试
                 try {
-                    const data = await this.request(reqPath, method, body, timeout)
+                    const data = await this.request(reqPath, method, body, timeout, maxRetries)
                     return { data, refreshed: true }
                 } catch (retryErr) {
                     throw new Error(`凭证已失效，请重新绑定 (${retryErr.message})`)

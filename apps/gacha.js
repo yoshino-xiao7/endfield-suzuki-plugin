@@ -3,6 +3,9 @@ import api from '../model/api.js'
 import data from '../model/data.js'
 import Render from '../model/render.js'
 
+// 用于防止同一用户重复发起同步的锁
+const _syncLocks = new Map()
+
 export class GachaApp extends plugin {
     constructor() {
         super({
@@ -20,27 +23,41 @@ export class GachaApp extends plugin {
         })
     }
 
-    // ========== 同步抽卡记录 ==========
+    // ========== 同步抽卡记录（异步后台执行） ==========
     async sync(e) {
         const bindingId = data.getBindingId(e.user_id)
         if (!bindingId) return e.reply('❌ 请先绑定: 私聊发送 #终末地绑定 <token>')
 
-        e.reply('⏳ 正在同步抽卡记录，请稍候（约10~30秒）...')
-        try {
-            const { data: result } = await api.requestWithAutoRefresh(
-                `/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, bindingId, 60000
-            )
+        // 防止同一用户重复发起同步
+        if (_syncLocks.has(e.user_id)) {
+            return e.reply('⏳ 你的抽卡记录正在同步中，请耐心等待结果...')
+        }
+
+        e.reply('⏳ 已开始后台同步抽卡记录，完成后会自动通知你~')
+
+        // 标记为同步中
+        _syncLocks.set(e.user_id, Date.now())
+
+        // 后台异步执行，不阻塞命令返回
+        api.requestWithAutoRefresh(
+            `/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, bindingId, 120000, 2
+        ).then(({ data: result }) => {
             const d = result.data || result || {}
             const newCount = d.newRecords ?? d.newCount ?? d.new_count ?? '?'
             const totalCount = d.totalRecords ?? d.totalCount ?? d.total_count ?? '?'
             e.reply(`✅ 同步完成！\n新增 ${newCount} 条记录\n总计 ${totalCount} 条记录`)
-        } catch (err) {
-            if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
-                e.reply(`❌ ${err.message}\n请私聊发送 #终末地绑定 <新token> 重新绑定`)
+        }).catch(err => {
+            const msg = err.message || ''
+            if (msg.includes('失效') || msg.includes('重新绑定')) {
+                e.reply(`❌ ${msg}\n请私聊发送 #终末地绑定 <新token> 重新绑定`)
+            } else if (msg.includes('524') || msg.includes('超时') || msg.includes('繁忙')) {
+                e.reply('❌ 服务器响应超时（524），可能服务器繁忙，请等待1~2分钟后重试\n💡 提示：高峰期同步可能需要多试几次')
             } else {
-                e.reply(`❌ 同步失败: ${err.message || '未知错误'}`)
+                e.reply(`❌ 同步失败: ${msg || '未知错误'}`)
             }
-        }
+        }).finally(() => {
+            _syncLocks.delete(e.user_id)
+        })
     }
 
     // ========== 抽卡记录 (全部 / 按池名) ==========
