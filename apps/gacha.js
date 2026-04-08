@@ -30,9 +30,9 @@ export class GachaApp extends plugin {
             const { data: result } = await api.requestWithAutoRefresh(
                 `/skland/endfield/gacha/sync?bindingId=${bindingId}`, 'POST', null, bindingId, 60000
             )
-            const d = result.data || {}
-            const newCount = d.newCount ?? d.new_count ?? '?'
-            const totalCount = d.totalCount ?? d.total_count ?? d.total ?? '?'
+            const d = result.data || result || {}
+            const newCount = d.newRecords ?? d.newCount ?? d.new_count ?? '?'
+            const totalCount = d.totalRecords ?? d.totalCount ?? d.total_count ?? '?'
             e.reply(`✅ 同步完成！\n新增 ${newCount} 条记录\n总计 ${totalCount} 条记录`)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
