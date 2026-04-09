@@ -6,63 +6,63 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 900px; background: transparent; }
-        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
+        .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
 
-        .char-card { display: grid; grid-template-columns: 500px 1fr; background: #242840; border-radius: 12px; overflow: hidden; min-height: 580px; }
+        .char-card { display: grid; grid-template-columns: 500px 1fr; background: #ffffff; border-radius: 16px; overflow: hidden; min-height: 580px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e6ea; }
 
         /* Left Column */
-        .portrait-col { position: relative; background: radial-gradient(circle at 50% 30%, #2e3250 0%, #1a1d2e 100%); overflow: hidden; }
+        .portrait-col { position: relative; background: radial-gradient(circle at 50% 30%, #f5f7fa 0%, #e8ecf0 100%); overflow: hidden; }
         .portrait { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
-        .char-info-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(26, 29, 46, 0.95) 0%, rgba(26, 29, 46, 0) 100%); padding: 24px; }
-        .char-name { font-size: 42px; font-weight: bold; color: #e8e8f0; }
+        .char-info-overlay { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 100%); padding: 24px; }
+        .char-name { font-size: 42px; font-weight: bold; color: #1a1a2e; }
         .char-meta { display: flex; gap: 12px; font-size: 15px; margin-top: 4px; }
-        .rarity { color: #fbbf24; }
-        .property.char_property_fire { color: #f87171; }
-        .property.char_property_cryst { color: #60a5fa; }
-        .property.char_property_pulse { color: #c084fc; }
-        .property.char_property_natural { color: #4ade80; }
-        .property.char_property_physical { color: #94a3b8; }
+        .rarity { color: #f59e0b; }
+        .property.char_property_fire { color: #ef4444; }
+        .property.char_property_cryst { color: #3b82f6; }
+        .property.char_property_pulse { color: #8b5cf6; }
+        .property.char_property_natural { color: #22c55e; }
+        .property.char_property_physical { color: #6b7280; }
 
         /* Right Column */
-        .detail-col { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+        .detail-col { padding: 22px; display: flex; flex-direction: column; gap: 14px; background: #ffffff; }
 
-        .section-title { font-size: 12px; color: #8a8eaa; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .section-title { font-size: 12px; color: #6b7280; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
         .section-dot { width: 4px; height: 14px; border-radius: 2px; }
         .dot-cyan { background: #06b6d4; }
         .dot-orange { background: #f97316; }
-        .dot-purple { background: #a855f7; }
+        .dot-purple { background: #8b5cf6; }
         .dot-green { background: #22c55e; }
 
         /* Stats */
         .stats-row { display: flex; gap: 10px; }
-        .stat-box { background: #1a1d2e; padding: 12px 10px; border-radius: 8px; flex: 1; text-align: center; }
-        .stat-label { font-size: 10px; color: #5a5e7a; }
-        .stat-value { font-size: 18px; color: #e0e0f0; font-weight: bold; font-family: 'Consolas', monospace; margin-top: 2px; }
+        .stat-box { background: #f5f7fa; padding: 12px 10px; border-radius: 10px; flex: 1; text-align: center; border: 1px solid #e8ecf0; }
+        .stat-label { font-size: 10px; color: #9ca3af; }
+        .stat-value { font-size: 18px; color: #1a1a2e; font-weight: bold; font-family: 'Consolas', monospace; margin-top: 2px; }
 
         /* Weapon */
-        .weapon-box { display: flex; align-items: center; background: #1a1d2e; padding: 12px 14px; border-radius: 8px; gap: 14px; }
-        .weapon-icon { width: 48px; height: 48px; border-radius: 6px; object-fit: cover; background: #2e3250; flex-shrink: 0; }
+        .weapon-box { display: flex; align-items: center; background: #f5f7fa; padding: 12px 14px; border-radius: 12px; gap: 14px; border: 1px solid #e8ecf0; }
+        .weapon-icon { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; background: #e8ecf0; flex-shrink: 0; }
         .weapon-info { flex: 1; }
-        .weapon-name { font-size: 15px; color: #e0e0f0; font-weight: bold; }
-        .weapon-meta { font-size: 12px; color: #6a6e8a; margin-top: 2px; }
-        .refine { color: #fbbf24; font-weight: bold; margin-left: 6px; }
+        .weapon-name { font-size: 15px; color: #1a1a2e; font-weight: bold; }
+        .weapon-meta { font-size: 12px; color: #8c94a6; margin-top: 2px; }
+        .refine { color: #f59e0b; font-weight: bold; margin-left: 6px; }
 
-        .empty-box { background: #1a1d2e; padding: 14px; border-radius: 8px; color: #4a4e6a; text-align: center; font-size: 13px; }
+        .empty-box { background: #f5f7fa; padding: 14px; border-radius: 12px; color: #b0b8c4; text-align: center; font-size: 13px; border: 1px solid #e8ecf0; }
 
         /* Skills */
         .skills-list { display: flex; gap: 10px; }
-        .skill-item { position: relative; width: 56px; height: 56px; background: #1a1d2e; border-radius: 10px; display: flex; justify-content: center; align-items: center; }
+        .skill-item { position: relative; width: 56px; height: 56px; background: #f5f7fa; border-radius: 12px; display: flex; justify-content: center; align-items: center; border: 1px solid #e8ecf0; }
         .skill-icon { width: 38px; height: 38px; }
-        .skill-level { position: absolute; bottom: -4px; right: -4px; background: #242840; color: #fbbf24; font-size: 10px; padding: 2px 6px; border-radius: 6px; border: 1px solid #3a3e5a; font-weight: bold; }
+        .skill-level { position: absolute; bottom: -4px; right: -4px; background: #fff; color: #3b82f6; font-size: 10px; padding: 2px 6px; border-radius: 6px; border: 1px solid #e2e6ea; font-weight: bold; }
 
         /* Equips */
         .equips-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-        .equip-item { background: #1a1d2e; border-radius: 8px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
+        .equip-item { background: #f5f7fa; border-radius: 10px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; border: 1px solid #e8ecf0; }
         .equip-icon { width: 80%; height: 80%; object-fit: contain; }
-        .equip-level { position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: #d0d0e0; background: rgba(26, 29, 46, 0.85); padding: 1px 5px; border-radius: 4px; font-family: 'Consolas', monospace; }
-        .equip-empty { width: 80%; height: 80%; background: #2e3250; border-radius: 6px; }
+        .equip-level { position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: #fff; background: rgba(0,0,0,0.5); padding: 1px 5px; border-radius: 4px; font-family: 'Consolas', monospace; }
+        .equip-empty { width: 80%; height: 80%; background: #e8ecf0; border-radius: 8px; }
 
-        .copyright { margin-top: auto; text-align: right; font-size: 10px; color: #3a3e5a; font-style: italic; }
+        .copyright { margin-top: auto; text-align: right; font-size: 10px; color: #b0b8c4; font-style: italic; }
     </style>
 </head>
 

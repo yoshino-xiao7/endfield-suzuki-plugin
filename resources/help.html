@@ -6,37 +6,37 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 600px; background: transparent; text-rendering: optimizeLegibility; }
-        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
+        .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
 
-        .header { background: #242840; border-radius: 12px; padding: 20px 24px; margin-bottom: 14px; position: relative; overflow: hidden; }
-        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #f97316, #ef4444, #a855f7); }
-        .help-meta { font-size: 9px; color: #3a3e5a; letter-spacing: 3px; font-family: 'Consolas', monospace; margin-bottom: 6px; }
-        .help-title { font-size: 22px; font-weight: 900; color: #e8e8f0; display: flex; align-items: center; gap: 10px; }
-        .help-title-bar { width: 28px; height: 3px; background: linear-gradient(90deg, #f97316, #ef4444); border-radius: 2px; }
-        .help-sub { font-size: 10px; color: #5a5e7a; font-family: 'Consolas', monospace; margin-top: 6px; letter-spacing: 1px; }
+        .header { background: #ffffff; border-radius: 16px; padding: 20px 24px; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
+        .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6); }
+        .help-meta { font-size: 9px; color: #b0b8c4; letter-spacing: 3px; font-family: 'Consolas', monospace; margin-bottom: 6px; }
+        .help-title { font-size: 22px; font-weight: 900; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
+        .help-title-bar { width: 28px; height: 3px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 2px; }
+        .help-sub { font-size: 10px; color: #9ca3af; font-family: 'Consolas', monospace; margin-top: 6px; letter-spacing: 1px; }
 
-        .help-section { background: #242840; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .help-section { background: #ffffff; border-radius: 14px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
 
-        .section-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #2e3250; }
+        .section-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #f0f2f5; }
         .section-dot { width: 4px; height: 14px; border-radius: 2px; }
         .dot-orange { background: #f97316; }
         .dot-cyan { background: #06b6d4; }
-        .dot-purple { background: #a855f7; }
+        .dot-purple { background: #8b5cf6; }
         .dot-green { background: #22c55e; }
         .dot-red { background: #ef4444; }
         .dot-yellow { background: #eab308; }
         .section-icon { font-size: 14px; flex-shrink: 0; }
-        .section-title { font-size: 13px; font-weight: bold; color: #d0d0e0; letter-spacing: 1px; }
+        .section-title { font-size: 13px; font-weight: bold; color: #1a1a2e; letter-spacing: 1px; }
 
         .cmd-list { padding: 6px 0; }
         .cmd-row { display: flex; align-items: baseline; padding: 5px 18px; gap: 14px; }
-        .cmd-name { font-size: 12px; color: #22d3ee; font-family: 'Consolas', monospace; white-space: nowrap; flex-shrink: 0; min-width: 200px; }
-        .cmd-desc { font-size: 11px; color: #6a6e8a; }
+        .cmd-name { font-size: 12px; color: #3b82f6; font-family: 'Consolas', monospace; white-space: nowrap; flex-shrink: 0; min-width: 200px; }
+        .cmd-desc { font-size: 11px; color: #8c94a6; }
 
-        .note-row { padding: 6px 18px; font-size: 11px; color: #6a6e8a; }
+        .note-row { padding: 6px 18px; font-size: 11px; color: #8c94a6; }
         .note-label { color: #f97316; font-family: 'Consolas', monospace; font-size: 10px; font-weight: bold; }
 
-        .help-footer { display: flex; justify-content: space-between; padding: 12px 0 2px; font-size: 9px; color: #3a3e5a; font-family: 'Consolas', monospace; letter-spacing: 2px; }
+        .help-footer { display: flex; justify-content: space-between; padding: 12px 0 2px; font-size: 9px; color: #b0b8c4; font-family: 'Consolas', monospace; letter-spacing: 2px; }
     </style>
 </head>
 

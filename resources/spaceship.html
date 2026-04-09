@@ -6,32 +6,32 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 650px; background: transparent; }
-        .page { background: #1a1d2e; padding: 20px; border-radius: 16px; }
+        .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
 
-        .header { background: #242840; border-radius: 12px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; position: relative; overflow: hidden; }
+        .header { background: #ffffff; border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
         .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #f97316, #ea580c, #dc2626); }
-        .header-title { font-size: 20px; font-weight: bold; color: #e8e8f0; }
-        .header-sub { font-size: 11px; color: #6a6e8a; margin-top: 3px; }
-        .header-player { font-size: 14px; color: #b0b4d0; font-weight: bold; }
+        .header-title { font-size: 20px; font-weight: bold; color: #1a1a2e; }
+        .header-sub { font-size: 11px; color: #8c94a6; margin-top: 3px; }
+        .header-player { font-size: 14px; color: #3a3f50; font-weight: bold; }
 
         .rooms-list { display: flex; flex-direction: column; gap: 10px; }
 
-        .room-card { background: #242840; border-radius: 10px; overflow: hidden; }
-        .room-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #2e3250; }
-        .room-name { font-size: 15px; font-weight: bold; color: #e0e0f0; }
+        .room-card { background: #ffffff; border-radius: 14px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
+        .room-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #f0f2f5; }
+        .room-name { font-size: 15px; font-weight: bold; color: #1a1a2e; }
         .room-level { font-size: 11px; color: #fff; background: linear-gradient(135deg, #f97316, #ea580c); padding: 3px 10px; border-radius: 12px; font-weight: bold; }
 
         .room-chars { padding: 10px 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-        .room-char { display: flex; align-items: center; gap: 8px; background: #1a1d2e; padding: 6px 12px; border-radius: 8px; }
-        .char-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3a3e5a; object-fit: cover; background: #2e3250; }
-        .char-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: #2e3250; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #6a6e8a; border: 2px solid #3a3e5a; }
+        .room-char { display: flex; align-items: center; gap: 8px; background: #f5f7fa; padding: 6px 12px; border-radius: 10px; border: 1px solid #e8ecf0; }
+        .char-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #d0d5de; object-fit: cover; background: #f0f2f5; }
+        .char-avatar-placeholder { width: 32px; height: 32px; border-radius: 50%; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #8c94a6; border: 2px solid #d0d5de; }
         .char-detail { display: flex; flex-direction: column; }
-        .char-name-tag { font-size: 13px; color: #d0d0e0; font-weight: 500; }
-        .char-fav { font-size: 10px; color: #f472b6; }
+        .char-name-tag { font-size: 13px; color: #3a3f50; font-weight: 500; }
+        .char-fav { font-size: 10px; color: #ec4899; }
 
-        .room-empty { padding: 12px 16px; font-size: 12px; color: #4a4e6a; }
+        .room-empty { padding: 12px 16px; font-size: 12px; color: #b0b8c4; }
 
-        .stats-footer { text-align: center; padding: 14px 0 2px; font-size: 10px; color: #3a3e5a; font-style: italic; }
+        .stats-footer { text-align: center; padding: 14px 0 2px; font-size: 10px; color: #b0b8c4; font-style: italic; }
     </style>
 </head>
 

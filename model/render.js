@@ -190,6 +190,7 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-character', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'character.html'),
+            scale: 2,
             character
         })
     }
@@ -305,6 +306,7 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-spaceship', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'spaceship.html'),
+            scale: 2,
             playerName: base.name,
             rooms
         })
@@ -353,6 +355,7 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-domain', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'domain.html'),
+            scale: 2,
             playerName: base.name,
             domains
         })
@@ -374,6 +377,7 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-gacha-records', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
+            scale: 2,
             records: fmtRecords,
             poolName,
             totalCount: records.length,
