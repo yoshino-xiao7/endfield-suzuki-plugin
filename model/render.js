@@ -540,9 +540,9 @@ export default class Render {
             if (stat) allPoolStats.push(stat)
         }
 
-        // ===== 分类池 =====
-        const limitedPools = allPoolStats.filter(p => p.category === 'limited')
-        const weaponPools = allPoolStats.filter(p => p.category === 'weapon')
+        // ===== 分类池（最新池在前） =====
+        const limitedPools = allPoolStats.filter(p => p.category === 'limited').reverse()
+        const weaponPools = allPoolStats.filter(p => p.category === 'weapon').reverse()
         const beginnerPools = allPoolStats.filter(p => p.category === 'beginner')
         const standardPools = allPoolStats.filter(p => p.category === 'standard' || p.category === 'standard_weapon')
 

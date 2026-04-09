@@ -283,8 +283,8 @@
             position: absolute;
             top: 0;
             right: 0;
-            width: 100px;
-            height: 110px;
+            width: 110px;
+            height: 70px;
             overflow: hidden;
             pointer-events: none;
             z-index: 0;
@@ -295,8 +295,8 @@
             height: auto;
             position: absolute;
             top: -8px;
-            right: -35px;
-            opacity: 0.13;
+            right: -30px;
+            opacity: 0.28;
             filter: grayscale(20%);
         }
 
@@ -304,7 +304,9 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0) 25%, rgba(255,255,255,1) 100%);
+            background:
+                linear-gradient(to bottom, rgba(255,255,255,0) 30%, rgba(255,255,255,1) 95%),
+                linear-gradient(to left, rgba(255,255,255,0) 40%, rgba(255,255,255,1) 100%);
         }
 
         .banner-top-bar {
@@ -379,6 +381,8 @@
         /* ===== 6★ Records ===== */
         .six-star-list {
             padding: 0 10px 8px;
+            position: relative;
+            z-index: 2;
         }
 
         .six-star-entry {
@@ -474,7 +478,8 @@
 
         .ss-pull-label {
             font-size: 9px;
-            color: #8c94a6;
+            color: #1a1a2e;
+            font-weight: bold;
             font-family: 'Consolas', monospace;
             flex-shrink: 0;
             min-width: 28px;
@@ -538,6 +543,8 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            position: relative;
+            z-index: 2;
         }
 
         .bp-bar-bg {
@@ -825,74 +832,8 @@
                 {{/if}}
             </div>
 
-            <!-- 新手池 + 常驻池 Column -->
+            <!-- 常驻池 + 新手池 Column -->
             <div class="pool-column">
-                {{if beginnerPools.length > 0}}
-                <div class="pool-col-header">新手池 <span class="col-badge">[{{beginnerTotalPulls}}抽]</span></div>
-                {{each beginnerPools bp}}
-                <div class="banner-card">
-                    <div class="banner-top-bar bar-green"></div>
-                    <div class="banner-header">
-                        <div class="banner-title-row">
-                        <div class="banner-pool-name">{{bp.poolName}}</div>
-                        </div>
-                    </div>
-                    <div class="banner-stats-row">
-                        <div class="bs-item">
-                            <div class="bs-value">{{bp.totalPulls}}</div>
-                            <div class="bs-label">总抽数</div>
-                        </div>
-                        <div class="bs-item">
-                            <div class="bs-value">{{bp.sixCount}}</div>
-                            <div class="bs-label">6★</div>
-                        </div>
-                        <div class="bs-item">
-                            <div class="bs-value">{{bp.currentPity}}</div>
-                            <div class="bs-label">已垫</div>
-                        </div>
-                    </div>
-
-                    {{if bp.sixStars.length > 0}}
-                    <div class="six-star-list">
-                        {{each bp.sixStars ss}}
-                        <div class="six-star-entry">
-                            {{if ss.avatar}}
-                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
-                            {{/if}}
-                            {{if !ss.avatar}}
-                            <div class="ss-avatar-placeholder">★</div>
-                            {{/if}}
-                            <div class="ss-info">
-                                <div class="ss-name-row">
-                                    <span class="ss-name">{{ss.name}}</span>
-                                    {{if ss.isNewChar}}<span class="ss-tag tag-new">NEW</span>{{/if}}
-                                </div>
-                                <div class="ss-bar-row">
-                                    <span class="ss-pull-label">{{ss.pulls}}抽</span>
-                                    <div class="ss-bar-bg">
-                                        <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {{/each}}
-                    </div>
-                    {{/if}}
-
-                    {{if bp.sixStars.length === 0}}
-                    <div class="no-six-msg">暂无6★记录</div>
-                    {{/if}}
-
-                    <div class="banner-pity">
-                        <div class="bp-bar-bg">
-                            <div class="bp-bar {{bp.pityBarColor}}" style="width: {{bp.pityBarWidth}}%"></div>
-                        </div>
-                        <div class="bp-text">{{bp.currentPity}}/80</div>
-                    </div>
-                </div>
-                {{/each}}
-                {{/if}}
-
                 <!-- 常驻池 -->
                 <div class="pool-col-header">常驻池 <span class="col-badge">[{{standardTotalPulls}}抽]</span></div>
                 {{each standardPools sp}}
@@ -967,6 +908,72 @@
                     <div class="banner-top-bar bar-cyan"></div>
                     <div class="no-six-msg">暂无常驻池记录</div>
                 </div>
+                {{/if}}
+
+                {{if beginnerPools.length > 0}}
+                <div class="pool-col-header">新手池 <span class="col-badge">[{{beginnerTotalPulls}}抽]</span></div>
+                {{each beginnerPools bp}}
+                <div class="banner-card">
+                    <div class="banner-top-bar bar-green"></div>
+                    <div class="banner-header">
+                        <div class="banner-title-row">
+                        <div class="banner-pool-name">{{bp.poolName}}</div>
+                        </div>
+                    </div>
+                    <div class="banner-stats-row">
+                        <div class="bs-item">
+                            <div class="bs-value">{{bp.totalPulls}}</div>
+                            <div class="bs-label">总抽数</div>
+                        </div>
+                        <div class="bs-item">
+                            <div class="bs-value">{{bp.sixCount}}</div>
+                            <div class="bs-label">6★</div>
+                        </div>
+                        <div class="bs-item">
+                            <div class="bs-value">{{bp.currentPity}}</div>
+                            <div class="bs-label">已垫</div>
+                        </div>
+                    </div>
+
+                    {{if bp.sixStars.length > 0}}
+                    <div class="six-star-list">
+                        {{each bp.sixStars ss}}
+                        <div class="six-star-entry">
+                            {{if ss.avatar}}
+                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
+                            {{/if}}
+                            {{if !ss.avatar}}
+                            <div class="ss-avatar-placeholder">★</div>
+                            {{/if}}
+                            <div class="ss-info">
+                                <div class="ss-name-row">
+                                    <span class="ss-name">{{ss.name}}</span>
+                                    {{if ss.isNewChar}}<span class="ss-tag tag-new">NEW</span>{{/if}}
+                                </div>
+                                <div class="ss-bar-row">
+                                    <span class="ss-pull-label">{{ss.pulls}}抽</span>
+                                    <div class="ss-bar-bg">
+                                        <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                    {{/if}}
+
+                    {{if bp.sixStars.length === 0}}
+                    <div class="no-six-msg">暂无6★记录</div>
+                    {{/if}}
+
+                    <div class="banner-pity">
+                        <div class="bp-bar-bg">
+                            <div class="bp-bar {{bp.pityBarColor}}" style="width: {{bp.pityBarWidth}}%"></div>
+                        </div>
+                        <div class="bp-text">{{bp.currentPity}}/80</div>
+                    </div>
+                </div>
+                {{/each}}
                 {{/if}}
             </div>
         </div>
