@@ -93,7 +93,10 @@ export class GachaApp extends plugin {
 
             if (records.length === 0) return e.reply('📋 暂无抽卡记录，请先同步: #终末地同步抽卡')
 
-            const img = await Render.renderGachaStats(records, pools, playerInfo)
+            // 有池名筛选时用紧凑单列模板，否则用全量三列模板
+            const img = poolName
+                ? await Render.renderGachaPool(records, pools, playerInfo, `${poolName}`)
+                : await Render.renderGachaStats(records, pools, playerInfo)
             e.reply(img)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {
@@ -132,7 +135,7 @@ export class GachaApp extends plugin {
 
             if (records.length === 0) return e.reply('📋 暂无记录，请先同步: #终末地同步抽卡')
 
-            const img = await Render.renderGachaStats(records, pools, playerInfo)
+            const img = await Render.renderGachaPool(records, pools, playerInfo, displayName)
             e.reply(img)
         } catch (err) {
             if (err.message && (err.message.includes('失效') || err.message.includes('重新绑定'))) {

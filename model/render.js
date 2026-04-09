@@ -606,4 +606,189 @@ export default class Render {
             standardTotalPulls
         })
     }
+
+    // ===== 单池/筛选抽卡统计（紧凑单列布局） =====
+    static async renderGachaPool(records, pools, playerInfo = {}, filterLabel = '抽卡统计') {
+        const maxPullBase = 80
+
+        const getBarColor = (pulls) => {
+            if (pulls <= 30) return 'bar-lucky'
+            if (pulls <= 50) return 'bar-normal'
+            if (pulls <= 65) return 'bar-warn'
+            return 'bar-bad'
+        }
+
+        const getPityColor = (pity) => {
+            if (pity <= 40) return 'safe'
+            if (pity <= 60) return 'warn'
+            return 'danger'
+        }
+
+        // 推断筛选类型（用于顶部渐变色）
+        const guessFilterType = () => {
+            const types = new Set(pools.map(p => p.poolType))
+            if (types.size === 1) {
+                if (types.has('char')) return 'char'
+                if (types.has('weapon')) return 'weapon'
+            }
+            return 'mixed'
+        }
+
+        const getBarClass = (category) => {
+            if (category === 'limited') return 'bar-purple'
+            if (category === 'weapon') return 'bar-orange'
+            if (category === 'beginner') return 'bar-green'
+            return 'bar-cyan'
+        }
+
+        // 池分类（复用）
+        const classifyPool = (poolId, poolType) => {
+            if (poolId === 'beginner') return 'beginner'
+            if (poolId === 'standard') return 'standard'
+            if (poolId && poolId.startsWith('special_')) return 'limited'
+            if (poolId && (poolId.startsWith('weponbox_') || poolId.startsWith('weaponbox_'))) {
+                if (poolId.includes('constant')) return 'standard_weapon'
+                return 'weapon'
+            }
+            if (poolType === 'weapon') return 'weapon'
+            if (poolType === 'char') return 'limited'
+            return 'standard'
+        }
+
+        // 按池分组
+        const poolMap = new Map()
+        for (const p of pools) {
+            poolMap.set(p.poolId || p.poolName, {
+                poolId: p.poolId,
+                poolName: p.poolName,
+                poolType: p.poolType,
+                category: classifyPool(p.poolId, p.poolType),
+                records: []
+            })
+        }
+
+        for (const r of records) {
+            const key = r.poolId || r.poolName
+            if (poolMap.has(key)) {
+                poolMap.get(key).records.push(r)
+            } else {
+                poolMap.set(key, {
+                    poolId: r.poolId,
+                    poolName: r.poolName || key,
+                    poolType: r.poolType,
+                    category: classifyPool(r.poolId, r.poolType),
+                    records: [r]
+                })
+            }
+        }
+
+        // 处理池统计
+        const processPool = (pool) => {
+            if (pool.records.length === 0) return null
+            const sorted = [...pool.records].sort((a, b) => (a.gachaTs || 0) - (b.gachaTs || 0))
+
+            let pullsSinceLast = 0
+            const sixStars = []
+            let fiveCount = 0
+            let hasFreeRecords = false
+
+            for (const r of sorted) {
+                pullsSinceLast++
+                if (r.isFree) hasFreeRecords = true
+                if (r.rarity === 5) fiveCount++
+                if (r.rarity === 6) {
+                    sixStars.push({
+                        name: r.itemName || '???',
+                        pulls: pullsSinceLast,
+                        isUp: r.isUp,
+                        isNew: r.isNew,
+                        isFree: r.isFree
+                    })
+                    pullsSinceLast = 0
+                }
+            }
+
+            const currentPity = pullsSinceLast
+            const sixCount = sixStars.length
+            const upCount = sixStars.filter(s => s.isUp === true).length
+            const lostCount = sixStars.filter(s => s.isUp === false).length
+
+            const upChars = sixStars.filter(s => s.isUp === true)
+            const upCharName = upChars.length > 0 ? upChars[0].name : ''
+
+            const fmtSixStars = sixStars.map(s => ({
+                name: s.name,
+                pulls: s.pulls,
+                barWidth: Math.min(Math.max((s.pulls / maxPullBase) * 100, 10), 100),
+                barColor: getBarColor(s.pulls),
+                isUp: s.isUp === true,
+                isMiss: s.isUp === false,
+                isNewChar: s.isNew === true,
+                wasFree: s.isFree === true
+            }))
+
+            const sixInfo = `${sixCount}/${upCount + lostCount > 0 ? upCount + lostCount : sixCount}`
+            const upAvg = sixCount > 0 ? (sorted.length / sixCount).toFixed(1) : '-'
+
+            const freeRecords = sorted.filter(r => r.isFree)
+            const freeSixStar = freeRecords.some(r => r.rarity === 6)
+            const freeStatus = hasFreeRecords ? (freeSixStar ? '出6★' : '未出6★') : ''
+
+            return {
+                poolName: pool.poolName,
+                poolId: pool.poolId,
+                category: pool.category,
+                barClass: getBarClass(pool.category),
+                totalPulls: sorted.length,
+                sixCount,
+                fiveCount,
+                sixInfo,
+                upAvg,
+                upCharName,
+                currentPity,
+                sixStars: fmtSixStars,
+                pityBarWidth: Math.min((currentPity / maxPullBase) * 100, 100),
+                pityBarColor: getPityColor(currentPity),
+                hasFree: hasFreeRecords,
+                freeStatus
+            }
+        }
+
+        const poolStats = []
+        for (const [, pool] of poolMap) {
+            const stat = processPool(pool)
+            if (stat) poolStats.push(stat)
+        }
+
+        // 汇总
+        const totalPulls = records.length
+        const totalSixCount = poolStats.reduce((s, p) => s + p.sixCount, 0)
+        const upCount = poolStats.reduce((s, p) => s + p.sixStars.filter(ss => ss.isUp).length, 0)
+        const missCount = poolStats.reduce((s, p) => s + p.sixStars.filter(ss => ss.isMiss).length, 0)
+        const avgPulls = totalSixCount > 0 ? (totalPulls / totalSixCount).toFixed(1) : '-'
+
+        // 总体保底（取最大已垫）
+        const overallPity = poolStats.length > 0 ? Math.max(...poolStats.map(p => p.currentPity)) : 0
+        const overallPityWidth = Math.min((overallPity / maxPullBase) * 100, 100)
+        const overallPityColor = getPityColor(overallPity)
+
+        return await puppeteer.screenshot('endfield-gacha-pool', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-pool.html'),
+            scale: 2,
+            filterType: guessFilterType(),
+            filterLabel,
+            playerName: playerInfo.name || '',
+            playerUid: playerInfo.uid || '',
+            playerAvatar: playerInfo.avatar || '',
+            totalPulls,
+            totalSixCount,
+            avgPulls,
+            upCount,
+            missCount,
+            overallPity,
+            overallPityWidth,
+            overallPityColor,
+            poolStats
+        })
+    }
 }

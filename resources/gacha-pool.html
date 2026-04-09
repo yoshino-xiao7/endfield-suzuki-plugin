@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            margin: 0; padding: 0;
+            width: 520px;
+            background: transparent;
+            text-rendering: optimizeLegibility;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            background: #f0f2f5;
+            padding: 20px;
+            min-height: 100px;
+        }
+
+        /* ===== Header ===== */
+        .header {
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e6ea;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+        }
+
+        .header.type-char::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
+        .header.type-weapon::before { background: linear-gradient(90deg, #f97316, #ea580c); }
+        .header.type-mixed::before { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-avatar {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            border: 2px solid #d0d5de;
+            object-fit: cover;
+            background: #f5f7fa;
+        }
+
+        .header-info .player-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
+        .header-info .player-uid {
+            font-size: 10px;
+            color: #8c94a6;
+            margin-top: 1px;
+            font-family: 'Consolas', monospace;
+        }
+
+        .header-right {
+            text-align: right;
+        }
+
+        .header-type {
+            font-size: 13px;
+            font-weight: bold;
+            color: #8c94a6;
+            margin-bottom: 2px;
+        }
+
+        .header-total {
+            font-size: 28px;
+            font-weight: 900;
+            color: #1a1a2e;
+            line-height: 1;
+        }
+
+        .header-total small {
+            font-size: 14px;
+            font-weight: normal;
+            color: #8c94a6;
+        }
+
+        /* ===== Overview Summary ===== */
+        .overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .ov-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e6ea;
+        }
+
+        .ov-value {
+            font-size: 20px;
+            font-weight: 900;
+            color: #1a1a2e;
+            font-family: 'Consolas', monospace;
+        }
+
+        .ov-value.ov-cyan { color: #0891b2; }
+        .ov-value.ov-green { color: #16a34a; }
+        .ov-value.ov-orange { color: #ea580c; }
+        .ov-value.ov-red { color: #dc2626; }
+
+        .ov-label {
+            font-size: 9px;
+            color: #9ca3af;
+            margin-top: 3px;
+        }
+
+        /* ===== Pity Row ===== */
+        .pity-row {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e6ea;
+        }
+
+        .pity-label {
+            font-size: 11px;
+            color: #6b7280;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .pity-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #e8ecf0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .pity-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .pity-bar.safe { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .pity-bar.warn { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .pity-bar.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .pity-text {
+            font-size: 12px;
+            color: #1a1a2e;
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* ===== Pool Banners ===== */
+        .pool-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .banner-card {
+            background: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e6ea;
+        }
+
+        .banner-top-bar { height: 4px; }
+        .banner-top-bar.bar-purple { background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc); }
+        .banner-top-bar.bar-orange { background: linear-gradient(90deg, #ea580c, #f97316, #fb923c); }
+        .banner-top-bar.bar-cyan { background: linear-gradient(90deg, #0891b2, #06b6d4, #22d3ee); }
+        .banner-top-bar.bar-green { background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80); }
+
+        .banner-header { padding: 12px 16px 10px; }
+
+        .banner-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+        }
+
+        .banner-pool-name {
+            font-size: 15px;
+            font-weight: bold;
+            color: #1a1a2e;
+        }
+
+        .banner-pull-count {
+            font-size: 14px;
+            font-weight: bold;
+            color: #8c94a6;
+        }
+
+        .banner-pull-count span { color: #1a1a2e; }
+
+        .banner-up-name {
+            font-size: 11px;
+            color: #8c94a6;
+            margin-top: 2px;
+        }
+
+        .banner-stats-row {
+            display: flex;
+            gap: 20px;
+            padding: 0 16px 10px;
+        }
+
+        .bs-item { text-align: center; }
+
+        .bs-value {
+            font-size: 17px;
+            font-weight: bold;
+            color: #1a1a2e;
+            font-family: 'Consolas', monospace;
+        }
+
+        .bs-label {
+            font-size: 9px;
+            color: #9ca3af;
+        }
+
+        /* ===== 6★ Records ===== */
+        .six-star-list { padding: 0 12px 10px; }
+
+        .six-star-entry {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 4px;
+        }
+
+        .ss-info { flex: 1; min-width: 0; }
+
+        .ss-name-row {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .ss-name {
+            font-size: 13px;
+            font-weight: bold;
+            color: #3a3f50;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ss-tag {
+            font-size: 8px;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .tag-up { background: #f97316; color: #fff; }
+        .tag-new { background: #22c55e; color: #fff; }
+        .tag-miss { background: #ef4444; color: #fff; }
+        .tag-free { background: #a855f7; color: #fff; }
+
+        .ss-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .ss-pull-label {
+            font-size: 10px;
+            color: #8c94a6;
+            font-family: 'Consolas', monospace;
+            flex-shrink: 0;
+            min-width: 32px;
+        }
+
+        .ss-bar-bg {
+            flex: 1;
+            height: 14px;
+            background: #e8ecf0;
+            border-radius: 7px;
+            overflow: hidden;
+        }
+
+        .ss-bar {
+            height: 100%;
+            border-radius: 7px;
+            min-width: 10px;
+        }
+
+        .ss-bar.bar-lucky { background: linear-gradient(90deg, #059669, #34d399); }
+        .ss-bar.bar-normal { background: linear-gradient(90deg, #0891b2, #22d3ee); }
+        .ss-bar.bar-warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
+        .ss-bar.bar-bad { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+        /* ===== Free 10-pull ===== */
+        .free-pull-entry {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 4px 5px 12px;
+        }
+
+        .free-icon { font-size: 14px; flex-shrink: 0; }
+        .free-text { font-size: 11px; color: #8b5cf6; font-weight: bold; }
+        .free-badge { font-size: 8px; background: #a855f7; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
+
+        /* ===== Pity in Banner ===== */
+        .banner-pity {
+            padding: 8px 16px 12px;
+            border-top: 1px solid #f0f2f5;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bp-bar-bg {
+            flex: 1; height: 6px;
+            background: #e8ecf0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .bp-bar { height: 100%; border-radius: 3px; }
+        .bp-bar.safe { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .bp-bar.warn { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .bp-bar.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+        .bp-text {
+            font-size: 10px;
+            color: #6b7280;
+            font-family: 'Consolas', monospace;
+            flex-shrink: 0;
+        }
+
+        .no-six-msg {
+            padding: 14px 16px;
+            font-size: 11px;
+            color: #b0b8c4;
+            text-align: center;
+        }
+
+        /* ===== Footer ===== */
+        .stats-footer {
+            text-align: center;
+            padding: 16px 0 4px;
+            font-size: 10px;
+            color: #b0b8c4;
+            font-style: italic;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <!-- Header -->
+        <div class="header type-{{filterType}}">
+            <div class="header-left">
+                {{if playerAvatar}}
+                <img class="header-avatar" src="{{playerAvatar}}">
+                {{/if}}
+                {{if !playerAvatar}}
+                <div class="header-avatar" style="display:flex;align-items:center;justify-content:center;font-size:18px;color:#8c94a6;">👤</div>
+                {{/if}}
+                <div class="header-info">
+                    <div class="player-name">{{playerName || '指挥官'}}</div>
+                    {{if playerUid}}
+                    <div class="player-uid">UID: {{playerUid}}</div>
+                    {{/if}}
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="header-type">{{filterLabel}}</div>
+                <div class="header-total">{{totalPulls}}<small> 抽</small></div>
+            </div>
+        </div>
+
+        <!-- Overview -->
+        <div class="overview">
+            <div class="ov-card">
+                <div class="ov-value">{{totalSixCount}}</div>
+                <div class="ov-label">6★ 总数</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-value ov-cyan">{{avgPulls}}</div>
+                <div class="ov-label">平均出金</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-value ov-green">{{upCount}}</div>
+                <div class="ov-label">UP 命中</div>
+            </div>
+            <div class="ov-card">
+                <div class="ov-value ov-red">{{missCount}}</div>
+                <div class="ov-label">歪了</div>
+            </div>
+        </div>
+
+        <!-- Overall Pity -->
+        <div class="pity-row">
+            <div class="pity-label">当前保底</div>
+            <div class="pity-bar-bg">
+                <div class="pity-bar {{overallPityColor}}" style="width: {{overallPityWidth}}%"></div>
+            </div>
+            <div class="pity-text">{{overallPity}}/80</div>
+        </div>
+
+        <!-- Pool Banners -->
+        <div class="pool-list">
+            {{each poolStats ps}}
+            <div class="banner-card">
+                <div class="banner-top-bar {{ps.barClass}}"></div>
+                <div class="banner-header">
+                    <div class="banner-title-row">
+                        <div class="banner-pool-name">{{ps.poolName}}</div>
+                        <div class="banner-pull-count"><span>{{ps.totalPulls}}</span> 抽</div>
+                    </div>
+                    {{if ps.upCharName}}
+                    <div class="banner-up-name">UP: {{ps.upCharName}}</div>
+                    {{/if}}
+                </div>
+                <div class="banner-stats-row">
+                    <div class="bs-item">
+                        <div class="bs-value">{{ps.sixInfo}}</div>
+                        <div class="bs-label">6★/全</div>
+                    </div>
+                    <div class="bs-item">
+                        <div class="bs-value">{{ps.upAvg}}</div>
+                        <div class="bs-label">平均</div>
+                    </div>
+                    <div class="bs-item">
+                        <div class="bs-value">{{ps.currentPity}}</div>
+                        <div class="bs-label">已垫</div>
+                    </div>
+                </div>
+
+                {{if ps.sixStars.length > 0}}
+                <div class="six-star-list">
+                    {{each ps.sixStars ss}}
+                    <div class="six-star-entry">
+                        <div class="ss-info">
+                            <div class="ss-name-row">
+                                <span class="ss-name">{{ss.name}}</span>
+                                {{if ss.isUp}}<span class="ss-tag tag-up">UP</span>{{/if}}
+                                {{if ss.isNewChar}}<span class="ss-tag tag-new">NEW</span>{{/if}}
+                                {{if ss.isMiss}}<span class="ss-tag tag-miss">歪</span>{{/if}}
+                                {{if ss.wasFree}}<span class="ss-tag tag-free">免费</span>{{/if}}
+                            </div>
+                            <div class="ss-bar-row">
+                                <span class="ss-pull-label">{{ss.pulls}}抽</span>
+                                <div class="ss-bar-bg">
+                                    <div class="ss-bar {{ss.barColor}}" style="width: {{ss.barWidth}}%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+                {{/if}}
+
+                {{if ps.sixStars.length === 0}}
+                <div class="no-six-msg">暂无6★记录</div>
+                {{/if}}
+
+                {{if ps.hasFree}}
+                <div class="free-pull-entry">
+                    <span class="free-icon">🎁</span>
+                    <span class="free-text">免费10连</span>
+                    <span class="free-badge">{{ps.freeStatus}}</span>
+                </div>
+                {{/if}}
+
+                <div class="banner-pity">
+                    <div class="bp-bar-bg">
+                        <div class="bp-bar {{ps.pityBarColor}}" style="width: {{ps.pityBarWidth}}%"></div>
+                    </div>
+                    <div class="bp-text">{{ps.currentPity}}/80</div>
+                </div>
+            </div>
+            {{/each}}
+
+            {{if poolStats.length === 0}}
+            <div class="banner-card">
+                <div class="banner-top-bar bar-cyan"></div>
+                <div class="no-six-msg">暂无记录</div>
+            </div>
+            {{/if}}
+        </div>
+
+        <div class="stats-footer">Generated by endfield-suzuki-plugin</div>
+    </div>
+</body>
+
+</html>
