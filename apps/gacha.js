@@ -183,10 +183,21 @@ export class GachaApp extends plugin {
             if (!cardRes) return {}
             const detail = cardRes.data?.data?.detail || cardRes.data?.detail || {}
             const base = detail.base || {}
+            const charList = detail.chars || []
+
+            // 构建角色名 -> 头像 映射
+            const charAvatars = {}
+            for (const c of charList) {
+                if (c.charData && c.charData.name) {
+                    charAvatars[c.charData.name] = c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
+                }
+            }
+
             return {
                 name: base.name || '',
                 uid: base.roleId || '',
-                avatar: base.avatarUrl || ''
+                avatar: base.avatarUrl || '',
+                charAvatars
             }
         } catch {
             return {}

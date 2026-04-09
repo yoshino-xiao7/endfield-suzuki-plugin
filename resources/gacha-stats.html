@@ -354,13 +354,27 @@
         }
 
         .ss-avatar {
-            width: 28px;
-            height: 28px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            border: 2px solid #d0d5de;
+            border: 2px solid #e2e6ea;
             object-fit: cover;
             flex-shrink: 0;
             background: #f5f7fa;
+        }
+
+        .ss-avatar-placeholder {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #b0b8c4;
+            flex-shrink: 0;
+            border: 2px solid #e2e6ea;
         }
 
         .ss-info {
@@ -628,6 +642,12 @@
                     <div class="six-star-list">
                         {{each lp.sixStars ss}}
                         <div class="six-star-entry">
+                            {{if ss.avatar}}
+                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
+                            {{/if}}
+                            {{if !ss.avatar}}
+                            <div class="ss-avatar-placeholder">★</div>
+                            {{/if}}
                             <div class="ss-info">
                                 <div class="ss-name-row">
                                     <span class="ss-name">{{ss.name}}</span>
@@ -707,6 +727,12 @@
                     <div class="six-star-list">
                         {{each wp.sixStars ss}}
                         <div class="six-star-entry">
+                            {{if ss.avatar}}
+                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
+                            {{/if}}
+                            {{if !ss.avatar}}
+                            <div class="ss-avatar-placeholder">★</div>
+                            {{/if}}
                             <div class="ss-info">
                                 <div class="ss-name-row">
                                     <span class="ss-name">{{ss.name}}</span>
@@ -776,6 +802,12 @@
                     <div class="six-star-list">
                         {{each bp.sixStars ss}}
                         <div class="six-star-entry">
+                            {{if ss.avatar}}
+                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
+                            {{/if}}
+                            {{if !ss.avatar}}
+                            <div class="ss-avatar-placeholder">★</div>
+                            {{/if}}
                             <div class="ss-info">
                                 <div class="ss-name-row">
                                     <span class="ss-name">{{ss.name}}</span>
@@ -837,6 +869,12 @@
                     <div class="six-star-list">
                         {{each sp.sixStars ss}}
                         <div class="six-star-entry">
+                            {{if ss.avatar}}
+                            <img class="ss-avatar" src="{{ss.avatar}}" onerror="this.style.display='none'">
+                            {{/if}}
+                            {{if !ss.avatar}}
+                            <div class="ss-avatar-placeholder">★</div>
+                            {{/if}}
                             <div class="ss-info">
                                 <div class="ss-name-row">
                                     <span class="ss-name">{{ss.name}}</span>

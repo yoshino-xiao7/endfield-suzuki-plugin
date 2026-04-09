@@ -482,10 +482,12 @@ export default class Render {
             const upCharName = upChars.length > 0 ? upChars[0].name : ''
 
             // 格式化6★条目
+            const charAvatars = playerInfo.charAvatars || {}
             const fmtSixStars = sixStars.map(s => {
                 const barWidth = Math.min(Math.max((s.pulls / maxPullBase) * 100, 10), 100)
                 return {
                     name: s.name,
+                    avatar: charAvatars[s.name] || '',
                     pulls: s.pulls,
                     barWidth,
                     barColor: getBarColor(s.pulls),
@@ -716,8 +718,10 @@ export default class Render {
             const upChars = sixStars.filter(s => s.isUp === true)
             const upCharName = upChars.length > 0 ? upChars[0].name : ''
 
+            const charAvatars = playerInfo.charAvatars || {}
             const fmtSixStars = sixStars.map(s => ({
                 name: s.name,
+                avatar: charAvatars[s.name] || '',
                 pulls: s.pulls,
                 barWidth: Math.min(Math.max((s.pulls / maxPullBase) * 100, 10), 100),
                 barColor: getBarColor(s.pulls),
