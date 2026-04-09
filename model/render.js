@@ -88,7 +88,7 @@ export default class Render {
 
         const topChars = sortedChars.slice(0, 8).map(c => ({
             name: c.charData.name,
-            avatar: c.charData.avatarSqUrl || c.charData.avatarRtUrl || '',
+            avatar: c.charData.illustrationUrl || c.charData.avatarRtUrl || c.charData.avatarSqUrl || '',
             level: c.level || 1,
             evolvePhase: c.evolvePhase || 0,
             rarity: c.charData.rarity?.value || 3,
