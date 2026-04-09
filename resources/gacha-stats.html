@@ -621,14 +621,17 @@
                     <div class="banner-header">
                         <div class="banner-title-row">
                             <div class="banner-pool-name">{{lp.poolName}}</div>
-                            <div class="banner-pull-count"><span>{{lp.totalPulls}}</span> 抽</div>
-                        </div>
-                        {{if lp.upCharName}}
-                        <div class="banner-up-name">UP: {{lp.upCharName}}</div>
-                        {{/if}}
                     </div>
-                    <div class="banner-stats-row">
-                        <div class="bs-item">
+                    {{if lp.upCharName}}
+                    <div class="banner-up-name">UP: {{lp.upCharName}}</div>
+                    {{/if}}
+                </div>
+                <div class="banner-stats-row">
+                    <div class="bs-item">
+                        <div class="bs-value">{{lp.totalPulls}}</div>
+                        <div class="bs-label">总抽数</div>
+                    </div>
+                    <div class="bs-item">
                             <div class="bs-value">{{lp.sixInfo}}</div>
                             <div class="bs-label">6★/全</div>
                         </div>
@@ -706,13 +709,16 @@
                     <div class="banner-header">
                         <div class="banner-title-row">
                             <div class="banner-pool-name">{{wp.poolName}}</div>
-                            <div class="banner-pull-count"><span>{{wp.totalPulls}}</span> 抽</div>
                         </div>
                         {{if wp.upCharName}}
                         <div class="banner-up-name">UP: {{wp.upCharName}}</div>
                         {{/if}}
                     </div>
                     <div class="banner-stats-row">
+                        <div class="bs-item">
+                            <div class="bs-value">{{wp.totalPulls}}</div>
+                            <div class="bs-label">总抽数</div>
+                        </div>
                         <div class="bs-item">
                             <div class="bs-value">{{wp.sixInfo}}</div>
                             <div class="bs-label">6★/全</div>
@@ -783,11 +789,14 @@
                     <div class="banner-top-bar bar-green"></div>
                     <div class="banner-header">
                         <div class="banner-title-row">
-                            <div class="banner-pool-name">{{bp.poolName}}</div>
-                            <div class="banner-pull-count"><span>{{bp.totalPulls}}</span> 抽</div>
+                        <div class="banner-pool-name">{{bp.poolName}}</div>
                         </div>
                     </div>
                     <div class="banner-stats-row">
+                        <div class="bs-item">
+                            <div class="bs-value">{{bp.totalPulls}}</div>
+                            <div class="bs-label">总抽数</div>
+                        </div>
                         <div class="bs-item">
                             <div class="bs-value">{{bp.sixCount}}</div>
                             <div class="bs-label">6★</div>
@@ -846,11 +855,14 @@
                     <div class="banner-top-bar bar-cyan"></div>
                     <div class="banner-header">
                         <div class="banner-title-row">
-                            <div class="banner-pool-name">{{sp.poolName}}</div>
-                            <div class="banner-pull-count"><span>{{sp.totalPulls}}</span> 抽</div>
+                        <div class="banner-pool-name">{{sp.poolName}}</div>
                         </div>
                     </div>
                     <div class="banner-stats-row">
+                        <div class="bs-item">
+                            <div class="bs-value">{{sp.totalPulls}}</div>
+                            <div class="bs-label">总抽数</div>
+                        </div>
                         <div class="bs-item">
                             <div class="bs-value">{{sp.sixCount}}</div>
                             <div class="bs-label">6★</div>
