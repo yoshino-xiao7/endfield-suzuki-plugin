@@ -191,15 +191,44 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #e2e6ea;
+            position: relative;
         }
 
-        .banner-top-bar { height: 4px; }
+        .banner-illustration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 130px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .banner-illustration img {
+            width: 200px;
+            height: auto;
+            position: absolute;
+            top: -10px;
+            right: -40px;
+            opacity: 0.15;
+            filter: grayscale(20%);
+        }
+
+        .banner-illustration::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,1) 100%);
+        }
+
+        .banner-top-bar { height: 4px; position: relative; z-index: 1; }
         .banner-top-bar.bar-purple { background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc); }
         .banner-top-bar.bar-orange { background: linear-gradient(90deg, #ea580c, #f97316, #fb923c); }
         .banner-top-bar.bar-cyan { background: linear-gradient(90deg, #0891b2, #06b6d4, #22d3ee); }
         .banner-top-bar.bar-green { background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80); }
 
-        .banner-header { padding: 12px 16px 10px; }
+        .banner-header { padding: 12px 16px 10px; position: relative; z-index: 1; }
 
         .banner-title-row {
             display: flex;
@@ -231,6 +260,8 @@
             display: flex;
             gap: 20px;
             padding: 0 16px 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .bs-item { text-align: center; }
@@ -457,6 +488,11 @@
         <div class="pool-list">
             {{each poolStats ps}}
             <div class="banner-card">
+                {{if ps.upIllustration}}
+                <div class="banner-illustration">
+                    <img src="{{ps.upIllustration}}" onerror="this.parentElement.style.display='none'">
+                </div>
+                {{/if}}
                 <div class="banner-top-bar {{ps.barClass}}"></div>
                 <div class="banner-header">
                     <div class="banner-title-row">

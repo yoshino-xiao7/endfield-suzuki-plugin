@@ -510,6 +510,10 @@ export default class Render {
             const sixInfo = `${sixCount}/${upCount + lostCount > 0 ? upCount + lostCount : sixCount}`
             const upAvg = sixCount > 0 ? (sorted.length / sixCount).toFixed(1) : '-'
 
+            // UP角色立绘
+            const charIllustrations = playerInfo.charIllustrations || {}
+            const upIllustration = upCharName ? (charIllustrations[upCharName] || '') : ''
+
             return {
                 poolName: pool.poolName,
                 poolId: pool.poolId,
@@ -520,6 +524,7 @@ export default class Render {
                 sixInfo,
                 upAvg,
                 upCharName,
+                upIllustration,
                 currentPity,
                 sixStars: fmtSixStars,
                 pityBarWidth,
@@ -738,6 +743,10 @@ export default class Render {
             const freeSixStar = freeRecords.some(r => r.rarity === 6)
             const freeStatus = hasFreeRecords ? (freeSixStar ? '出6★' : '未出6★') : ''
 
+            // UP角色立绘
+            const charIllustrations = playerInfo.charIllustrations || {}
+            const upIllustration = upCharName ? (charIllustrations[upCharName] || '') : ''
+
             return {
                 poolName: pool.poolName,
                 poolId: pool.poolId,
@@ -749,6 +758,7 @@ export default class Render {
                 sixInfo,
                 upAvg,
                 upCharName,
+                upIllustration,
                 currentPity,
                 sixStars: fmtSixStars,
                 pityBarWidth: Math.min((currentPity / maxPullBase) * 100, 100),

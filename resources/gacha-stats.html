@@ -276,10 +276,41 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #e2e6ea;
+            position: relative;
+        }
+
+        .banner-illustration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 110px;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .banner-illustration img {
+            width: 160px;
+            height: auto;
+            position: absolute;
+            top: -8px;
+            right: -35px;
+            opacity: 0.13;
+            filter: grayscale(20%);
+        }
+
+        .banner-illustration::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0) 25%, rgba(255,255,255,1) 100%);
         }
 
         .banner-top-bar {
             height: 4px;
+            position: relative;
+            z-index: 1;
         }
 
         .banner-top-bar.bar-purple { background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc); }
@@ -289,6 +320,8 @@
 
         .banner-header {
             padding: 12px 14px 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .banner-title-row {
@@ -323,6 +356,8 @@
             display: flex;
             gap: 16px;
             padding: 0 14px 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .bs-item {
@@ -617,6 +652,11 @@
                 <div class="pool-col-header">限定池 <span class="col-badge">[{{limitedTotalPulls}}抽]</span></div>
                 {{each limitedPools lp}}
                 <div class="banner-card">
+                    {{if lp.upIllustration}}
+                    <div class="banner-illustration">
+                        <img src="{{lp.upIllustration}}" onerror="this.parentElement.style.display='none'">
+                    </div>
+                    {{/if}}
                     <div class="banner-top-bar bar-purple"></div>
                     <div class="banner-header">
                         <div class="banner-title-row">
@@ -705,6 +745,11 @@
                 <div class="pool-col-header">武器池 <span class="col-badge">[{{weaponTotalPulls}}抽]</span></div>
                 {{each weaponPools wp}}
                 <div class="banner-card">
+                    {{if wp.upIllustration}}
+                    <div class="banner-illustration">
+                        <img src="{{wp.upIllustration}}" onerror="this.parentElement.style.display='none'">
+                    </div>
+                    {{/if}}
                     <div class="banner-top-bar bar-orange"></div>
                     <div class="banner-header">
                         <div class="banner-title-row">

@@ -187,9 +187,12 @@ export class GachaApp extends plugin {
 
             // 构建角色名 -> 头像 映射
             const charAvatars = {}
+            // 构建角色名 -> 立绘 映射
+            const charIllustrations = {}
             for (const c of charList) {
                 if (c.charData && c.charData.name) {
                     charAvatars[c.charData.name] = c.charData.avatarSqUrl || c.charData.avatarRtUrl || ''
+                    charIllustrations[c.charData.name] = c.charData.illustrationUrl || c.charData.avatarRtUrl || ''
                 }
             }
 
@@ -197,7 +200,8 @@ export class GachaApp extends plugin {
                 name: base.name || '',
                 uid: base.roleId || '',
                 avatar: base.avatarUrl || '',
-                charAvatars
+                charAvatars,
+                charIllustrations
             }
         } catch {
             return {}
