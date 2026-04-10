@@ -60,6 +60,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'help.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig()
         })
     }
@@ -160,6 +162,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'profile.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             // 玩家基础
             playerName: base.name,
@@ -242,6 +246,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'character.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             character
         })
@@ -360,6 +366,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'spaceship.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             playerName: base.name,
             rooms
@@ -411,6 +419,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'domain.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             playerName: base.name,
             domains
@@ -435,6 +445,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             records: fmtRecords,
             poolName,
@@ -651,6 +663,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             // Header
             playerName: playerInfo.name || '',
@@ -872,6 +886,8 @@ export default class Render {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-pool.html'),
             scale: 2,
             type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig(),
             filterType: guessFilterType(),
             filterLabel,
