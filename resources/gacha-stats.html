@@ -277,7 +277,12 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #e2e6ea;
+        }
+
+        /* 上半盒子：包含立绘+标题+统计，立绘被限制在此区域内 */
+        .banner-head-box {
             position: relative;
+            overflow: hidden;
         }
 
         .banner-illustration {
@@ -289,7 +294,6 @@
             overflow: hidden;
             pointer-events: none;
             z-index: 0;
-            clip-path: inset(0 0 0 0 round 0 14px 0 0);
         }
 
         .banner-illustration img {
@@ -661,6 +665,7 @@
                 <div class="pool-col-header">限定池 <span class="col-badge">[{{limitedTotalPulls}}抽]</span></div>
                 {{each limitedPools lp}}
                 <div class="banner-card">
+                    <div class="banner-head-box">
                     {{if lp.upIllustration}}
                     <div class="banner-illustration">
                         <img src="{{lp.upIllustration}}" onerror="this.parentElement.style.display='none'">
@@ -688,6 +693,7 @@
                             <div class="bs-value">{{lp.currentPity}}</div>
                             <div class="bs-label">已垫</div>
                         </div>
+                    </div>
                     </div>
 
                     {{if lp.sixStars.length > 0}}
@@ -754,6 +760,7 @@
                 <div class="pool-col-header">武器池 <span class="col-badge">[{{weaponTotalPulls}}抽]</span></div>
                 {{each weaponPools wp}}
                 <div class="banner-card">
+                    <div class="banner-head-box">
                     {{if wp.upIllustration}}
                     <div class="banner-illustration">
                         <img src="{{wp.upIllustration}}" onerror="this.parentElement.style.display='none'">
@@ -781,6 +788,7 @@
                             <div class="bs-value">{{wp.currentPity}}</div>
                             <div class="bs-label">已垫</div>
                         </div>
+                    </div>
                     </div>
 
                     {{if wp.sixStars.length > 0}}
