@@ -59,8 +59,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-help', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'help.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig()
         })
     }
@@ -160,8 +159,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-profile', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'profile.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             // 玩家基础
             playerName: base.name,
@@ -243,8 +241,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-character', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'character.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             character
         })
@@ -362,8 +359,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-spaceship', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'spaceship.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             playerName: base.name,
             rooms
@@ -414,8 +410,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-domain', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'domain.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             playerName: base.name,
             domains
@@ -439,8 +434,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-records', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             records: fmtRecords,
             poolName,
@@ -656,8 +650,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             // Header
             playerName: playerInfo.name || '',
@@ -878,8 +871,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-pool', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-pool.html'),
             scale: 2,
-            type: 'jpeg',
-            quality: 100,
+            type: 'png',
             ...getFontConfig(),
             filterType: guessFilterType(),
             filterLabel,
