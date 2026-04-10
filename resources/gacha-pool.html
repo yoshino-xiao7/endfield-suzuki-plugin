@@ -4,11 +4,22 @@
 <head>
     <meta charset="utf-8">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
         body {
-            font-family: {{fontFamily}};
-            margin: 0; padding: 0;
+            font-family: {
+                    {
+                    fontFamily
+                }
+            }
+
+            ;
+            margin: 0;
+            padding: 0;
             width: 520px;
             background: transparent;
             text-rendering: optimizeLegibility;
@@ -30,7 +41,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 14px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e6ea;
             position: relative;
             overflow: hidden;
@@ -39,13 +50,23 @@
         .header::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 4px;
         }
 
-        .header.type-char::before { background: linear-gradient(90deg, #a855f7, #7c3aed); }
-        .header.type-weapon::before { background: linear-gradient(90deg, #f97316, #ea580c); }
-        .header.type-mixed::before { background: linear-gradient(90deg, #06b6d4, #0891b2); }
+        .header.type-char::before {
+            background: linear-gradient(90deg, #a855f7, #7c3aed);
+        }
+
+        .header.type-weapon::before {
+            background: linear-gradient(90deg, #f97316, #ea580c);
+        }
+
+        .header.type-mixed::before {
+            background: linear-gradient(90deg, #06b6d4, #0891b2);
+        }
 
         .header-left {
             display: flex;
@@ -54,7 +75,8 @@
         }
 
         .header-avatar {
-            width: 44px; height: 44px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             border: 2px solid #d0d5de;
             object-fit: cover;
@@ -69,9 +91,17 @@
 
         .header-info .player-uid {
             font-size: 10px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             margin-top: 1px;
-            font-family: {{monoFontFamily}};
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
         }
 
         .header-right {
@@ -81,7 +111,8 @@
         .header-type {
             font-size: 13px;
             font-weight: bold;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             margin-bottom: 2px;
         }
 
@@ -95,7 +126,8 @@
         .header-total small {
             font-size: 14px;
             font-weight: normal;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
         }
 
         /* ===== Overview Summary ===== */
@@ -111,7 +143,7 @@
             border-radius: 12px;
             padding: 12px 8px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e6ea;
         }
 
@@ -119,13 +151,31 @@
             font-size: 20px;
             font-weight: 900;
             color: #1a1a2e;
-            font-family: {{monoFontFamily}};
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
         }
 
-        .ov-value.ov-cyan { color: #0891b2; }
-        .ov-value.ov-green { color: #16a34a; }
-        .ov-value.ov-orange { color: #ea580c; }
-        .ov-value.ov-red { color: #dc2626; }
+        .ov-value.ov-cyan {
+            color: #0891b2;
+        }
+
+        .ov-value.ov-green {
+            color: #16a34a;
+        }
+
+        .ov-value.ov-orange {
+            color: #ea580c;
+        }
+
+        .ov-value.ov-red {
+            color: #dc2626;
+        }
 
         .ov-label {
             font-size: 9px;
@@ -143,13 +193,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e6ea;
         }
 
         .pity-label {
             font-size: 11px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             font-weight: bold;
             flex-shrink: 0;
         }
@@ -167,14 +218,29 @@
             border-radius: 4px;
         }
 
-        .pity-bar.safe { background: linear-gradient(90deg, #22c55e, #4ade80); }
-        .pity-bar.warn { background: linear-gradient(90deg, #f97316, #fb923c); }
-        .pity-bar.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .pity-bar.safe {
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+        }
+
+        .pity-bar.warn {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+        }
+
+        .pity-bar.danger {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
 
         .pity-text {
             font-size: 12px;
             color: #1a1a2e;
-            font-family: {{monoFontFamily}};
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
             font-weight: bold;
             flex-shrink: 0;
         }
@@ -190,7 +256,7 @@
             background: #ffffff;
             border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             border: 1px solid #e2e6ea;
         }
 
@@ -211,28 +277,48 @@
         }
 
         .banner-illustration img {
-            width: 140px;
+            width: 120px;
             height: auto;
             position: absolute;
-            top: 4px;
+            /* top: 4px;
             right: -20px;
-            opacity: 0.18;
+            opacity: 0.18; */
         }
 
         .banner-illustration::after {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0) 30%, rgba(255,255,255,1) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 1) 100%);
         }
 
-        .banner-top-bar { height: 4px; position: relative; z-index: 1; }
-        .banner-top-bar.bar-purple { background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc); }
-        .banner-top-bar.bar-orange { background: linear-gradient(90deg, #ea580c, #f97316, #fb923c); }
-        .banner-top-bar.bar-cyan { background: linear-gradient(90deg, #0891b2, #06b6d4, #22d3ee); }
-        .banner-top-bar.bar-green { background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80); }
+        .banner-top-bar {
+            height: 4px;
+            position: relative;
+            z-index: 1;
+        }
 
-        .banner-header { padding: 12px 16px 10px; position: relative; z-index: 1; }
+        .banner-top-bar.bar-purple {
+            background: linear-gradient(90deg, #7c3aed, #a855f7, #c084fc);
+        }
+
+        .banner-top-bar.bar-orange {
+            background: linear-gradient(90deg, #ea580c, #f97316, #fb923c);
+        }
+
+        .banner-top-bar.bar-cyan {
+            background: linear-gradient(90deg, #0891b2, #06b6d4, #22d3ee);
+        }
+
+        .banner-top-bar.bar-green {
+            background: linear-gradient(90deg, #16a34a, #22c55e, #4ade80);
+        }
+
+        .banner-header {
+            padding: 12px 16px 10px;
+            position: relative;
+            z-index: 1;
+        }
 
         .banner-title-row {
             display: flex;
@@ -249,14 +335,18 @@
         .banner-pull-count {
             font-size: 14px;
             font-weight: bold;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
         }
 
-        .banner-pull-count span { color: #1a1a2e; }
+        .banner-pull-count span {
+            color: #1a1a2e;
+        }
 
         .banner-up-name {
             font-size: 11px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             margin-top: 2px;
         }
 
@@ -268,13 +358,22 @@
             z-index: 1;
         }
 
-        .bs-item { text-align: center; }
+        .bs-item {
+            text-align: center;
+        }
 
         .bs-value {
             font-size: 17px;
             font-weight: bold;
             color: #1a1a2e;
-            font-family: {{monoFontFamily}};
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
         }
 
         .bs-label {
@@ -284,7 +383,9 @@
         }
 
         /* ===== 6★ Records ===== */
-        .six-star-list { padding: 0 12px 10px; }
+        .six-star-list {
+            padding: 0 12px 10px;
+        }
 
         .six-star-entry {
             display: flex;
@@ -294,7 +395,8 @@
         }
 
         .ss-avatar {
-            width: 34px; height: 34px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             border: 2px solid #e2e6ea;
             object-fit: cover;
@@ -303,19 +405,24 @@
         }
 
         .ss-avatar-placeholder {
-            width: 34px; height: 34px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: #f0f2f5;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 12px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             flex-shrink: 0;
             border: 2px solid #e2e6ea;
         }
 
-        .ss-info { flex: 1; min-width: 0; }
+        .ss-info {
+            flex: 1;
+            min-width: 0;
+        }
 
         .ss-name-row {
             display: flex;
@@ -340,10 +447,25 @@
             flex-shrink: 0;
         }
 
-        .tag-up { background: #f97316; color: #fff; }
-        .tag-new { background: #22c55e; color: #fff; }
-        .tag-miss { background: #ef4444; color: #fff; }
-        .tag-free { background: #a855f7; color: #fff; }
+        .tag-up {
+            background: #f97316;
+            color: #fff;
+        }
+
+        .tag-new {
+            background: #22c55e;
+            color: #fff;
+        }
+
+        .tag-miss {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        .tag-free {
+            background: #a855f7;
+            color: #fff;
+        }
 
         .ss-bar-row {
             display: flex;
@@ -354,8 +476,16 @@
 
         .ss-pull-label {
             font-size: 10px;
-            color: #1a1a2e; font-weight: bold;
-            font-family: {{monoFontFamily}};
+            color: #1a1a2e;
+            font-weight: bold;
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
             flex-shrink: 0;
             min-width: 32px;
         }
@@ -374,10 +504,21 @@
             min-width: 10px;
         }
 
-        .ss-bar.bar-lucky { background: linear-gradient(90deg, #059669, #34d399); }
-        .ss-bar.bar-normal { background: linear-gradient(90deg, #0891b2, #22d3ee); }
-        .ss-bar.bar-warn { background: linear-gradient(90deg, #d97706, #fbbf24); }
-        .ss-bar.bar-bad { background: linear-gradient(90deg, #dc2626, #f87171); }
+        .ss-bar.bar-lucky {
+            background: linear-gradient(90deg, #059669, #34d399);
+        }
+
+        .ss-bar.bar-normal {
+            background: linear-gradient(90deg, #0891b2, #22d3ee);
+        }
+
+        .ss-bar.bar-warn {
+            background: linear-gradient(90deg, #d97706, #fbbf24);
+        }
+
+        .ss-bar.bar-bad {
+            background: linear-gradient(90deg, #dc2626, #f87171);
+        }
 
         /* ===== Free 10-pull ===== */
         .free-pull-entry {
@@ -387,9 +528,25 @@
             padding: 5px 4px 5px 12px;
         }
 
-        .free-icon { font-size: 14px; flex-shrink: 0; }
-        .free-text { font-size: 11px; color: #8b5cf6; font-weight: bold; }
-        .free-badge { font-size: 8px; background: #a855f7; color: #fff; padding: 1px 5px; border-radius: 3px; font-weight: bold; }
+        .free-icon {
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .free-text {
+            font-size: 11px;
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+
+        .free-badge {
+            font-size: 8px;
+            background: #a855f7;
+            color: #fff;
+            padding: 1px 5px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
 
         /* ===== Pity in Banner ===== */
         .banner-pity {
@@ -401,28 +558,50 @@
         }
 
         .bp-bar-bg {
-            flex: 1; height: 6px;
+            flex: 1;
+            height: 6px;
             background: #e8ecf0;
             border-radius: 3px;
             overflow: hidden;
         }
 
-        .bp-bar { height: 100%; border-radius: 3px; }
-        .bp-bar.safe { background: linear-gradient(90deg, #22c55e, #4ade80); }
-        .bp-bar.warn { background: linear-gradient(90deg, #f97316, #fb923c); }
-        .bp-bar.danger { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .bp-bar {
+            height: 100%;
+            border-radius: 3px;
+        }
+
+        .bp-bar.safe {
+            background: linear-gradient(90deg, #22c55e, #4ade80);
+        }
+
+        .bp-bar.warn {
+            background: linear-gradient(90deg, #f97316, #fb923c);
+        }
+
+        .bp-bar.danger {
+            background: linear-gradient(90deg, #ef4444, #f87171);
+        }
 
         .bp-text {
             font-size: 10px;
-            color: #1a1a2e; font-weight: bold;
-            font-family: {{monoFontFamily}};
+            color: #1a1a2e;
+            font-weight: bold;
+
+            font-family: {
+                    {
+                    monoFontFamily
+                }
+            }
+
+            ;
             flex-shrink: 0;
         }
 
         .no-six-msg {
             padding: 14px 16px;
             font-size: 11px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             text-align: center;
         }
 
@@ -431,7 +610,8 @@
             text-align: center;
             padding: 16px 0 4px;
             font-size: 10px;
-            color: #1a1a2e; font-weight: bold;
+            color: #1a1a2e;
+            font-weight: bold;
             font-style: italic;
         }
     </style>
@@ -446,7 +626,9 @@
                 <img class="header-avatar" src="{{playerAvatar}}">
                 {{/if}}
                 {{if !playerAvatar}}
-                <div class="header-avatar" style="display:flex;align-items:center;justify-content:center;font-size:18px;color: #1a1a2e; font-weight: bold;">👤</div>
+                <div class="header-avatar"
+                    style="display:flex;align-items:center;justify-content:center;font-size:18px;color: #1a1a2e; font-weight: bold;">
+                    👤</div>
                 {{/if}}
                 <div class="header-info">
                     <div class="player-name">{{playerName || '指挥官'}}</div>
@@ -494,38 +676,38 @@
             {{each poolStats ps}}
             <div class="banner-card">
                 <div class="banner-head-box">
-                {{if ps.upIllustration}}
-                <div class="banner-illustration">
-                    <img src="{{ps.upIllustration}}" onerror="this.parentElement.style.display='none'">
-                </div>
-                {{/if}}
-                <div class="banner-top-bar {{ps.barClass}}"></div>
-                <div class="banner-header">
-                    <div class="banner-title-row">
-                        <div class="banner-pool-name">{{ps.poolName}}</div>
+                    {{if ps.upIllustration}}
+                    <div class="banner-illustration">
+                        <img src="{{ps.upIllustration}}" onerror="this.parentElement.style.display='none'">
                     </div>
-                    {{if ps.upCharName}}
-                    <div class="banner-up-name">UP: {{ps.upCharName}}</div>
                     {{/if}}
-                </div>
-                <div class="banner-stats-row">
-                    <div class="bs-item">
-                        <div class="bs-value">{{ps.totalPulls}}</div>
-                        <div class="bs-label">总抽数</div>
+                    <div class="banner-top-bar {{ps.barClass}}"></div>
+                    <div class="banner-header">
+                        <div class="banner-title-row">
+                            <div class="banner-pool-name">{{ps.poolName}}</div>
+                        </div>
+                        {{if ps.upCharName}}
+                        <div class="banner-up-name">UP: {{ps.upCharName}}</div>
+                        {{/if}}
                     </div>
-                    <div class="bs-item">
-                        <div class="bs-value">{{ps.sixInfo}}</div>
-                        <div class="bs-label">6★/全</div>
+                    <div class="banner-stats-row">
+                        <div class="bs-item">
+                            <div class="bs-value">{{ps.totalPulls}}</div>
+                            <div class="bs-label">总抽数</div>
+                        </div>
+                        <div class="bs-item">
+                            <div class="bs-value">{{ps.sixInfo}}</div>
+                            <div class="bs-label">6★/全</div>
+                        </div>
+                        <div class="bs-item">
+                            <div class="bs-value">{{ps.upAvg}}</div>
+                            <div class="bs-label">平均</div>
+                        </div>
+                        <div class="bs-item">
+                            <div class="bs-value">{{ps.currentPity}}</div>
+                            <div class="bs-label">已垫</div>
+                        </div>
                     </div>
-                    <div class="bs-item">
-                        <div class="bs-value">{{ps.upAvg}}</div>
-                        <div class="bs-label">平均</div>
-                    </div>
-                    <div class="bs-item">
-                        <div class="bs-value">{{ps.currentPity}}</div>
-                        <div class="bs-label">已垫</div>
-                    </div>
-                </div>
                 </div>
 
                 {{if ps.sixStars.length > 0}}
