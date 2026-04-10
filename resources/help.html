@@ -29,10 +29,15 @@
         .section-icon { font-size: 14px; flex-shrink: 0; }
         .section-title { font-size: 13px; font-weight: bold; color: #1a1a2e; letter-spacing: 1px; }
 
-        .cmd-list { padding: 6px 0; }
+        /*.cmd-list { padding: 6px 0; }
         .cmd-row { display: flex; align-items: baseline; padding: 5px 18px; gap: 14px; }
         .cmd-name { font-size: 12px; color: #3b82f6; font-family: {{monoFontFamily}}; white-space: nowrap; flex-shrink: 0; min-width: 200px; }
-        .cmd-desc { font-size: 11px; color: #8c94a6; }
+        .cmd-desc { font-size: 11px; color: #8c94a6; }*/
+
+        .cmd-list { padding: 6px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 12px 18px; }
+        .cmd-row { background: #ffffff; border-radius: 6px; padding: 10px; }
+        .cmd-name { font-size: 11px; color: #22d3ee; font-family: 'Consolas', monospace; font-weight: bold; margin-bottom: 4px; word-break: break-all; }
+        .cmd-desc { font-size: 10px; color: #6a6e8a; line-height: 1.3; }
 
         .note-row { padding: 6px 18px; font-size: 11px; color: #8c94a6; }
         .note-label { color: #f97316; font-family: {{monoFontFamily}}; font-size: 10px; font-weight: bold; }
@@ -58,12 +63,12 @@
             </div>
             <div class="cmd-list">
                 <div class="cmd-row">
-                    <div class="cmd-name">#终末地绑定 &lt;token&gt;</div>
-                    <div class="cmd-desc">Token 绑定（仅私聊）</div>
-                </div>
-                <div class="cmd-row">
                     <div class="cmd-name">#终末地手机绑定 &lt;手机号&gt;</div>
                     <div class="cmd-desc">手机验证码绑定（仅私聊）</div>
+                </div>
+                <div class="cmd-row">
+                    <div class="cmd-name">#终末地绑定 &lt;token&gt;</div>
+                    <div class="cmd-desc">Token 绑定（仅私聊）</div>
                 </div>
                 <div class="cmd-row">
                     <div class="cmd-name">#终末地解绑</div>
