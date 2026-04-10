@@ -827,6 +827,28 @@ export default class Render {
             if (stat) poolStats.push(stat)
         }
 
+        // 排序：限定池（最新在前）> 武器池（最新在前）> 常驻池 > 新手池
+        const CATEGORY_ORDER = { limited: 0, weapon: 1, standard: 2, standard_weapon: 3, beginner: 4 }
+        poolStats.sort((a, b) => {
+            const oa = CATEGORY_ORDER[a.category] ?? 99
+            const ob = CATEGORY_ORDER[b.category] ?? 99
+            return oa - ob
+        })
+        // 同类别内反转（所有类别最新的排前面）
+        const reverseWithinCategory = (cat) => {
+            const indices = []
+            poolStats.forEach((p, i) => { if (p.category === cat) indices.push(i) })
+            if (indices.length > 1) {
+                const items = indices.map(i => poolStats[i]).reverse()
+                indices.forEach((idx, j) => { poolStats[idx] = items[j] })
+            }
+        }
+        reverseWithinCategory('limited')
+        reverseWithinCategory('weapon')
+        reverseWithinCategory('standard')
+        reverseWithinCategory('standard_weapon')
+        reverseWithinCategory('beginner')
+
         // 汇总
         const totalPulls = records.length
         const totalSixCount = poolStats.reduce((s, p) => s + p.sixCount, 0)

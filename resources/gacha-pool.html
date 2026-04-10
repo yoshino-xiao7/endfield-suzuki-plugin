@@ -192,7 +192,11 @@
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             border: 1px solid #e2e6ea;
+        }
+
+        .banner-head-box {
             position: relative;
+            overflow: hidden;
         }
 
         .banner-illustration {
@@ -200,19 +204,19 @@
             top: 0;
             right: 0;
             width: 120px;
-            height: 130px;
+            height: 100%;
             overflow: hidden;
             pointer-events: none;
             z-index: 0;
         }
 
         .banner-illustration img {
-            width: 200px;
+            width: 140px;
             height: auto;
             position: absolute;
-            top: -10px;
-            right: -40px;
-            opacity: 0.25;
+            top: 4px;
+            right: -20px;
+            opacity: 0.18;
         }
 
         .banner-illustration::after {
@@ -489,6 +493,7 @@
         <div class="pool-list">
             {{each poolStats ps}}
             <div class="banner-card">
+                <div class="banner-head-box">
                 {{if ps.upIllustration}}
                 <div class="banner-illustration">
                     <img src="{{ps.upIllustration}}" onerror="this.parentElement.style.display='none'">
@@ -520,6 +525,7 @@
                         <div class="bs-value">{{ps.currentPity}}</div>
                         <div class="bs-label">已垫</div>
                     </div>
+                </div>
                 </div>
 
                 {{if ps.sixStars.length > 0}}
