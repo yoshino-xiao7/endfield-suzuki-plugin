@@ -8,6 +8,7 @@
 }
 
 body {
+    zoom: 2; /* Forced Retina Scale */
     font-family: 'Noto Sans SC', sans-serif;
     color: #3a3f50;
     background: transparent;

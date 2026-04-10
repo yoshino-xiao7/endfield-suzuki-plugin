@@ -5,7 +5,8 @@
     <meta charset="utf-8">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: {{fontFamily}}; margin: 0; padding: 0; width: 650px; background: transparent; }
+        body {
+    zoom: 2; /* Forced Retina Scale */ font-family: {{fontFamily}}; margin: 0; padding: 0; width: 650px; background: transparent; }
         .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
 
         .header { background: #ffffff; border-radius: 16px; padding: 18px 24px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
