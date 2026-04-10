@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 660px; background: transparent; text-rendering: optimizeLegibility; }
+        body { font-family: {{fontFamily}}; margin: 0; padding: 0; width: 660px; background: transparent; text-rendering: optimizeLegibility; }
         .page { background: #f0f2f5; padding: 16px; }
 
         /* ===== Header ===== */
@@ -13,14 +13,14 @@
         .avatar-wrap { position: relative; flex-shrink: 0; }
         .avatar { width: 64px; height: 64px; border-radius: 14px; border: 2px solid #d0d5de; object-fit: cover; background: #f5f7fa; }
         .header-info { flex: 1; }
-        .header-meta { font-size: 9px; color: #b0b8c4; letter-spacing: 3px; font-family: 'Consolas', monospace; margin-bottom: 4px; }
+        .header-meta { font-size: 9px; color: #b0b8c4; letter-spacing: 3px; font-family: {{monoFontFamily}}; margin-bottom: 4px; }
         .player-name { font-size: 22px; font-weight: 900; color: #1a1a2e; }
         .player-sub { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
         .create-badge { font-size: 10px; background: #22c55e; color: #fff; padding: 2px 8px; border-radius: 4px; font-weight: bold; }
-        .create-date { font-size: 11px; color: #8c94a6; font-family: 'Consolas', monospace; }
+        .create-date { font-size: 11px; color: #8c94a6; font-family: {{monoFontFamily}}; }
         .header-right { text-align: right; flex-shrink: 0; }
-        .uid-text { font-size: 11px; color: #8c94a6; font-family: 'Consolas', monospace; }
-        .endfield-logo { font-size: 10px; color: #b0b8c4; letter-spacing: 2px; margin-top: 4px; font-family: 'Consolas', monospace; font-weight: bold; }
+        .uid-text { font-size: 11px; color: #8c94a6; font-family: {{monoFontFamily}}; }
+        .endfield-logo { font-size: 10px; color: #b0b8c4; letter-spacing: 2px; margin-top: 4px; font-family: {{monoFontFamily}}; font-weight: bold; }
 
         /* ===== Main Grid ===== */
         .main-grid { display: grid; grid-template-columns: 200px 1fr; gap: 10px; margin-bottom: 10px; }
@@ -29,7 +29,7 @@
         .stamina-card { background: #ffffff; border-radius: 14px; padding: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
         .stamina-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #06b6d4, #22d3ee); }
         .stamina-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-        .stamina-nums { font-size: 24px; font-weight: 900; color: #1a1a2e; font-family: 'Consolas', monospace; }
+        .stamina-nums { font-size: 24px; font-weight: 900; color: #1a1a2e; font-family: {{monoFontFamily}}; }
         .stamina-nums small { font-size: 14px; color: #9ca3af; font-weight: normal; }
         .stamina-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .stamina-icon { font-size: 20px; }
@@ -42,13 +42,13 @@
         .recovery-dot { width: 6px; height: 6px; border-radius: 50%; }
         .recovery-dot.full { background: #4ade80; }
         .recovery-dot.recovering { background: #22d3ee; }
-        .recovery-text { font-size: 10px; color: #8c94a6; font-family: 'Consolas', monospace; }
+        .recovery-text { font-size: 10px; color: #8c94a6; font-family: {{monoFontFamily}}; }
         .recovery-text.full-text { color: #22c55e; }
 
         /* ===== Stats Grid ===== */
         .stats-right { display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: repeat(2, 1fr); gap: 6px; }
         .stat-box { background: #ffffff; border-radius: 10px; padding: 10px 6px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
-        .stat-value { font-size: 18px; font-weight: 900; color: #1a1a2e; font-family: 'Consolas', monospace; }
+        .stat-value { font-size: 18px; font-weight: 900; color: #1a1a2e; font-family: {{monoFontFamily}}; }
         .stat-label { font-size: 9px; color: #9ca3af; margin-top: 3px; }
 
         /* ===== Bottom Row ===== */
@@ -59,7 +59,7 @@
         .stm-row { display: flex; align-items: center; justify-content: space-between; padding: 3px 0; }
         .stm-icon { font-size: 10px; color: #9ca3af; margin-right: 4px; }
         .stm-name { font-size: 11px; color: #5a6070; }
-        .stm-level { font-size: 11px; color: #6b7280; font-family: 'Consolas', monospace; font-weight: bold; }
+        .stm-level { font-size: 11px; color: #6b7280; font-family: {{monoFontFamily}}; font-weight: bold; }
 
         .activity-card { background: #ffffff; border-radius: 14px; padding: 12px; min-width: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
         .act-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
@@ -71,7 +71,7 @@
         .act-bar { height: 100%; border-radius: 3px; }
         .act-bar.bar-green { background: linear-gradient(90deg, #22c55e, #4ade80); }
         .act-bar.bar-cyan { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
-        .act-nums { font-size: 12px; color: #1a1a2e; font-weight: bold; font-family: 'Consolas', monospace; }
+        .act-nums { font-size: 12px; color: #1a1a2e; font-weight: bold; font-family: {{monoFontFamily}}; }
 
         /* ===== Rainbow Divider ===== */
         .rainbow-bar { height: 4px; background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e, #06b6d4, #8b5cf6, #ec4899); border-radius: 2px; margin-bottom: 12px; }
@@ -96,7 +96,7 @@
         .char-bottom { padding: 6px 8px 8px; display: flex; align-items: center; justify-content: space-between; }
         .char-bottom-left { }
         .char-level-row { display: flex; align-items: center; gap: 4px; }
-        .char-lv { font-size: 12px; color: #1a1a2e; font-weight: bold; font-family: 'Consolas', monospace; }
+        .char-lv { font-size: 12px; color: #1a1a2e; font-weight: bold; font-family: {{monoFontFamily}}; }
         .char-prof { font-size: 8px; color: #9ca3af; }
         .char-tile-name { font-size: 12px; color: #5a6070; font-weight: bold; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif; margin: 0; padding: 0; width: 900px; background: transparent; }
+        body { font-family: {{fontFamily}}; margin: 0; padding: 0; width: 900px; background: transparent; }
         .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
 
         .char-card { display: grid; grid-template-columns: 500px 1fr; background: #ffffff; border-radius: 16px; overflow: hidden; min-height: 580px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); border: 1px solid #e2e6ea; }
@@ -37,7 +37,7 @@
         .stats-row { display: flex; gap: 10px; }
         .stat-box { background: #f5f7fa; padding: 12px 10px; border-radius: 10px; flex: 1; text-align: center; border: 1px solid #e8ecf0; }
         .stat-label { font-size: 10px; color: #9ca3af; }
-        .stat-value { font-size: 18px; color: #1a1a2e; font-weight: bold; font-family: 'Consolas', monospace; margin-top: 2px; }
+        .stat-value { font-size: 18px; color: #1a1a2e; font-weight: bold; font-family: {{monoFontFamily}}; margin-top: 2px; }
 
         /* Weapon */
         .weapon-box { display: flex; align-items: center; background: #f5f7fa; padding: 12px 14px; border-radius: 12px; gap: 14px; border: 1px solid #e8ecf0; }
@@ -59,7 +59,7 @@
         .equips-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
         .equip-item { background: #f5f7fa; border-radius: 10px; aspect-ratio: 1; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; border: 1px solid #e8ecf0; }
         .equip-icon { width: 80%; height: 80%; object-fit: contain; }
-        .equip-level { position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: #fff; background: rgba(0,0,0,0.5); padding: 1px 5px; border-radius: 4px; font-family: 'Consolas', monospace; }
+        .equip-level { position: absolute; bottom: 3px; right: 5px; font-size: 10px; color: #fff; background: rgba(0,0,0,0.5); padding: 1px 5px; border-radius: 4px; font-family: {{monoFontFamily}}; }
         .equip-empty { width: 80%; height: 80%; background: #e8ecf0; border-radius: 8px; }
 
         .copyright { margin-top: auto; text-align: right; font-size: 10px; color: #b0b8c4; font-style: italic; }

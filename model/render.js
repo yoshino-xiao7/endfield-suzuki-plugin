@@ -1,6 +1,9 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
 import path from 'path'
+import os from 'os'
+import fs from 'fs'
+import YAML from 'yaml'
 import { fileURLToPath } from 'url'
 
 // Compatible way to get plugin root directory
@@ -8,11 +11,55 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PLUGIN_ROOT = path.resolve(__dirname, '..')
 
+/**
+ * 根据操作系统自动选择字体，也支持用户在配置中自定义
+ * @returns {{ fontFamily: string, monoFontFamily: string }}
+ */
+function getFontConfig() {
+    // 读取用户配置
+    const defPath = path.join(PLUGIN_ROOT, 'defSet/config.yaml')
+    const cfgPath = path.join(PLUGIN_ROOT, 'config/config.yaml')
+    const def = YAML.parse(fs.readFileSync(defPath, 'utf8')) || {}
+    let cfg = {}
+    if (fs.existsSync(cfgPath)) cfg = YAML.parse(fs.readFileSync(cfgPath, 'utf8')) || {}
+    const merged = { ...def, ...cfg }
+
+    const platform = os.platform() // 'win32' | 'linux' | 'darwin'
+
+    // 主字体：用户自定义 > 平台默认
+    let fontFamily = merged.fontFamily
+    if (!fontFamily) {
+        if (platform === 'win32') {
+            fontFamily = "'Microsoft YaHei', 'PingFang SC', sans-serif"
+        } else if (platform === 'darwin') {
+            fontFamily = "'PingFang SC', 'Hiragino Sans GB', sans-serif"
+        } else {
+            // Linux
+            fontFamily = "'Noto Sans SC', 'WenQuanYi Micro Hei', 'Source Han Sans CN', sans-serif"
+        }
+    }
+
+    // 等宽字体：用户自定义 > 平台默认
+    let monoFontFamily = merged.monoFontFamily
+    if (!monoFontFamily) {
+        if (platform === 'win32') {
+            monoFontFamily = "'Consolas', monospace"
+        } else if (platform === 'darwin') {
+            monoFontFamily = "'Menlo', monospace"
+        } else {
+            monoFontFamily = "'DejaVu Sans Mono', 'Noto Sans Mono', monospace"
+        }
+    }
+
+    return { fontFamily, monoFontFamily }
+}
+
 export default class Render {
     static async renderHelp() {
         return await puppeteer.screenshot('endfield-help', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'help.html'),
-            scale: 2
+            scale: 2,
+            ...getFontConfig()
         })
     }
 
@@ -111,6 +158,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-profile', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'profile.html'),
             scale: 2,
+            ...getFontConfig(),
             // 玩家基础
             playerName: base.name,
             playerUid: base.roleId,
@@ -191,6 +239,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-character', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'character.html'),
             scale: 2,
+            ...getFontConfig(),
             character
         })
     }
@@ -307,6 +356,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-spaceship', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'spaceship.html'),
             scale: 2,
+            ...getFontConfig(),
             playerName: base.name,
             rooms
         })
@@ -356,6 +406,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-domain', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'domain.html'),
             scale: 2,
+            ...getFontConfig(),
             playerName: base.name,
             domains
         })
@@ -378,6 +429,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-records', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
             scale: 2,
+            ...getFontConfig(),
             records: fmtRecords,
             poolName,
             totalCount: records.length,
@@ -592,6 +644,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
             scale: 2,
+            ...getFontConfig(),
             // Header
             playerName: playerInfo.name || '',
             playerUid: playerInfo.uid || '',
@@ -789,6 +842,7 @@ export default class Render {
         return await puppeteer.screenshot('endfield-gacha-pool', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-pool.html'),
             scale: 2,
+            ...getFontConfig(),
             filterType: guessFilterType(),
             filterLabel,
             playerName: playerInfo.name || '',
