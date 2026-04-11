@@ -80,7 +80,7 @@ export default class Render {
         const STAMINA_RECOVERY_SECONDS = 7 * 60 + 12 // 7分12秒/点
         let recoveryText = ''
         let staminaPercent = maxStamina > 0 ? Math.min((curStamina / maxStamina) * 100, 100) : 0
-        let staminaFull = Number(curStamina) >= Number(maxStamina)
+        let staminaFull = Number(curStamina) >= Number(maxStamina)  
 
         if (!staminaFull && maxStamina > 0) {
             const remaining = maxStamina - curStamina
