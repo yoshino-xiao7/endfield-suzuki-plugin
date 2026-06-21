@@ -1,5 +1,6 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import puppeteer from '../../../lib/puppeteer/puppeteer.js'
+import fetch from 'node-fetch'
 import path from 'path'
 import os from 'os'
 import fs from 'fs'
@@ -70,6 +71,47 @@ function proxyWikiMediaUrl(url) {
         }
     } catch { }
     return url
+}
+
+function mimeFromUrl(url, fallback = 'image/png') {
+    const ext = String(url || '').split('?')[0].split('.').pop()?.toLowerCase()
+    const map = {
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        webp: 'image/webp',
+        gif: 'image/gif'
+    }
+    return map[ext] || fallback
+}
+
+async function toDataImageUrl(url, maxBytes = 5 * 1024 * 1024) {
+    if (!url || typeof url !== 'string' || url.startsWith('data:')) return url || ''
+    const targets = [...new Set([proxyWikiMediaUrl(url), url].filter(Boolean))]
+    let lastErr
+
+    for (const target of targets) {
+        try {
+            const res = await fetch(target, { timeout: 15000 })
+            if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+            const length = Number(res.headers?.get?.('content-length') || 0)
+            if (length > maxBytes) return target
+
+            const raw = typeof res.arrayBuffer === 'function'
+                ? Buffer.from(await res.arrayBuffer())
+                : await res.buffer()
+            if (raw.length > maxBytes) return target
+
+            const mime = res.headers?.get?.('content-type')?.split(';')[0] || mimeFromUrl(target)
+            return `data:${mime};base64,${raw.toString('base64')}`
+        } catch (err) {
+            lastErr = err
+        }
+    }
+
+    globalThis.logger?.warn?.(`[Endfield Wiki] 图片预加载失败: ${lastErr?.message || 'unknown'}`)
+    return proxyWikiMediaUrl(url)
 }
 
 function stripHtml(value) {
@@ -256,6 +298,14 @@ function buildWikiListItems(items) {
     })
 }
 
+async function prepareWikiListItems(items) {
+    const list = buildWikiListItems(items)
+    await Promise.all(list.map(async item => {
+        if (item.cover) item.cover = await toDataImageUrl(item.cover, 2 * 1024 * 1024)
+    }))
+    return list
+}
+
 function prepareWikiOperator(operator) {
     const clone = {
         ...operator,
@@ -289,6 +339,14 @@ function prepareWikiOperator(operator) {
     return clone
 }
 
+async function prepareWikiOperatorImages(operator) {
+    const clone = prepareWikiOperator(operator)
+    const image = clone.illustration || clone.cover
+    if (image) clone.illustration = await toDataImageUrl(image, 6 * 1024 * 1024)
+    if (clone.cover && clone.cover !== image) clone.cover = await toDataImageUrl(clone.cover, 3 * 1024 * 1024)
+    return clone
+}
+
 export default class Render {
     static async renderHelp() {
         return await puppeteer.screenshot('endfield-help', {
@@ -303,6 +361,7 @@ export default class Render {
 
     static async renderWikiList(items, meta = {}) {
         const list = items || []
+        const renderItems = await prepareWikiListItems(list)
         return await puppeteer.screenshot('endfield-wiki-list', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'wiki-list.html'),
             scale: 2,
@@ -314,13 +373,13 @@ export default class Render {
             page: meta.page || 1,
             size: meta.size || 10,
             total: meta.total || list.length,
-            items: buildWikiListItems(list),
+            items: renderItems,
             hasItems: list.length > 0
         })
     }
 
     static async renderWikiDetail(item, filters = []) {
-        const cover = proxyWikiMediaUrl(item.cover || findFirstImageUrl(item))
+        const cover = await toDataImageUrl(item.cover || findFirstImageUrl(item), 5 * 1024 * 1024)
         const tags = buildWikiTags(item, filters)
         const sections = buildWikiSections(item)
 
@@ -348,7 +407,7 @@ export default class Render {
     }
 
     static async renderWikiOperator(operator) {
-        const data = prepareWikiOperator(operator)
+        const data = await prepareWikiOperatorImages(operator)
         return await puppeteer.screenshot('endfield-wiki-operator', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'wiki-operator.html'),
             scale: 2,

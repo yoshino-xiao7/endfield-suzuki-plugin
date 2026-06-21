@@ -9,7 +9,7 @@ import { extractWikiMedia, parseWikiOperator } from '../model/wiki.js'
 
 const WIKI_COMMAND_PATTERN = '#(?:终末地|endfield)\\s*(?:百科|[wW][iI][kK][iI]|图鉴)'
 const WIKI_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)/i
-const WIKI_DETAIL_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:详情|条目)/i
+const WIKI_DETAIL_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:详情|详细|条目)/i
 const WIKI_SEARCH_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:搜索|查询)/i
 const WIKI_VOICE_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:语音|音频)/i
 const WIKI_VIDEO_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:mv|视频|演示)/i
@@ -91,11 +91,11 @@ export class WikiApp extends plugin {
             rule: [
                 { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:语音|音频)\\s*(.+)$`, fnc: 'voice' },
                 { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:[mM][vV]|视频|演示)\\s*(.+)$`, fnc: 'video' },
-                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:详情|条目)\\s*(.+)$`, fnc: 'detail' },
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:详情|详细|条目)\\s*(.+)$`, fnc: 'detail' },
                 { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:目录|分类)$`, fnc: 'sidebar' },
                 { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:搜索|查询)\\s*(.+)$`, fnc: 'search' },
                 { reg: `${WIKI_COMMAND_PATTERN}\\s*$`, fnc: 'index' },
-                { reg: `${WIKI_COMMAND_PATTERN}(?!\\s*(?:详情|条目|目录|分类|搜索|查询|语音|音频|[mM][vV]|视频|演示))\\s*(.+)$`, fnc: 'search' }
+                { reg: `${WIKI_COMMAND_PATTERN}(?!\\s*(?:详情|详细|条目|目录|分类|搜索|查询|语音|音频|[mM][vV]|视频|演示))\\s*(.+)$`, fnc: 'search' }
             ]
         })
     }
