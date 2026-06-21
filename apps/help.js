@@ -17,10 +17,15 @@ export class HelpApp extends plugin {
     async help(e) {
         try {
             const img = await Render.renderHelp()
-            e.reply(img)
+            await e.reply(img)
         } catch (err) {
-            logger.warn(`[Endfield] 帮助渲染失败: ${err.message}`)
-            e.reply(`📖 终末地助手 · 指令帮助
+            logger.warn(`[Endfield] 帮助图片发送失败: ${err.message}`)
+            await e.reply(this.textHelp())
+        }
+    }
+
+    textHelp() {
+        return `📖 终末地助手 · 指令帮助
 
 📌 账号绑定
   #终末地绑定 <token>　Token绑定(私聊)
@@ -56,7 +61,6 @@ export class HelpApp extends plugin {
   #终末地更新　　更新插件
   #终末地强制更新　强制更新
 
-Powered by Endfield Suzuki Plugin`)
-        }
+Powered by Endfield Suzuki Plugin`
     }
 }

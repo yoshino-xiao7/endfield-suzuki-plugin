@@ -6,43 +6,43 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-    zoom: 2; /* Forced Retina Scale */ font-family: {{fontFamily}}; margin: 0; padding: 0; width: 600px; background: transparent; text-rendering: optimizeLegibility; }
-        .page { background: #f0f2f5; padding: 20px; border-radius: 20px; }
+    zoom: 2; /* Forced Retina Scale */ font-family: {{fontFamily}}; margin: 0; padding: 0; width: 780px; background: transparent; text-rendering: optimizeLegibility; }
+        .page { background: #f0f2f5; padding: 14px; border-radius: 18px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
 
-        .header { background: #ffffff; border-radius: 16px; padding: 20px 24px; margin-bottom: 14px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
+        .header { background: #ffffff; border-radius: 14px; padding: 14px 18px; position: relative; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; grid-column: 1 / -1; }
         .header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #3b82f6, #6366f1, #8b5cf6); }
-        .help-meta { font-size: 9px; color: #b0b8c4; letter-spacing: 3px; font-family: {{monoFontFamily}}; margin-bottom: 6px; }
-        .help-title { font-size: 22px; font-weight: 900; color: #1a1a2e; display: flex; align-items: center; gap: 10px; }
-        .help-title-bar { width: 28px; height: 3px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 2px; }
-        .help-sub { font-size: 10px; color: #9ca3af; font-family: {{monoFontFamily}}; margin-top: 6px; letter-spacing: 1px; }
+        .help-meta { font-size: 8px; color: #b0b8c4; letter-spacing: 2px; font-family: {{monoFontFamily}}; margin-bottom: 4px; }
+        .help-title { font-size: 20px; font-weight: 900; color: #1a1a2e; display: flex; align-items: center; gap: 9px; }
+        .help-title-bar { width: 24px; height: 3px; background: linear-gradient(90deg, #3b82f6, #6366f1); border-radius: 2px; }
+        .help-sub { font-size: 9px; color: #9ca3af; font-family: {{monoFontFamily}}; margin-top: 4px; letter-spacing: 1px; }
 
-        .help-section { background: #ffffff; border-radius: 14px; margin-bottom: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
+        .help-section { background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border: 1px solid #e2e6ea; }
 
-        .section-header { display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-bottom: 1px solid #f0f2f5; }
-        .section-dot { width: 4px; height: 14px; border-radius: 2px; }
+        .section-header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-bottom: 1px solid #f0f2f5; }
+        .section-dot { width: 4px; height: 12px; border-radius: 2px; }
         .dot-orange { background: #f97316; }
         .dot-cyan { background: #06b6d4; }
         .dot-purple { background: #8b5cf6; }
         .dot-green { background: #22c55e; }
         .dot-red { background: #ef4444; }
         .dot-yellow { background: #eab308; }
-        .section-icon { font-size: 14px; flex-shrink: 0; }
-        .section-title { font-size: 13px; font-weight: bold; color: #1a1a2e; letter-spacing: 1px; }
+        .section-icon { font-size: 13px; flex-shrink: 0; }
+        .section-title { font-size: 12px; font-weight: bold; color: #1a1a2e; letter-spacing: 1px; }
 
         /*.cmd-list { padding: 6px 0; }
         .cmd-row { display: flex; align-items: baseline; padding: 5px 18px; gap: 14px; }
         .cmd-name { font-size: 12px; color: #3b82f6; font-family: {{monoFontFamily}}; white-space: nowrap; flex-shrink: 0; min-width: 200px; }
         .cmd-desc { font-size: 11px; color: #8c94a6; }*/
 
-        .cmd-list { padding: 6px 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 12px 18px; }
-        .cmd-row { background: #ffffff; border-radius: 6px; padding: 10px; }
-        .cmd-name { font-size: 11px; color: #22d3ee; font-family: 'Consolas', monospace; font-weight: bold; margin-bottom: 4px; word-break: break-all; }
-        .cmd-desc { font-size: 10px; color: #6a6e8a; line-height: 1.3; }
+        .cmd-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px 10px; }
+        .cmd-row { background: #f8fafc; border-radius: 6px; padding: 6px 7px; min-height: 38px; }
+        .cmd-name { font-size: 10px; color: #0891b2; font-family: {{monoFontFamily}}; font-weight: bold; margin-bottom: 2px; word-break: break-all; line-height: 1.2; }
+        .cmd-desc { font-size: 9px; color: #6a6e8a; line-height: 1.25; }
 
-        .note-row { padding: 6px 18px; font-size: 11px; color: #8c94a6; }
+        .note-row { padding: 5px 7px; font-size: 10px; color: #8c94a6; line-height: 1.35; }
         .note-label { color: #f97316; font-family: {{monoFontFamily}}; font-size: 10px; font-weight: bold; }
 
-        .help-footer { display: flex; justify-content: space-between; padding: 12px 0 2px; font-size: 9px; color: #b0b8c4; font-family: {{monoFontFamily}}; letter-spacing: 2px; }
+        .help-footer { display: flex; justify-content: space-between; padding: 3px 2px 0; font-size: 8px; color: #b0b8c4; font-family: {{monoFontFamily}}; letter-spacing: 2px; grid-column: 1 / -1; }
     </style>
 </head>
 
