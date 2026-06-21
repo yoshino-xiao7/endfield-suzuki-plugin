@@ -417,10 +417,8 @@ export class WikiApp extends plugin {
                 await this.downloadMedia(voice.url, filePath)
                 nodes.push({
                     title: `${safeName}-${safeLabel}${seq}`,
-                    message: [
-                        `${safeName}-${safeLabel}${seq}${voice.title ? `｜${voice.title}` : ''}${voice.profile ? `\n${voice.profile}` : ''}`,
-                        { type: 'record', data: { file: filePath } }
-                    ]
+                    text: `${safeName}-${safeLabel}${seq}${voice.title ? `｜${voice.title}` : ''}${voice.profile ? `\n${voice.profile}` : ''}`,
+                    filePath
                 })
             } catch (err) {
                 failed++
@@ -431,7 +429,7 @@ export class WikiApp extends plugin {
         if (nodes.length === 0) return e.reply(`❌ ${safeName}${safeLabel}下载失败`)
 
         try {
-            const chunks = this.chunk(nodes, 30)
+            const chunks = this.chunk(nodes, 10)
             for (let index = 0; index < chunks.length; index++) {
                 const chunkTitle = chunks.length > 1
                     ? `${safeName}${safeLabel} ${index + 1}/${chunks.length}`
@@ -457,8 +455,9 @@ export class WikiApp extends plugin {
 
     async sendDownloadedMediaOneByOne(e, nodes) {
         for (const node of nodes) {
-            const record = node.message.find(item => item?.type === 'record')
-            const text = node.message.find(item => typeof item === 'string')
+            const message = this.createVoiceMessage(node)
+            const text = message.find(item => typeof item === 'string')
+            const record = message.find(item => item?.type === 'record')
             if (text) await e.reply(text)
             if (record) await e.reply([record])
         }
@@ -468,12 +467,16 @@ export class WikiApp extends plugin {
         return {
             user_id: e.self_id || globalThis.Bot?.uin || e.user_id,
             nickname: 'Endfield Wiki',
-            message: node.message
+            message: this.createVoiceMessage(node)
         }
     }
 
     normalizeOneBotForwardNode(e, node) {
         const normalized = this.normalizeForwardNode(e, node)
+        return this.toOneBotForwardNode(normalized)
+    }
+
+    toOneBotForwardNode(normalized) {
         return {
             type: 'node',
             data: {
@@ -486,13 +489,18 @@ export class WikiApp extends plugin {
 
     async sendForwardMessages(e, title, nodes) {
         const normalizedNodes = nodes.map(node => this.normalizeForwardNode(e, node))
-        const oneBotNodes = nodes.map(node => this.normalizeOneBotForwardNode(e, node))
+        const oneBotNodes = normalizedNodes.map(node => this.toOneBotForwardNode(node))
         const target = e.group || e.friend || (e.group_id
             ? globalThis.Bot?.pickGroup?.(e.group_id)
             : globalThis.Bot?.pickUser?.(e.user_id))
         const errors = []
 
         const attempts = [
+            async () => {
+                if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
+                return target.sendForwardMsg(normalizedNodes)
+            },
+            async () => e.reply(oneBotNodes),
             async () => {
                 if (!target?.makeForwardMsg) throw new Error('target.makeForwardMsg unavailable')
                 const forwardMsg = await target.makeForwardMsg(normalizedNodes)
@@ -510,12 +518,7 @@ export class WikiApp extends plugin {
                 const forwardMsg = await e.friend.makeForwardMsg(normalizedNodes)
                 if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
                 return e.reply(forwardMsg)
-            },
-            async () => {
-                if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
-                return target.sendForwardMsg(normalizedNodes)
-            },
-            async () => e.reply(oneBotNodes)
+            }
         ]
 
         for (const attempt of attempts) {
@@ -528,6 +531,19 @@ export class WikiApp extends plugin {
         }
 
         throw new Error(errors.filter(Boolean).join('；') || '当前适配器不支持合并转发')
+    }
+
+    createVoiceMessage(node) {
+        if (!node.filePath) return node.message || []
+        return [
+            node.text,
+            this.createRecordSegment(node.filePath)
+        ].filter(Boolean)
+    }
+
+    createRecordSegment(filePath) {
+        const base64 = fs.readFileSync(filePath).toString('base64')
+        return { type: 'record', data: { file: `base64://${base64}` } }
     }
 
     async downloadMedia(url, filePath) {
