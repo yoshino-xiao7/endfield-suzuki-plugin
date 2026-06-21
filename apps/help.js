@@ -1,5 +1,4 @@
 import plugin from '../../../lib/plugins/plugin.js'
-import Render from '../model/render.js'
 
 export class HelpApp extends plugin {
     constructor() {
@@ -15,13 +14,7 @@ export class HelpApp extends plugin {
     }
 
     async help(e) {
-        try {
-            const img = await Render.renderHelp()
-            await e.reply(img)
-        } catch (err) {
-            logger.warn(`[Endfield] 帮助图片发送失败: ${err.message}`)
-            await e.reply(this.textHelp())
-        }
+        await e.reply(this.textHelp())
     }
 
     textHelp() {
