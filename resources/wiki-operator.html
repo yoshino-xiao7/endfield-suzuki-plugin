@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { zoom: 2; width: 720px; background: transparent; font-family: {{fontFamily}}; color: #162033; }
+        .page { background: #eef2f6; padding: 12px; border-radius: 16px; }
+        .card { height: 560px; background: #fff; border: 1px solid #dfe6ee; border-radius: 14px; overflow: hidden; display: grid; grid-template-columns: 260px 1fr; }
+        .art { position: relative; background: linear-gradient(145deg, #e5ebf3, #f9fbfd); overflow: hidden; }
+        .art img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+        .art::after { content: ''; position: absolute; inset: auto 0 0 0; height: 46%; background: linear-gradient(to top, rgba(10,18,31,0.78), rgba(10,18,31,0)); }
+        .namebox { position: absolute; left: 16px; right: 16px; bottom: 16px; color: #fff; z-index: 1; }
+        .name { font-size: 34px; line-height: 1; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,0.35); }
+        .id { margin-top: 7px; font-size: 9px; font-family: {{monoFontFamily}}; letter-spacing: 1px; opacity: 0.85; }
+        .main { padding: 14px; display: grid; grid-template-rows: auto auto 1fr auto; gap: 10px; min-width: 0; }
+        .top { border-bottom: 1px solid #edf1f6; padding-bottom: 10px; }
+        .meta { font-size: 9px; color: #8a96a8; font-family: {{monoFontFamily}}; letter-spacing: 2px; margin-bottom: 5px; }
+        .title { font-size: 26px; font-weight: 900; line-height: 1.05; color: #111827; }
+        .chips { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+        .chip { padding: 4px 7px; border-radius: 7px; background: #eef7ff; color: #2563eb; font-size: 10px; font-weight: 700; }
+        .quote { color: #0f766e; background: #ecfdf7; border: 1px solid #d0f2e6; border-radius: 10px; padding: 8px 10px; font-size: 12px; line-height: 1.35; font-weight: 700; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 0; }
+        .panel { border: 1px solid #e3e9f1; border-radius: 10px; overflow: hidden; background: #fbfcfe; min-width: 0; }
+        .panel-title { padding: 7px 9px; background: #f6f8fb; color: #253044; font-size: 11px; font-weight: 900; display: flex; align-items: center; gap: 6px; }
+        .dot { width: 4px; height: 12px; border-radius: 2px; background: linear-gradient(180deg, #06b6d4, #6366f1); }
+        .rows { padding: 7px 9px; display: grid; gap: 5px; }
+        .row { display: grid; grid-template-columns: 68px 1fr; gap: 6px; font-size: 10px; line-height: 1.25; }
+        .label { color: #8792a3; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .value { color: #263245; font-weight: 700; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .skill { padding: 7px 9px; border-top: 1px solid #edf1f6; }
+        .skill:first-child { border-top: 0; }
+        .skill-head { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+        .skill-name { font-size: 11px; font-weight: 900; color: #111827; }
+        .skill-desc { margin-top: 3px; font-size: 9px; color: #667085; line-height: 1.3; }
+        .statline { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px; }
+        .stat { font-size: 9px; color: #334155; background: #eef2f7; border-radius: 6px; padding: 3px 5px; max-width: 126px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .desc { font-size: 11px; line-height: 1.45; color: #485466; padding: 8px 9px; }
+        .bottom { display: grid; grid-template-columns: 1.2fr .8fr; gap: 8px; }
+        .tiny { font-size: 9px; color: #8a96a8; font-family: {{monoFontFamily}}; display: flex; justify-content: space-between; padding-top: 2px; }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="card">
+            <div class="art">
+                <img src="{{operator.illustration || operator.cover}}">
+                <div class="namebox">
+                    <div class="name">{{operator.name}}</div>
+                    <div class="id">WIKI ID {{operator.id}}</div>
+                </div>
+            </div>
+
+            <div class="main">
+                <div class="top">
+                    <div class="meta">ENDFIELD WIKI // OPERATOR</div>
+                    <div class="title">{{operator.name}}</div>
+                    <div class="chips">
+                        {{if operator.rarity}}<span class="chip">{{operator.rarity}}</span>{{/if}}
+                        {{if operator.profession}}<span class="chip">{{operator.profession}}</span>{{/if}}
+                        {{if operator.property}}<span class="chip">{{operator.property}}</span>{{/if}}
+                        {{if operator.weapon}}<span class="chip">{{operator.weapon}}</span>{{/if}}
+                        {{if operator.abilities}}<span class="chip">{{operator.abilities}}</span>{{/if}}
+                    </div>
+                </div>
+
+                {{if operator.quote}}
+                <div class="quote">{{operator.quote}}</div>
+                {{/if}}
+
+                <div class="grid">
+                    <div class="panel">
+                        <div class="panel-title"><span class="dot"></span>资料</div>
+                        <div class="rows">
+                            {{each operator.basicTable row}}
+                            <div class="row">
+                                <div class="label">{{row.label}}</div>
+                                <div class="value">{{row.value}}</div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-title"><span class="dot"></span>最终属性</div>
+                        <div class="rows">
+                            {{each operator.attributes row}}
+                            <div class="row">
+                                <div class="label">{{row.label}}</div>
+                                <div class="value">{{row.value}}</div>
+                            </div>
+                            {{/each}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom">
+                    <div class="panel">
+                        <div class="panel-title"><span class="dot"></span>战斗技能</div>
+                        {{each operator.skills skill}}
+                        <div class="skill">
+                            <div class="skill-head">
+                                <div class="skill-name">{{skill.title}}</div>
+                            </div>
+                            <div class="statline">
+                                {{each skill.stats stat}}
+                                <span class="stat">{{stat.label}} {{stat.value}}</span>
+                                {{/each}}
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-title"><span class="dot"></span>潜能</div>
+                        {{each operator.potentials item}}
+                        <div class="skill">
+                            <div class="skill-name">{{item.title}}</div>
+                            <div class="skill-desc">{{item.description}}</div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+
+                <div class="tiny">
+                    <span>{{operator.voiceActors.join(' / ')}}</span>
+                    <span>DATA FROM WIKI</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

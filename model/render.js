@@ -256,6 +256,39 @@ function buildWikiListItems(items) {
     })
 }
 
+function prepareWikiOperator(operator) {
+    const clone = {
+        ...operator,
+        cover: proxyWikiMediaUrl(operator.cover),
+        illustration: proxyWikiMediaUrl(operator.illustration || operator.cover),
+        description: compactText(operator.description, 170),
+        basicTable: (operator.basicTable || []).slice(0, 6),
+        attributes: (operator.attributes || []).slice(0, 4),
+        skills: (operator.skills || []).slice(0, 4).map(skill => ({
+            ...skill,
+            description: compactText(skill.description, 74),
+            stats: (skill.stats || []).slice(0, 3)
+        })),
+        potentials: (operator.potentials || []).slice(0, 3).map(item => ({
+            ...item,
+            description: compactText(item.description, 54)
+        })),
+        archiveSummary: (operator.archiveSummary || []).slice(0, 2).map(item => ({
+            ...item,
+            content: compactText(item.content, 70)
+        })),
+        voiceActors: (operator.voiceActors || []).slice(0, 4),
+        gallery: (operator.gallery || []).map(item => ({
+            ...item,
+            url: proxyWikiMediaUrl(item.url)
+        }))
+    }
+    clone.previewImage = clone.gallery.find(item => item.title !== '立绘')?.url || clone.cover
+    clone.meta = [clone.rarity, clone.profession, clone.property, clone.weapon].filter(Boolean).join(' / ')
+    clone.abilities = [clone.mainAbility, clone.subAbility].filter(Boolean).join(' / ')
+    return clone
+}
+
 export default class Render {
     static async renderHelp() {
         return await puppeteer.screenshot('endfield-help', {
@@ -311,6 +344,19 @@ export default class Render {
             hasTags: tags.length > 0,
             sections,
             hasSections: sections.length > 0
+        })
+    }
+
+    static async renderWikiOperator(operator) {
+        const data = prepareWikiOperator(operator)
+        return await puppeteer.screenshot('endfield-wiki-operator', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'wiki-operator.html'),
+            scale: 2,
+            type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            ...getFontConfig(),
+            operator: data
         })
     }
 

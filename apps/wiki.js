@@ -1,6 +1,7 @@
 import plugin from '../../../lib/plugins/plugin.js'
 import api from '../model/api.js'
 import Render from '../model/render.js'
+import { parseWikiOperator } from '../model/wiki.js'
 
 const WIKI_PREFIX_RE = /^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)/
 
@@ -91,7 +92,7 @@ export class WikiApp extends plugin {
 
         try {
             await e.reply(`⏳ 正在检索 Wiki：${keyword}`)
-            const res = await api.searchWiki(keyword, 1, 8)
+            const res = await api.searchWiki(keyword, 1, 6)
             const page = res.data || {}
             const list = page.list || []
 
@@ -104,7 +105,13 @@ export class WikiApp extends plugin {
                 return this.replyDetail(e, exact.id || exact.officialItemId, true)
             }
 
-            await e.reply(this.formatSearchResult(keyword, list, page))
+            const img = await Render.renderWikiList(list, {
+                keyword,
+                total: page.total || list.length,
+                page: page.page || 1,
+                size: page.size || 6
+            })
+            await e.reply(img)
         } catch (err) {
             this.handleError(e, err)
         }
@@ -153,7 +160,10 @@ export class WikiApp extends plugin {
         const item = await this.resolveDetail(query)
         const filters = await this.getFilters(item.categoryId || item.subTypeId)
         try {
-            const img = await Render.renderWikiDetail(item, filters)
+            const operator = parseWikiOperator(item)
+            const img = operator
+                ? await Render.renderWikiOperator(operator)
+                : await Render.renderWikiDetail(item, filters)
             await e.reply(img)
         } catch (err) {
             logger.warn(`[Endfield Wiki] 详情图片发送失败: ${err.message}`)
