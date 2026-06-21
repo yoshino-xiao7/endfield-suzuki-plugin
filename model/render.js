@@ -737,10 +737,10 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-gacha-records', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-records.html'),
-            scale: 2,
+            scale: 1,
             type: 'png',
-            deviceScaleFactor: 2,
-            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            deviceScaleFactor: 1,
+            setViewport: { width: 700, height: 100, deviceScaleFactor: 1 },
             ...getFontConfig(),
             records: fmtRecords,
             poolName,
@@ -955,10 +955,10 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-gacha-stats', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-stats.html'),
-            scale: 2,
+            scale: 1,
             type: 'png',
-            deviceScaleFactor: 2,
-            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            deviceScaleFactor: 1,
+            setViewport: { width: 800, height: 100, deviceScaleFactor: 1 },
             ...getFontConfig(),
             // Header
             playerName: playerInfo.name || '',
@@ -1178,10 +1178,10 @@ export default class Render {
 
         return await puppeteer.screenshot('endfield-gacha-pool', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'gacha-pool.html'),
-            scale: 2,
+            scale: 1,
             type: 'png',
-            deviceScaleFactor: 2,
-            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            deviceScaleFactor: 1,
+            setViewport: { width: 520, height: 100, deviceScaleFactor: 1 },
             ...getFontConfig(),
             filterType: guessFilterType(),
             filterLabel,
