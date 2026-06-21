@@ -1,4 +1,5 @@
 import plugin from '../../../lib/plugins/plugin.js'
+import Render from '../model/render.js'
 
 export class HelpApp extends plugin {
     constructor() {
@@ -14,7 +15,13 @@ export class HelpApp extends plugin {
     }
 
     async help(e) {
-        await e.reply(this.textHelp())
+        try {
+            const img = await Render.renderHelp()
+            await e.reply(img)
+        } catch (err) {
+            logger.warn(`[Endfield] 帮助渲染失败: ${err.message}`)
+            await e.reply(this.textHelp())
+        }
     }
 
     textHelp() {
@@ -34,9 +41,10 @@ export class HelpApp extends plugin {
   #终末地角色 <名称>　角色详情卡
   #终末地帝江号　帝江号基建
   #终末地基建　　领地基建
-  #终末地百科 <关键词>　Wiki条目查询
-  #终末地百科目录　Wiki分类目录
-  #终末地百科详情 <ID>　Wiki条目详情
+  #终末地wiki <关键词>　Wiki条目查询
+  #终末地wiki目录　Wiki分类目录
+  #终末地wiki详情 <ID>　Wiki条目详情
+  以上命令也可把 wiki 替换为百科
 
 🎰 抽卡
   #终末地同步抽卡　同步抽卡记录

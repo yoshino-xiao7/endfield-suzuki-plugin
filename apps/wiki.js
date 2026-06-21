@@ -3,7 +3,10 @@ import api from '../model/api.js'
 import Render from '../model/render.js'
 import { parseWikiOperator } from '../model/wiki.js'
 
-const WIKI_PREFIX_RE = /^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)/
+const WIKI_COMMAND_PATTERN = '#(?:终末地|endfield)\\s*(?:百科|[wW][iI][kK][iI]|图鉴)'
+const WIKI_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)/i
+const WIKI_DETAIL_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:详情|条目)/i
+const WIKI_SEARCH_PREFIX_RE = /^#(?:终末地|endfield)\s*(?:百科|wiki|图鉴)\s*(?:搜索|查询)/i
 
 function stripHtml(value) {
     return String(value || '')
@@ -79,16 +82,25 @@ export class WikiApp extends plugin {
             event: 'message',
             priority: 450,
             rule: [
-                { reg: '^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)(?:详情|条目)\\s*(.+)$', fnc: 'detail' },
-                { reg: '^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)(?:目录|分类)$', fnc: 'sidebar' },
-                { reg: '^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)\\s*(.*)$', fnc: 'search' }
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:详情|条目)\\s*(.+)$`, fnc: 'detail' },
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:目录|分类)$`, fnc: 'sidebar' },
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?:搜索|查询)\\s*(.+)$`, fnc: 'search' },
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*$`, fnc: 'index' },
+                { reg: `${WIKI_COMMAND_PATTERN}\\s*(?!(?:详情|条目|目录|分类|搜索|查询))(.+)$`, fnc: 'search' }
             ]
         })
     }
 
+    async index(e) {
+        return this.sidebar(e)
+    }
+
     async search(e) {
-        const keyword = e.msg.replace(WIKI_PREFIX_RE, '').trim()
-        if (!keyword) return this.sidebar(e)
+        const keyword = e.msg
+            .replace(WIKI_SEARCH_PREFIX_RE, '')
+            .replace(WIKI_PREFIX_RE, '')
+            .trim()
+        if (!keyword) return this.index(e)
 
         try {
             await e.reply(`⏳ 正在检索 Wiki：${keyword}`)
@@ -98,11 +110,6 @@ export class WikiApp extends plugin {
 
             if (list.length === 0) {
                 return await e.reply(`❌ Wiki 中没有找到「${keyword}」`)
-            }
-
-            const exact = list.find(item => item.name === keyword) || (list.length === 1 ? list[0] : null)
-            if (exact) {
-                return this.replyDetail(e, exact.id || exact.officialItemId, true)
             }
 
             const img = await Render.renderWikiList(list, {
@@ -118,10 +125,8 @@ export class WikiApp extends plugin {
     }
 
     async detail(e) {
-        const query = e.msg
-            .replace(/^#(?:终末地|endfield)(?:百科|wiki|Wiki|图鉴)(?:详情|条目)/, '')
-            .trim()
-        if (!query) return e.reply('❌ 请指定条目 ID 或名称，例如：#终末地百科详情 洛茜')
+        const query = e.msg.replace(WIKI_DETAIL_PREFIX_RE, '').trim()
+        if (!query) return e.reply('❌ 请指定条目 ID 或名称，例如：#终末地wiki详情 洛茜')
 
         try {
             await e.reply(`⏳ 正在获取 Wiki 详情：${query}`)
@@ -147,8 +152,8 @@ export class WikiApp extends plugin {
                 if (categories.length > 20) lines.push(`- ... 还有 ${categories.length - 20} 个分类`)
             }
 
-            lines.push('\n查询：#终末地百科 <关键词>')
-            lines.push('详情：#终末地百科详情 <条目ID或名称>')
+            lines.push('\n查询：#终末地wiki <关键词>（或 #终末地百科 <关键词>）')
+            lines.push('详情：#终末地wiki详情 <条目ID或名称>')
             await e.reply(lines.join('\n'))
         } catch (err) {
             this.handleError(e, err)
@@ -206,7 +211,7 @@ export class WikiApp extends plugin {
             const desc = this.getSummary(item, 72)
             lines.push(`\n${index + 1}. ${item.name || '未命名条目'}（ID: ${id}）`)
             if (desc) lines.push(`   ${desc}`)
-            lines.push(`   详情：#终末地百科详情 ${id}`)
+            lines.push(`   详情：#终末地wiki详情 ${id}`)
         })
 
         return lines.join('\n')

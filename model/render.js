@@ -293,10 +293,10 @@ export default class Render {
     static async renderHelp() {
         return await puppeteer.screenshot('endfield-help', {
             tplFile: path.join(PLUGIN_ROOT, 'resources', 'help.html'),
-            scale: 2,
+            scale: 1,
             type: 'png',
-            deviceScaleFactor: 2,
-            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            deviceScaleFactor: 1,
+            setViewport: { width: 1560, height: 100, deviceScaleFactor: 1 },
             ...getFontConfig()
         })
     }
