@@ -152,7 +152,7 @@ export class WikiApp extends plugin {
             if (voices.length === 0) return e.reply(`❌ 没有找到 ${item.name || query} 的语音文件`)
 
             const label = language && language !== '全部' ? `${language}语音` : '语音'
-            await this.downloadAndSendVoiceForward(e, item.name || query, voices, label)
+            await this.downloadAndSendMedia(e, item.name || query, voices, label)
         } catch (err) {
             this.handleError(e, err)
         }
@@ -386,7 +386,7 @@ export class WikiApp extends plugin {
             const filePath = path.join(dir, fileName)
             try {
                 await this.downloadMedia(media.url, filePath)
-                await this.sendLocalFile(e, filePath, fileName, media.type)
+                await this.sendLocalFile(e, filePath, fileName)
                 sent++
             } catch (err) {
                 failed++
@@ -395,155 +395,6 @@ export class WikiApp extends plugin {
         }
 
         await e.reply(`✅ ${safeName}${safeLabel}发送完成：成功 ${sent}，失败 ${failed}`)
-    }
-
-    async downloadAndSendVoiceForward(e, itemName, voices, label) {
-        const safeName = this.safeFileName(itemName)
-        const safeLabel = this.safeFileName(label)
-        const dir = path.join(WIKI_MEDIA_DIR, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
-        fs.mkdirSync(dir, { recursive: true })
-
-        await e.reply(`📦 找到 ${voices.length} 段${safeLabel}，开始下载并合并转发...`)
-        const nodes = []
-        let failed = 0
-
-        for (let index = 0; index < voices.length; index++) {
-            const voice = voices[index]
-            const ext = voice.extension || 'wav'
-            const seq = String(index + 1).padStart(2, '0')
-            const fileName = `${safeName}-${safeLabel}${seq}.${ext}`
-            const filePath = path.join(dir, fileName)
-            try {
-                await this.downloadMedia(voice.url, filePath)
-                nodes.push({
-                    title: `${safeName}-${safeLabel}${seq}`,
-                    text: `${safeName}-${safeLabel}${seq}${voice.title ? `｜${voice.title}` : ''}${voice.profile ? `\n${voice.profile}` : ''}`,
-                    filePath
-                })
-            } catch (err) {
-                failed++
-                logger.warn(`[Endfield Wiki] 下载语音失败 ${fileName}: ${err.message}`)
-            }
-        }
-
-        if (nodes.length === 0) return e.reply(`❌ ${safeName}${safeLabel}下载失败`)
-
-        try {
-            const chunks = this.chunk(nodes, 10)
-            for (let index = 0; index < chunks.length; index++) {
-                const chunkTitle = chunks.length > 1
-                    ? `${safeName}${safeLabel} ${index + 1}/${chunks.length}`
-                    : `${safeName}${safeLabel}`
-                await this.sendForwardMessages(e, chunkTitle, chunks[index])
-            }
-            await e.reply(`✅ ${safeName}${safeLabel}合并转发完成：成功 ${nodes.length}，失败 ${failed}`)
-        } catch (err) {
-            logger.warn(`[Endfield Wiki] 合并转发失败，改为逐条发送: ${err.message}`)
-            await e.reply(`⚠️ 当前适配器合并转发失败，改为逐条发送：${err.message}`)
-            await this.sendDownloadedMediaOneByOne(e, nodes)
-            await e.reply(`✅ ${safeName}${safeLabel}发送完成：成功 ${nodes.length}，失败 ${failed}`)
-        }
-    }
-
-    chunk(list, size) {
-        const chunks = []
-        for (let index = 0; index < list.length; index += size) {
-            chunks.push(list.slice(index, index + size))
-        }
-        return chunks
-    }
-
-    async sendDownloadedMediaOneByOne(e, nodes) {
-        for (const node of nodes) {
-            const message = this.createVoiceMessage(node)
-            const text = message.find(item => typeof item === 'string')
-            const record = message.find(item => item?.type === 'record')
-            if (text) await e.reply(text)
-            if (record) await e.reply([record])
-        }
-    }
-
-    normalizeForwardNode(e, node) {
-        return {
-            user_id: e.self_id || globalThis.Bot?.uin || e.user_id,
-            nickname: 'Endfield Wiki',
-            message: this.createVoiceMessage(node)
-        }
-    }
-
-    normalizeOneBotForwardNode(e, node) {
-        const normalized = this.normalizeForwardNode(e, node)
-        return this.toOneBotForwardNode(normalized)
-    }
-
-    toOneBotForwardNode(normalized) {
-        return {
-            type: 'node',
-            data: {
-                name: normalized.nickname,
-                uin: String(normalized.user_id || ''),
-                content: normalized.message
-            }
-        }
-    }
-
-    async sendForwardMessages(e, title, nodes) {
-        const normalizedNodes = nodes.map(node => this.normalizeForwardNode(e, node))
-        const oneBotNodes = normalizedNodes.map(node => this.toOneBotForwardNode(node))
-        const target = e.group || e.friend || (e.group_id
-            ? globalThis.Bot?.pickGroup?.(e.group_id)
-            : globalThis.Bot?.pickUser?.(e.user_id))
-        const errors = []
-
-        const attempts = [
-            async () => {
-                if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
-                return target.sendForwardMsg(normalizedNodes)
-            },
-            async () => e.reply(oneBotNodes),
-            async () => {
-                if (!target?.makeForwardMsg) throw new Error('target.makeForwardMsg unavailable')
-                const forwardMsg = await target.makeForwardMsg(normalizedNodes)
-                if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
-                return e.reply(forwardMsg)
-            },
-            async () => {
-                if (!e.group?.makeForwardMsg) throw new Error('e.group.makeForwardMsg unavailable')
-                const forwardMsg = await e.group.makeForwardMsg(normalizedNodes)
-                if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
-                return e.reply(forwardMsg)
-            },
-            async () => {
-                if (!e.friend?.makeForwardMsg) throw new Error('e.friend.makeForwardMsg unavailable')
-                const forwardMsg = await e.friend.makeForwardMsg(normalizedNodes)
-                if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
-                return e.reply(forwardMsg)
-            }
-        ]
-
-        for (const attempt of attempts) {
-            try {
-                await attempt()
-                return
-            } catch (err) {
-                errors.push(err.message)
-            }
-        }
-
-        throw new Error(errors.filter(Boolean).join('；') || '当前适配器不支持合并转发')
-    }
-
-    createVoiceMessage(node) {
-        if (!node.filePath) return node.message || []
-        return [
-            node.text,
-            this.createRecordSegment(node.filePath)
-        ].filter(Boolean)
-    }
-
-    createRecordSegment(filePath) {
-        const base64 = fs.readFileSync(filePath).toString('base64')
-        return { type: 'record', data: { file: `base64://${base64}` } }
     }
 
     async downloadMedia(url, filePath) {
@@ -563,7 +414,7 @@ export class WikiApp extends plugin {
         throw lastErr || new Error('下载失败')
     }
 
-    async sendLocalFile(e, filePath, fileName, mediaType = '') {
+    async sendLocalFile(e, filePath, fileName) {
         const errors = []
         const bot = globalThis.Bot
         const target = e.group_id ? bot?.pickGroup?.(e.group_id) : bot?.pickUser?.(e.user_id)
@@ -580,9 +431,6 @@ export class WikiApp extends plugin {
         }
         attempts.push(() => e.reply([{ type: 'file', data: { file: filePath, name: fileName } }]))
         attempts.push(() => e.reply([{ type: 'file', data: { file: `file://${filePath}`, name: fileName } }]))
-        if (mediaType === 'audio') {
-            attempts.push(() => e.reply([{ type: 'record', data: { file: filePath } }]))
-        }
 
         for (const attempt of attempts) {
             try {
