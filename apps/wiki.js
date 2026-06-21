@@ -475,11 +475,8 @@ export class WikiApp extends plugin {
             : globalThis.Bot?.pickUser?.(e.user_id))
         const errors = []
         const buildNodes = useFileUrl => files.map(file => this.normalizeForwardFileNode(e, file, useFileUrl))
-        const buildOneBotNodes = useFileUrl => buildNodes(useFileUrl).map(node => this.toOneBotForwardNode(node))
 
         const attempts = [
-            async () => e.reply(buildOneBotNodes(true)),
-            async () => e.reply(buildOneBotNodes(false)),
             async () => {
                 if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
                 return target.sendForwardMsg(buildNodes(true))
@@ -519,17 +516,6 @@ export class WikiApp extends plugin {
             user_id: e.self_id || globalThis.Bot?.uin || e.user_id,
             nickname: 'Endfield Wiki',
             message: [this.createFileSegment(file, useFileUrl)]
-        }
-    }
-
-    toOneBotForwardNode(normalized) {
-        return {
-            type: 'node',
-            data: {
-                name: normalized.nickname,
-                uin: String(normalized.user_id || ''),
-                content: normalized.message
-            }
         }
     }
 
