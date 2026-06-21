@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { zoom: 2; font-family: {{fontFamily}}; width: 760px; background: transparent; color: #18202f; }
+        .page { background: #eef2f6; padding: 18px; border-radius: 18px; }
+        .header { background: #fff; border: 1px solid #dfe6ee; border-radius: 14px; padding: 18px 20px; margin-bottom: 12px; position: relative; overflow: hidden; }
+        .header::before { content: ''; position: absolute; inset: 0 auto 0 0; width: 5px; background: linear-gradient(180deg, #06b6d4, #6366f1); }
+        .meta { font-size: 10px; color: #8a96a8; font-family: {{monoFontFamily}}; letter-spacing: 2px; margin-bottom: 6px; }
+        .title { font-size: 24px; font-weight: 900; color: #111827; }
+        .sub { margin-top: 6px; font-size: 11px; color: #7b8494; font-family: {{monoFontFamily}}; }
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .item { min-height: 132px; background: #fff; border: 1px solid #dfe6ee; border-radius: 12px; padding: 10px; display: grid; grid-template-columns: 92px 1fr; gap: 12px; overflow: hidden; }
+        .cover { width: 92px; height: 112px; border-radius: 9px; background: #dce4ed; overflow: hidden; display: flex; align-items: center; justify-content: center; color: #91a0b3; font-size: 11px; font-family: {{monoFontFamily}}; }
+        .cover img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+        .name { font-size: 17px; line-height: 1.2; font-weight: 800; color: #111827; word-break: break-all; }
+        .id { margin-top: 4px; font-size: 10px; color: #8a96a8; font-family: {{monoFontFamily}}; }
+        .desc { margin-top: 8px; font-size: 11px; line-height: 1.45; color: #5d6675; min-height: 32px; }
+        .tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+        .tag { max-width: 92px; padding: 3px 6px; border-radius: 6px; background: #edf6ff; color: #2563eb; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 10px; color: #9aa4b2; font-family: {{monoFontFamily}}; }
+        .empty { background: #fff; border: 1px solid #dfe6ee; border-radius: 12px; padding: 28px; text-align: center; color: #8a96a8; font-size: 14px; }
+        .footer { padding: 10px 2px 0; color: #9aa4b2; font-size: 9px; font-family: {{monoFontFamily}}; letter-spacing: 2px; display: flex; justify-content: space-between; }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="meta">ENDFIELD WIKI // SEARCH</div>
+            <div class="title">{{keyword || 'Wiki 条目'}}</div>
+            <div class="sub">TOTAL {{total}} · PAGE {{page}} · DETAIL: #终末地百科详情 &lt;ID&gt;</div>
+        </div>
+
+        {{if hasItems}}
+        <div class="grid">
+            {{each items item}}
+            <div class="item">
+                <div class="cover">
+                    {{if item.hasCover}}
+                    <img src="{{item.cover}}">
+                    {{else}}
+                    WIKI
+                    {{/if}}
+                </div>
+                <div>
+                    <div class="name">{{item.name}}</div>
+                    <div class="id">ID {{item.id}}</div>
+                    <div class="desc">{{item.desc}}</div>
+                    {{if item.tags.length}}
+                    <div class="tags">
+                        {{each item.tags tag}}
+                        <span class="tag">{{tag}}</span>
+                        {{/each}}
+                    </div>
+                    {{/if}}
+                    <div class="foot">
+                        <span>{{item.updatedAt || 'NO DATE'}}</span>
+                        <span>DETAIL</span>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        {{else}}
+        <div class="empty">没有找到匹配的 Wiki 条目</div>
+        {{/if}}
+
+        <div class="footer">
+            <span>ENDFIELD SUZUKI PLUGIN // WIKI</span>
+            <span>DATA FROM ENDFIELD WIKI API</span>
+        </div>
+    </div>
+</body>
+
+</html>

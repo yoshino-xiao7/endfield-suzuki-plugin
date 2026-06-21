@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { zoom: 2; font-family: {{fontFamily}}; width: 860px; background: transparent; color: #172033; }
+        .page { background: #eef2f6; padding: 18px; border-radius: 18px; }
+        .card { background: #fff; border: 1px solid #dfe6ee; border-radius: 16px; overflow: hidden; display: grid; grid-template-columns: 310px 1fr; min-height: 470px; }
+        .cover { position: relative; min-height: 470px; background: linear-gradient(145deg, #dde5ee, #f7f9fc); display: flex; align-items: center; justify-content: center; overflow: hidden; color: #8fa0b3; font-family: {{monoFontFamily}}; letter-spacing: 2px; }
+        .cover img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+        .cover::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 45%; background: linear-gradient(to top, rgba(10,18,31,0.62), rgba(10,18,31,0)); }
+        .cover-name { position: absolute; left: 18px; right: 18px; bottom: 18px; z-index: 1; color: #fff; }
+        .cover-name .name { font-size: 32px; line-height: 1.05; font-weight: 900; text-shadow: 0 2px 12px rgba(0,0,0,0.32); word-break: break-all; }
+        .cover-name .id { margin-top: 8px; font-size: 10px; font-family: {{monoFontFamily}}; letter-spacing: 1px; opacity: 0.84; }
+        .main { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .head { border-bottom: 1px solid #edf1f6; padding-bottom: 12px; }
+        .meta { font-size: 10px; color: #8a96a8; font-family: {{monoFontFamily}}; letter-spacing: 2px; margin-bottom: 6px; }
+        .title { font-size: 28px; line-height: 1.15; font-weight: 900; color: #111827; word-break: break-all; }
+        .status { display: flex; gap: 8px; margin-top: 9px; color: #6b7483; font-size: 11px; font-family: {{monoFontFamily}}; flex-wrap: wrap; }
+        .pill { padding: 4px 8px; border-radius: 7px; background: #eef7ff; color: #2563eb; }
+        .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .tag { padding: 5px 8px; border-radius: 7px; background: #edfdf8; color: #0f766e; font-size: 11px; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .section { border: 1px solid #e3e9f1; border-radius: 12px; overflow: hidden; }
+        .section-title { display: flex; align-items: center; gap: 8px; padding: 9px 12px; background: #f7f9fc; color: #253044; font-weight: 800; font-size: 13px; }
+        .dot { width: 4px; height: 14px; border-radius: 2px; background: linear-gradient(180deg, #06b6d4, #6366f1); }
+        .rows { padding: 8px 12px 10px; display: grid; gap: 7px; }
+        .row { display: grid; grid-template-columns: 96px 1fr; gap: 10px; align-items: start; font-size: 12px; line-height: 1.45; }
+        .label { color: #8a96a8; font-weight: 700; word-break: break-all; }
+        .value { color: #263245; word-break: break-word; }
+        .empty { border: 1px solid #e3e9f1; border-radius: 12px; padding: 24px; text-align: center; color: #8a96a8; font-size: 13px; }
+        .footer { margin-top: auto; padding-top: 4px; display: flex; justify-content: space-between; color: #a1abb8; font-size: 9px; font-family: {{monoFontFamily}}; letter-spacing: 2px; }
+    </style>
+</head>
+
+<body>
+    <div class="page">
+        <div class="card">
+            <div class="cover">
+                {{if item.hasCover}}
+                <img src="{{item.cover}}">
+                {{else}}
+                WIKI ENTRY
+                {{/if}}
+                <div class="cover-name">
+                    <div class="name">{{item.name}}</div>
+                    <div class="id">ID {{item.id || 'UNKNOWN'}}</div>
+                </div>
+            </div>
+
+            <div class="main">
+                <div class="head">
+                    <div class="meta">ENDFIELD WIKI // DETAIL</div>
+                    <div class="title">{{item.name}}</div>
+                    <div class="status">
+                        {{if item.categoryId}}<span class="pill">CATEGORY {{item.categoryId}}</span>{{/if}}
+                        {{if item.updatedAt}}<span class="pill">UPDATED {{item.updatedAt}}</span>{{/if}}
+                        <span class="pill">{{item.hasDetail ? 'DETAIL READY' : 'SUMMARY ONLY'}}</span>
+                    </div>
+                </div>
+
+                {{if hasTags}}
+                <div class="tags">
+                    {{each tags tag}}
+                    <span class="tag">{{tag}}</span>
+                    {{/each}}
+                </div>
+                {{/if}}
+
+                {{if hasSections}}
+                {{each sections section}}
+                <div class="section">
+                    <div class="section-title"><span class="dot"></span>{{section.title}}</div>
+                    <div class="rows">
+                        {{each section.rows row}}
+                        <div class="row">
+                            <div class="label">{{row.label}}</div>
+                            <div class="value">{{row.value}}</div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+                {{/each}}
+                {{else}}
+                <div class="empty">该条目暂无可展示的结构化详情</div>
+                {{/if}}
+
+                <div class="footer">
+                    <span>ENDFIELD SUZUKI PLUGIN // WIKI</span>
+                    <span>DATA FROM ENDFIELD WIKI API</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

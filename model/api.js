@@ -28,6 +28,10 @@ class EndfieldApi {
 
     get apiKey() { return this.config.apiKey }
     get baseUrl() { return this.config.apiBaseUrl }
+    get wikiBaseUrl() {
+        const base = String(this.baseUrl || '').replace(/\/+$/, '')
+        return base.endsWith('/endfield/wiki') ? base : `${base}/endfield/wiki`
+    }
 
     /**
      * 可重试的 HTTP 状态码（均为瞬态 / 网关超时错误）
@@ -98,6 +102,105 @@ class EndfieldApi {
 
         // 所有重试都失败了
         throw lastErr || new Error('请求失败，所有重试均已耗尽')
+    }
+
+    buildQuery(params = {}) {
+        const query = new URLSearchParams()
+        for (const [key, value] of Object.entries(params)) {
+            if (value === undefined || value === null || value === '') continue
+            query.set(key, Array.isArray(value) ? value.join(',') : String(value))
+        }
+        const text = query.toString()
+        return text ? `?${text}` : ''
+    }
+
+    async wikiRequest(reqPath, params = {}, timeout = 15000) {
+        const pathWithQuery = `${reqPath}${this.buildQuery(params)}`
+        const url = `${this.wikiBaseUrl}${pathWithQuery}`
+        const headers = { 'Content-Type': 'application/json' }
+        if (this.apiKey) headers['X-API-Key'] = this.apiKey
+
+        const res = await fetch(url, { method: 'GET', headers, timeout })
+        if (!res.ok) {
+            let errMsg = `HTTP ${res.status}`
+            try {
+                const errData = await res.json()
+                errMsg = errData.message || errData.msg || JSON.stringify(errData)
+            } catch { }
+            throw new Error(errMsg)
+        }
+
+        const data = await res.json()
+        logger.info(`[Endfield Wiki] GET ${pathWithQuery} => ${data.code}`)
+        if (data.code !== 200 || data.success === false) {
+            throw new Error(data.message || 'Wiki 请求失败')
+        }
+        return data
+    }
+
+    getWikiHome() { return this.wikiRequest('/home') }
+    getWikiSidebar() { return this.wikiRequest('/sidebar') }
+    getWikiCategories(catalogId) { return this.wikiRequest('/categories', { catalogId }) }
+    getWikiFilters(params = {}) { return this.wikiRequest('/filters', params) }
+    getWikiItems(params = {}) { return this.wikiRequest('/items/page', params) }
+    searchWiki(keyword, page = 1, size = 10, timeout = 15000) { return this.wikiRequest('/search', { keyword, page, size }, timeout) }
+    getWikiItemDetail(itemId, timeout = 15000) { return this.wikiRequest('/item/detail', { itemId }, timeout) }
+
+    getWikiMediaProxyUrl(url) {
+        if (!url || typeof url !== 'string') return url
+        try {
+            const parsed = new URL(url)
+            if (parsed.protocol === 'https:' && parsed.hostname === 'bbs.hycdn.cn') {
+                return `${this.wikiBaseUrl}/media/proxy?url=${encodeURIComponent(url)}`
+            }
+        } catch { }
+        return url
+    }
+
+    getWikiItemImage(item) {
+        const image = this.findFirstImageUrl(item)
+        return image ? this.getWikiMediaProxyUrl(image) : ''
+    }
+
+    findFirstImageUrl(value, seen = new Set()) {
+        if (!value) return ''
+        if (typeof value === 'string') {
+            return /^https?:\/\/.+\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(value) || value.includes('bbs.hycdn.cn')
+                ? value
+                : ''
+        }
+        if (typeof value !== 'object') return ''
+        if (seen.has(value)) return ''
+        seen.add(value)
+
+        const preferredKeys = ['cover', 'image', 'icon', 'avatar', 'avatarUrl', 'avatarSqUrl', 'avatarRtUrl', 'illustrationUrl', 'pic', 'mobilePic']
+        for (const key of preferredKeys) {
+            const found = this.findFirstImageUrl(value[key], seen)
+            if (found) return found
+        }
+        for (const child of Object.values(value)) {
+            const found = this.findFirstImageUrl(child, seen)
+            if (found) return found
+        }
+        return ''
+    }
+
+    async getWikiImageMap(names = []) {
+        const uniqueNames = [...new Set(names.map(n => String(n || '').trim()).filter(Boolean))].slice(0, 12)
+        const entries = await Promise.allSettled(uniqueNames.map(async name => {
+            const res = await this.searchWiki(name, 1, 5, 5000)
+            const list = res.data?.list || []
+            const item = list.find(i => i.name === name) || list.find(i => i.name?.includes(name)) || list[0]
+            return [name, item ? this.getWikiItemImage(item) : '']
+        }))
+
+        const map = {}
+        for (const entry of entries) {
+            if (entry.status !== 'fulfilled') continue
+            const [name, image] = entry.value
+            if (image) map[name] = image
+        }
+        return map
     }
 
     // ===== 绑定 =====

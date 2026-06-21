@@ -11,19 +11,21 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 const PLUGIN_ROOT = path.resolve(__dirname, '..')
 
-/**
- * 根据操作系统自动选择字体，也支持用户在配置中自定义
- * @returns {{ fontFamily: string, monoFontFamily: string }}
- */
-function getFontConfig() {
-    // 读取用户配置
+function getMergedConfig() {
     const defPath = path.join(PLUGIN_ROOT, 'defSet/config.yaml')
     const cfgPath = path.join(PLUGIN_ROOT, 'config/config.yaml')
     const def = YAML.parse(fs.readFileSync(defPath, 'utf8')) || {}
     let cfg = {}
     if (fs.existsSync(cfgPath)) cfg = YAML.parse(fs.readFileSync(cfgPath, 'utf8')) || {}
-    const merged = { ...def, ...cfg }
+    return { ...def, ...cfg }
+}
 
+/**
+ * 根据操作系统自动选择字体，也支持用户在配置中自定义
+ * @returns {{ fontFamily: string, monoFontFamily: string }}
+ */
+function getFontConfig() {
+    const merged = getMergedConfig()
     const platform = os.platform() // 'win32' | 'linux' | 'darwin'
 
     // 主字体：用户自定义 > 平台默认
@@ -54,6 +56,206 @@ function getFontConfig() {
     return { fontFamily, monoFontFamily }
 }
 
+function getWikiBaseUrl() {
+    const base = String(getMergedConfig().apiBaseUrl || '').replace(/\/+$/, '')
+    return base.endsWith('/endfield/wiki') ? base : `${base}/endfield/wiki`
+}
+
+function proxyWikiMediaUrl(url) {
+    if (!url || typeof url !== 'string') return ''
+    try {
+        const parsed = new URL(url)
+        if (parsed.protocol === 'https:' && parsed.hostname === 'bbs.hycdn.cn') {
+            return `${getWikiBaseUrl()}/media/proxy?url=${encodeURIComponent(url)}`
+        }
+    } catch { }
+    return url
+}
+
+function stripHtml(value) {
+    return String(value || '')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+}
+
+function compactText(value, maxLength = 180) {
+    const text = stripHtml(value).replace(/\s+/g, ' ').trim()
+    if (!text) return ''
+    return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text
+}
+
+function isImageUrl(value) {
+    return typeof value === 'string'
+        && (/^https?:\/\/.+\.(png|jpe?g|webp|gif)(\?.*)?$/i.test(value) || value.includes('bbs.hycdn.cn'))
+}
+
+function findFirstImageUrl(value, seen = new Set()) {
+    if (!value) return ''
+    if (isImageUrl(value)) return value
+    if (typeof value !== 'object') return ''
+    if (seen.has(value)) return ''
+    seen.add(value)
+
+    const preferredKeys = ['cover', 'image', 'icon', 'avatar', 'avatarUrl', 'avatarSqUrl', 'avatarRtUrl', 'illustrationUrl', 'pic', 'mobilePic']
+    for (const key of preferredKeys) {
+        const found = findFirstImageUrl(value[key], seen)
+        if (found) return found
+    }
+    for (const child of Object.values(value)) {
+        const found = findFirstImageUrl(child, seen)
+        if (found) return found
+    }
+    return ''
+}
+
+const WIKI_LABELS = {
+    name: '名称',
+    title: '标题',
+    desc: '描述',
+    description: '描述',
+    content: '内容',
+    rarity: '稀有度',
+    profession: '职业',
+    property: '属性',
+    faction: '阵营',
+    race: '种族',
+    gender: '性别',
+    weapon: '武器',
+    position: '定位',
+    tagValue: '标签值',
+    categoryId: '分类',
+    updatedAt: '更新时间',
+    publishedAt: '发布时间'
+}
+
+function labelOf(key) {
+    return WIKI_LABELS[key] || String(key || '').replace(/([A-Z])/g, ' $1').replace(/_/g, ' ')
+}
+
+function displaySimpleValue(value) {
+    if (value === undefined || value === null || value === '') return ''
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+    if (typeof value === 'string') {
+        if (isImageUrl(value)) return ''
+        return compactText(value)
+    }
+    if (Array.isArray(value)) {
+        const simple = value
+            .map(v => displaySimpleValue(v))
+            .filter(Boolean)
+            .slice(0, 6)
+        return simple.length ? simple.join(' / ') : ''
+    }
+    if (typeof value === 'object') {
+        for (const key of ['value', 'name', 'title', 'text', 'description', 'desc']) {
+            const text = displaySimpleValue(value[key])
+            if (text) return text
+        }
+    }
+    return ''
+}
+
+function collectRows(value, limit = 10, depth = 0, prefix = '') {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return []
+    const rows = []
+    const skipKeys = new Set(['id', 'cover', 'image', 'icon', 'avatar', 'avatarUrl', 'avatarSqUrl', 'avatarRtUrl', 'illustrationUrl', 'createdAt', 'updatedAt', 'detailData', 'chapters', 'widgets'])
+
+    for (const [key, child] of Object.entries(value)) {
+        if (rows.length >= limit) break
+        if (skipKeys.has(key) || key.toLowerCase().includes('url')) continue
+
+        const simple = displaySimpleValue(child)
+        if (simple) {
+            rows.push({ label: prefix ? `${prefix}.${labelOf(key)}` : labelOf(key), value: simple })
+            continue
+        }
+
+        if (child && typeof child === 'object' && !Array.isArray(child) && depth < 1) {
+            rows.push(...collectRows(child, limit - rows.length, depth + 1, labelOf(key)))
+        }
+    }
+
+    return rows
+}
+
+function normalizeTagIds(tagIds) {
+    if (!tagIds) return []
+    if (Array.isArray(tagIds)) return tagIds.map(String).filter(Boolean)
+    if (typeof tagIds === 'string') return tagIds.split(',').map(s => s.trim()).filter(Boolean)
+    if (typeof tagIds === 'object') return Object.values(tagIds).flat().map(String).filter(Boolean)
+    return []
+}
+
+function formatTime(value) {
+    if (!value) return ''
+    const date = typeof value === 'number'
+        ? new Date(value > 1000000000000 ? value : value * 1000)
+        : new Date(value)
+    if (Number.isNaN(date.getTime())) return ''
+    return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
+}
+
+function buildWikiTags(item, filters = []) {
+    const filterMap = new Map(filters.map(f => [String(f.tagId), f.name]))
+    return normalizeTagIds(item.tagIds)
+        .map(tag => filterMap.get(String(tag)) || String(tag))
+        .filter(Boolean)
+        .slice(0, 8)
+}
+
+function buildWikiSections(item) {
+    const sections = []
+    const briefRows = collectRows(item.briefData, 10)
+    if (briefRows.length) sections.push({ title: '基础资料', rows: briefRows })
+
+    const captionRows = collectRows(item.caption, 8)
+    if (captionRows.length) sections.push({ title: '简介', rows: captionRows })
+
+    const chapterSections = []
+    for (const chapter of item.chapters || []) {
+        const rows = []
+        for (const widget of chapter.widgets || []) {
+            if (widget.type === 'entryInfo') continue
+            rows.push(...collectRows(widget.content, 8 - rows.length))
+            if (rows.length >= 8) break
+        }
+        if (rows.length) chapterSections.push({ title: chapter.title || '详情', rows })
+        if (chapterSections.length >= 3) break
+    }
+    sections.push(...chapterSections)
+
+    if (sections.length === 0) {
+        const rawRows = collectRows(item.detailData, 12)
+        if (rawRows.length) sections.push({ title: '详情', rows: rawRows })
+    }
+
+    return sections.slice(0, 5)
+}
+
+function buildWikiListItems(items) {
+    return (items || []).map(item => {
+        const cover = proxyWikiMediaUrl(item.cover || findFirstImageUrl(item))
+        const rows = collectRows(item.briefData, 4)
+        const desc = displaySimpleValue(item.caption?.title)
+            || rows.map(r => `${r.label}: ${r.value}`).join(' · ')
+            || (item.hasDetail ? '已同步详情' : '暂无详情')
+
+        return {
+            id: item.id || item.officialItemId || '',
+            name: item.name || '未命名条目',
+            cover,
+            hasCover: Boolean(cover),
+            desc: compactText(desc, 80),
+            tags: normalizeTagIds(item.tagIds).slice(0, 4),
+            updatedAt: formatTime(item.updatedAt || item.publishedAt)
+        }
+    })
+}
+
 export default class Render {
     static async renderHelp() {
         return await puppeteer.screenshot('endfield-help', {
@@ -63,6 +265,52 @@ export default class Render {
             deviceScaleFactor: 2,
             setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
             ...getFontConfig()
+        })
+    }
+
+    static async renderWikiList(items, meta = {}) {
+        const list = items || []
+        return await puppeteer.screenshot('endfield-wiki-list', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'wiki-list.html'),
+            scale: 2,
+            type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            ...getFontConfig(),
+            keyword: meta.keyword || '',
+            page: meta.page || 1,
+            size: meta.size || 10,
+            total: meta.total || list.length,
+            items: buildWikiListItems(list),
+            hasItems: list.length > 0
+        })
+    }
+
+    static async renderWikiDetail(item, filters = []) {
+        const cover = proxyWikiMediaUrl(item.cover || findFirstImageUrl(item))
+        const tags = buildWikiTags(item, filters)
+        const sections = buildWikiSections(item)
+
+        return await puppeteer.screenshot('endfield-wiki-detail', {
+            tplFile: path.join(PLUGIN_ROOT, 'resources', 'wiki-detail.html'),
+            scale: 2,
+            type: 'png',
+            deviceScaleFactor: 2,
+            setViewport: { width: 1600, height: 100, deviceScaleFactor: 2 },
+            ...getFontConfig(),
+            item: {
+                id: item.id || item.officialItemId || '',
+                name: item.name || '未命名条目',
+                categoryId: item.categoryId || item.subTypeId || '',
+                cover,
+                hasCover: Boolean(cover),
+                hasDetail: item.hasDetail !== false,
+                updatedAt: formatTime(item.updatedAt || item.publishedAt)
+            },
+            tags,
+            hasTags: tags.length > 0,
+            sections,
+            hasSections: sections.length > 0
         })
     }
 

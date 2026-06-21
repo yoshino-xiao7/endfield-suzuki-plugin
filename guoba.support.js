@@ -21,7 +21,7 @@ export function supportGuoba() {
             link: '',
             isV3: true,
             isV2: false,
-            description: '终末地签到、角色查询',
+            description: '终末地签到、角色查询、Wiki百科',
             icon: 'mdi:robot-outline',
             iconColor: '#7c4dff'
         },

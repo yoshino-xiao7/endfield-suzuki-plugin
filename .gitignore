@@ -17,6 +17,7 @@ data/
 数据.txt
 
 # 开发文档 (不需要发布)
+/docs/
 yunzai_plugin_guide.md
 
 # Node
