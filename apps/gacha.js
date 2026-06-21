@@ -92,6 +92,7 @@ export class GachaApp extends plugin {
             }
 
             if (records.length === 0) return e.reply('📋 暂无抽卡记录，请先同步: #终末地同步抽卡')
+            await this._enrichPlayerAvatarsWithWiki(playerInfo, records)
 
             // 有池名筛选时用紧凑单列模板，否则用全量三列模板
             const img = poolName
@@ -134,6 +135,7 @@ export class GachaApp extends plugin {
             const playerInfo = this._extractPlayerInfo(cardRes)
 
             if (records.length === 0) return e.reply('📋 暂无记录，请先同步: #终末地同步抽卡')
+            await this._enrichPlayerAvatarsWithWiki(playerInfo, records)
 
             const img = await Render.renderGachaPool(records, pools, playerInfo, displayName)
             e.reply(img)
@@ -165,6 +167,7 @@ export class GachaApp extends plugin {
             const playerInfo = this._extractPlayerInfo(cardRes)
 
             if (records.length === 0) return e.reply('📋 暂无抽卡记录，请先同步: #终末地同步抽卡')
+            await this._enrichPlayerAvatarsWithWiki(playerInfo, records)
 
             const img = await Render.renderGachaStats(records, pools, playerInfo)
             e.reply(img)
@@ -206,5 +209,25 @@ export class GachaApp extends plugin {
         } catch {
             return {}
         }
+    }
+
+    async _enrichPlayerAvatarsWithWiki(playerInfo, records) {
+        try {
+            playerInfo.charAvatars = playerInfo.charAvatars || {}
+            const names = [...new Set((records || [])
+                .filter(r => Number(r.rarity) >= 6)
+                .map(r => r.itemName)
+                .filter(Boolean))]
+            const missing = names.filter(name => !playerInfo.charAvatars[name])
+            if (missing.length === 0) return playerInfo
+
+            const wikiAvatars = await api.getWikiAvatarMap(missing)
+            for (const [name, image] of Object.entries(wikiAvatars)) {
+                if (!playerInfo.charAvatars[name]) playerInfo.charAvatars[name] = image
+            }
+        } catch (err) {
+            logger.warn(`[Endfield] Wiki 头像补全失败: ${err.message}`)
+        }
+        return playerInfo
     }
 }

@@ -162,6 +162,33 @@ class EndfieldApi {
         return image ? this.getWikiMediaProxyUrl(image) : ''
     }
 
+    getWikiItemCover(item) {
+        const image = item?.cover || item?.briefData?.cover || item?.detailData?.brief?.cover || ''
+        return image ? this.getWikiMediaProxyUrl(image) : ''
+    }
+
+    async getWikiAvatarMap(names = []) {
+        const uniqueNames = [...new Set(names.map(name => String(name || '').trim()).filter(Boolean))].slice(0, 12)
+        if (uniqueNames.length === 0) return {}
+
+        const entries = await Promise.allSettled(uniqueNames.map(async name => {
+            const res = await this.searchWiki(name, 1, 5, 5000)
+            const list = res.data?.list || []
+            const item = list.find(i => i.name === name)
+                || list.find(i => i.name?.includes(name))
+                || list[0]
+            return [name, item ? this.getWikiItemCover(item) : '']
+        }))
+
+        const map = {}
+        for (const entry of entries) {
+            if (entry.status !== 'fulfilled') continue
+            const [name, image] = entry.value || []
+            if (name && image) map[name] = image
+        }
+        return map
+    }
+
     findFirstImageUrl(value, seen = new Set()) {
         if (!value) return ''
         if (typeof value === 'string') {
