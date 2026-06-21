@@ -152,7 +152,7 @@ export class WikiApp extends plugin {
             if (voices.length === 0) return e.reply(`❌ 没有找到 ${item.name || query} 的语音文件`)
 
             const label = language && language !== '全部' ? `${language}语音` : '语音'
-            await this.downloadAndSendMedia(e, item.name || query, voices, label)
+            await this.downloadAndSendMediaForward(e, item.name || query, voices, label)
         } catch (err) {
             this.handleError(e, err)
         }
@@ -395,6 +395,152 @@ export class WikiApp extends plugin {
         }
 
         await e.reply(`✅ ${safeName}${safeLabel}发送完成：成功 ${sent}，失败 ${failed}`)
+    }
+
+    async downloadAndSendMediaForward(e, itemName, mediaList, label) {
+        const safeName = this.safeFileName(itemName)
+        const safeLabel = this.safeFileName(label)
+        const dir = path.join(WIKI_MEDIA_DIR, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
+        fs.mkdirSync(dir, { recursive: true })
+
+        await e.reply(`📦 找到 ${mediaList.length} 个${safeLabel}文件，开始下载并合并转发...`)
+        const files = []
+        let failed = 0
+
+        for (let index = 0; index < mediaList.length; index++) {
+            const media = mediaList[index]
+            const ext = media.extension || 'dat'
+            const seq = String(index + 1).padStart(2, '0')
+            const fileName = `${safeName}-${safeLabel}${seq}.${ext}`
+            const filePath = path.join(dir, fileName)
+            try {
+                await this.downloadMedia(media.url, filePath)
+                files.push({ fileName, filePath })
+            } catch (err) {
+                failed++
+                logger.warn(`[Endfield Wiki] 下载媒体失败 ${fileName}: ${err.message}`)
+            }
+        }
+
+        if (files.length === 0) return e.reply(`❌ ${safeName}${safeLabel}下载失败`)
+
+        let forwarded = 0
+        try {
+            const chunks = this.chunk(files, 20)
+            for (let index = 0; index < chunks.length; index++) {
+                const chunkTitle = chunks.length > 1
+                    ? `${safeName}${safeLabel} ${index + 1}/${chunks.length}`
+                    : `${safeName}${safeLabel}`
+                await this.sendForwardFiles(e, chunkTitle, chunks[index])
+                forwarded += chunks[index].length
+            }
+            await e.reply(`✅ ${safeName}${safeLabel}合并转发完成：成功 ${files.length}，失败 ${failed}`)
+        } catch (err) {
+            const remaining = forwarded > 0 ? files.slice(forwarded) : files
+            logger.warn(`[Endfield Wiki] 合并转发文件失败，改为逐个发送: ${err.message}`)
+            await e.reply(`⚠️ 当前适配器合并转发文件失败，改为逐个发文件：${err.message}`)
+            const result = await this.sendDownloadedFiles(e, remaining)
+            await e.reply(`✅ ${safeName}${safeLabel}发送完成：合并转发 ${forwarded}，文件发送成功 ${result.sent}，失败 ${failed + result.failed}`)
+        }
+    }
+
+    chunk(list, size) {
+        const chunks = []
+        for (let index = 0; index < list.length; index += size) {
+            chunks.push(list.slice(index, index + size))
+        }
+        return chunks
+    }
+
+    async sendDownloadedFiles(e, files) {
+        let sent = 0
+        let failed = 0
+
+        for (const file of files) {
+            try {
+                await this.sendLocalFile(e, file.filePath, file.fileName)
+                sent++
+            } catch (err) {
+                failed++
+                logger.warn(`[Endfield Wiki] 发送文件失败 ${file.fileName}: ${err.message}`)
+            }
+        }
+
+        return { sent, failed }
+    }
+
+    async sendForwardFiles(e, title, files) {
+        const target = e.group || e.friend || (e.group_id
+            ? globalThis.Bot?.pickGroup?.(e.group_id)
+            : globalThis.Bot?.pickUser?.(e.user_id))
+        const errors = []
+        const buildNodes = useFileUrl => files.map(file => this.normalizeForwardFileNode(e, file, useFileUrl))
+        const buildOneBotNodes = useFileUrl => buildNodes(useFileUrl).map(node => this.toOneBotForwardNode(node))
+
+        const attempts = [
+            async () => e.reply(buildOneBotNodes(true)),
+            async () => e.reply(buildOneBotNodes(false)),
+            async () => {
+                if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
+                return target.sendForwardMsg(buildNodes(true))
+            },
+            async () => {
+                if (!target?.sendForwardMsg) throw new Error('target.sendForwardMsg unavailable')
+                return target.sendForwardMsg(buildNodes(false))
+            },
+            async () => {
+                if (!target?.makeForwardMsg) throw new Error('target.makeForwardMsg unavailable')
+                const forwardMsg = await target.makeForwardMsg(buildNodes(true))
+                if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
+                return e.reply(forwardMsg)
+            },
+            async () => {
+                if (!target?.makeForwardMsg) throw new Error('target.makeForwardMsg unavailable')
+                const forwardMsg = await target.makeForwardMsg(buildNodes(false))
+                if (forwardMsg?.data?.meta?.detail) forwardMsg.data.meta.detail.news = [{ text: title }]
+                return e.reply(forwardMsg)
+            }
+        ]
+
+        for (const attempt of attempts) {
+            try {
+                await attempt()
+                return
+            } catch (err) {
+                errors.push(err.message)
+            }
+        }
+
+        throw new Error(errors.filter(Boolean).join('；') || '当前适配器不支持合并转发文件')
+    }
+
+    normalizeForwardFileNode(e, file, useFileUrl) {
+        return {
+            user_id: e.self_id || globalThis.Bot?.uin || e.user_id,
+            nickname: 'Endfield Wiki',
+            message: [this.createFileSegment(file, useFileUrl)]
+        }
+    }
+
+    toOneBotForwardNode(normalized) {
+        return {
+            type: 'node',
+            data: {
+                name: normalized.nickname,
+                uin: String(normalized.user_id || ''),
+                content: normalized.message
+            }
+        }
+    }
+
+    createFileSegment(file, useFileUrl = false) {
+        return {
+            type: 'file',
+            data: {
+                file: useFileUrl ? `file://${file.filePath}` : file.filePath,
+                name: file.fileName
+            }
+        }
     }
 
     async downloadMedia(url, filePath) {
