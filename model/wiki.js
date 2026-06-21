@@ -14,12 +14,28 @@ function inlineText(inlineElements = []) {
     }).join(''))
 }
 
+function inlineLinks(inlineElements = []) {
+    return inlineElements
+        .filter(item => item?.link?.link)
+        .map(item => ({
+            title: normalizeText(item.link.text || item.link.link),
+            url: item.link.link
+        }))
+}
+
 function blockText(block) {
     if (!block) return ''
     if (block.kind === 'text') return inlineText(block.text?.inlineElements || [])
     if (block.kind === 'quote') return inlineText(block.quote?.inlineElements || [])
     if (block.kind === 'image') return normalizeText(block.image?.description || '')
     return ''
+}
+
+function blockLinks(block) {
+    if (!block) return []
+    if (block.kind === 'text') return inlineLinks(block.text?.inlineElements || [])
+    if (block.kind === 'quote') return inlineLinks(block.quote?.inlineElements || [])
+    return []
 }
 
 function orderedValues(map = {}, ids = []) {
@@ -71,6 +87,13 @@ function getDocumentImages(detailData, contentId, limit = 4) {
             height: Number(block.image.height || 0),
             format: block.image.format || ''
         }))
+        .slice(0, limit)
+}
+
+function getDocumentLinks(detailData, contentId, limit = 8) {
+    return getDocumentBlocks(detailData, contentId)
+        .flatMap(blockLinks)
+        .filter(link => link.url)
         .slice(0, limit)
 }
 
@@ -287,6 +310,122 @@ function extractVoiceActors(detailData) {
         .slice(0, 4)
 }
 
+function extensionFromUrl(url, fallback = '') {
+    try {
+        const pathname = new URL(url).pathname
+        const ext = pathname.split('/').pop()?.split('.').pop() || ''
+        return ext ? ext.toLowerCase() : fallback
+    } catch {
+        const ext = String(url || '').split('?')[0].split('/').pop()?.split('.').pop() || ''
+        return ext ? ext.toLowerCase() : fallback
+    }
+}
+
+function mediaTypeFromUrl(url) {
+    const ext = extensionFromUrl(url)
+    if (['wav', 'mp3', 'flac', 'ogg', 'm4a', 'aac'].includes(ext)) return 'audio'
+    if (['mp4', 'mov', 'webm', 'mkv', 'm4v'].includes(ext)) return 'video'
+    return ''
+}
+
+function widgetTitleMap(detailData) {
+    const map = new Map()
+    for (const group of detailData?.document?.chapterGroup || []) {
+        for (const widget of group.widgets || []) {
+            if (widget.id) map.set(widget.id, widget.title || group.title || '')
+        }
+    }
+    return map
+}
+
+function collectAudioMedia(item) {
+    const detailData = item.detailData || {}
+    const titleMap = widgetTitleMap(detailData)
+    const result = {
+        voices: [],
+        audios: []
+    }
+
+    for (const [widgetId, widget] of Object.entries(detailData.document?.widgetCommonMap || {})) {
+        const widgetTitle = titleMap.get(widgetId) || widget.title || ''
+        const tabTitleMap = new Map((widget.tabList || []).map(tab => [tab.tabId, tab.title || '']))
+
+        for (const [tabId, tabData] of Object.entries(widget.tabDataMap || {})) {
+            const tabTitle = tabTitleMap.get(tabId) || ''
+            for (const audio of tabData.audioList || []) {
+                if (!audio.resourceUrl) continue
+                const media = {
+                    type: 'audio',
+                    widgetTitle,
+                    language: normalizeText(tabTitle),
+                    title: normalizeText(audio.title),
+                    profile: normalizeText(audio.profile),
+                    url: audio.resourceUrl,
+                    extension: extensionFromUrl(audio.resourceUrl, 'wav')
+                }
+                result.audios.push(media)
+                if (widgetTitle.includes('语音')) result.voices.push(media)
+            }
+        }
+    }
+
+    return result
+}
+
+function collectVideoMedia(item) {
+    const detailData = item.detailData || {}
+    const videos = []
+    const links = []
+    const seen = new Set()
+
+    for (const [widgetId, widget] of Object.entries(detailData.document?.widgetCommonMap || {})) {
+        const titleMap = widgetTitleMap(detailData)
+        const widgetTitle = titleMap.get(widgetId) || widget.title || ''
+        const isOfficialMedia = /演示|EP|MV|影像|视频|记事社/.test(widgetTitle)
+        if (!isOfficialMedia) continue
+
+        for (const tab of widget.tabList || []) {
+            const contentId = widget.tabDataMap?.[tab.tabId]?.content
+            const tabTitle = tab.title || widgetTitle
+            for (const link of getDocumentLinks(detailData, contentId, 8)) {
+                const key = link.url
+                if (seen.has(key)) continue
+                seen.add(key)
+                links.push({
+                    widgetTitle,
+                    title: link.title || tabTitle,
+                    url: link.url
+                })
+            }
+        }
+    }
+
+    const visit = (value, title = '') => {
+        if (!value) return
+        if (Array.isArray(value)) {
+            value.forEach(item => visit(item, title))
+            return
+        }
+        if (typeof value !== 'object') return
+
+        const currentTitle = normalizeText(value.title || value.name || value.description || title)
+        const url = value.resourceUrl || value.videoUrl || value.url || ''
+        if (url && mediaTypeFromUrl(url) === 'video' && !seen.has(url)) {
+            seen.add(url)
+            videos.push({
+                type: 'video',
+                title: currentTitle,
+                url,
+                extension: extensionFromUrl(url, 'mp4')
+            })
+        }
+        for (const child of Object.values(value)) visit(child, currentTitle)
+    }
+    visit(detailData)
+
+    return { videos, links }
+}
+
 function extractMaterialImages(detailData) {
     const gallery = []
     for (const widgetTitle of ['干员演示', '干员EP', '塔卫二记事社']) {
@@ -417,6 +556,18 @@ export function parseWikiOperator(item) {
     }
 }
 
+export function extractWikiMedia(item) {
+    const audio = collectAudioMedia(item)
+    const video = collectVideoMedia(item)
+    return {
+        voices: audio.voices,
+        audios: audio.audios,
+        videos: video.videos,
+        videoLinks: video.links
+    }
+}
+
 export default {
-    parseWikiOperator
+    parseWikiOperator,
+    extractWikiMedia
 }

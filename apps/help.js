@@ -44,6 +44,8 @@ export class HelpApp extends plugin {
   #终末地wiki <关键词>　Wiki条目查询
   #终末地wiki目录　Wiki分类目录
   #终末地wiki详情 <ID>　Wiki条目详情
+  #终末地wiki语音 <名称>　下载干员语音
+  #终末地wiki mv <名称>　获取MV/演示资源
   以上命令也可把 wiki 替换为百科
 
 🎰 抽卡
