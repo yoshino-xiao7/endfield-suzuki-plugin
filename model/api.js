@@ -185,24 +185,6 @@ class EndfieldApi {
         return ''
     }
 
-    async getWikiImageMap(names = []) {
-        const uniqueNames = [...new Set(names.map(n => String(n || '').trim()).filter(Boolean))].slice(0, 12)
-        const entries = await Promise.allSettled(uniqueNames.map(async name => {
-            const res = await this.searchWiki(name, 1, 5, 5000)
-            const list = res.data?.list || []
-            const item = list.find(i => i.name === name) || list.find(i => i.name?.includes(name)) || list[0]
-            return [name, item ? this.getWikiItemImage(item) : '']
-        }))
-
-        const map = {}
-        for (const entry of entries) {
-            if (entry.status !== 'fulfilled') continue
-            const [name, image] = entry.value
-            if (image) map[name] = image
-        }
-        return map
-    }
-
     // ===== 绑定 =====
     bindByToken(token) { return this.request('/skland/bind/token', 'POST', { token }) }
     sendCode(phone) { return this.request('/skland/send-code', 'POST', { phone }) }
